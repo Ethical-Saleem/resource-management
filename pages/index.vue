@@ -338,55 +338,26 @@ const drawMap = (geojsonData: GeoJSONData, resources: Resource[]) => {
 
   // Draw resources on the map
   filteredResources.value.forEach((resource) => {
-    const linkedFeatures =
-      selectedFilter.value === "state"
-        ? resource.stateResources.map((sr) =>
-            geojsonData.features.find((f) => f?.properties?.id === sr.stateId)
-          )
-        : resource.lgaResources.map((lr) =>
-            geojsonData.features.find((f) => f?.properties?.id === lr.lgaId)
-          );
+    resource.lgaResources.forEach((lgaResource) => {
+      const { locationLat, locationLong } = lgaResource;
 
-    linkedFeatures.forEach((feature) => {
-      if (!feature) return;
+      // Convert the lat/long to screen coordinates using the projection
+      const [x, y] = projection([locationLong, locationLat]) || [];
 
-      const centroid = path.centroid(
-        feature as unknown as GeoPermissibleObjects
-      );
-      const allResourcesInFeature = resources.filter((r) =>
-        selectedFilter.value === "state"
-          ? r.stateResources.some(
-              (sr) => sr.stateId === feature?.properties?.id
-            )
-          : r.lgaResources.some((lr) => lr.lgaId === feature?.properties?.id)
-      );
-
-      console.log('all-resources-feature', allResourcesInFeature);
-
-      // Calculate positions around the centroid
-      const radius = 15; // Distance from the centroid
-      const angleStep = (2 * Math.PI) / allResourcesInFeature.length;
-
-      allResourcesInFeature.forEach((res, index) => {
-        const angle = index * angleStep;
-        const x = centroid[0] + radius * Math.cos(angle);
-        const y = centroid[1] + radius * Math.sin(angle);
-
-        g.append("circle")
-          .attr("cx", x)
-          .attr("cy", y)
-          .attr("r", 3)
-          .attr("fill", res.colorCode)
-          .on("mouseover", function () {
-            d3.select(this).attr("r", 6); // Enlarge the circle on hover
-          })
-          .on("mouseout", function () {
-            d3.select(this).attr("r", 3); // Reset the circle size
-          })
-          .on("click", function () {
-            showResourceDetails(res);
-          });
-      });
+      g.append("circle")
+        .attr("cx", x ?? 0)
+        .attr("cy", y ?? 0)
+        .attr("r", 5) // Adjust radius as needed
+        .attr("fill", resource.colorCode)
+        .on("mouseover", function () {
+          d3.select(this).attr("r", 8); // Enlarge the circle on hover
+        })
+        .on("mouseout", function () {
+          d3.select(this).attr("r", 5); // Reset the circle size
+        })
+        .on("click", function () {
+          showResourceDetails(resource);
+        });
     });
   });
 

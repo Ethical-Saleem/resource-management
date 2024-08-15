@@ -41,6 +41,8 @@ export interface LgaResource {
   id: number;
   resourceId: number;
   lgaId: number;
+  locationLong: number;
+  locationLat: number
   resource: Resource;
   lga: Lga;
 }
