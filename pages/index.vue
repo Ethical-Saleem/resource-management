@@ -99,6 +99,7 @@
                     <USelectMenu
                       v-model="selectedResource"
                       :options="customOptions"
+                      searchable
                       option-attribute="name"
                       value-attribute="id"
                       placeholder="-- Select --"
