@@ -11,7 +11,7 @@ interface PieChartData {
 
 const analyticsStore = useAnalyticsStore();
 
-const resourceId = ref<number>(93);
+const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>(1);
 const states = ref([]);
 const resources = ref([] as Resource[]);

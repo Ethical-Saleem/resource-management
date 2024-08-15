@@ -18,6 +18,21 @@ interface Props {
   customOptions: any;
 }
 
+const items = [
+  [
+    {
+      label: "Resource Table",
+      icon: "i-heroicons-table-cells-20-solid",
+      to: '/resource-data',
+    },
+    {
+      label: "Resource Statistics",
+      icon: "i-heroicons-chart-bar-20-solid",
+      to: '/resource-statistics'
+    },
+  ],
+];
+
 const props = defineProps<Props>();
 const emit = defineEmits(['updateFilter', 'updateResource']);
 
@@ -52,10 +67,12 @@ watch(selectedResource, (newResource) => {
           <div class="group inline-flex items-center justify-center text-right">
             <div class="relative size-9 text-left" />
           </div>
-          <UButton
-            class="border-uimuted-200 block lg:hidden hover:ring-uimuted-200 dark:hover:ring-uimuted-700 dark:border-uimuted-700 dark:bg-uimuted-800 dark:ring-offset-uimuted-900 flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
-            icon="i-heroicons-squares-2x2"
-          />
+          <UDropdown :items="items" >
+            <UButton
+              class="border-uimuted-200 block hover:ring-uimuted-200 dark:hover:ring-uimuted-700 dark:border-uimuted-700 dark:bg-uimuted-800 dark:ring-offset-uimuted-900 flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
+              icon="i-heroicons-squares-2x2"
+            />
+          </UDropdown>
         </div>
       </div>
       <div class="p-4 flex-1 flex flex-col overflow-y-auto">

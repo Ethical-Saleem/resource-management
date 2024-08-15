@@ -375,13 +375,13 @@ const drawMap = (geojsonData: GeoJSONData, resources: Resource[]) => {
         g.append("circle")
           .attr("cx", x)
           .attr("cy", y)
-          .attr("r", 5)
+          .attr("r", 3)
           .attr("fill", res.colorCode)
           .on("mouseover", function () {
-            d3.select(this).attr("r", 9); // Enlarge the circle on hover
+            d3.select(this).attr("r", 6); // Enlarge the circle on hover
           })
           .on("mouseout", function () {
-            d3.select(this).attr("r", 6); // Reset the circle size
+            d3.select(this).attr("r", 3); // Reset the circle size
           })
           .on("click", function () {
             showResourceDetails(res);

@@ -36,7 +36,7 @@ interface BarChartData {
 const skip = ref(0);
 const take = ref(8);
 const hasMore = ref(true);
-const resourceId = ref<number>(93);
+const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>();
 const states = ref([]);
 const apiData = ref([] as BarChartData[]);
