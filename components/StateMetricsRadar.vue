@@ -98,7 +98,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UCard class="dark:to-muted-900 bg-gradient-to-b from-transparent to-white">
+  <UCard class="">
     <template #header>
       <div class="flex items-center justify-between">
         <div class="">
