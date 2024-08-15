@@ -47,7 +47,7 @@
           <div class="group inline-flex items-center justify-center text-right">
             <div class="relative size-9 text-left" />
           </div>
-          <UDropdown :items="items" >
+          <UDropdown :items="items">
             <UButton
               class="border-uimuted-200 block hover:ring-uimuted-200 dark:hover:ring-uimuted-700 dark:border-uimuted-700 dark:bg-uimuted-800 dark:ring-offset-uimuted-900 flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
               icon="i-heroicons-squares-2x2"
@@ -179,12 +179,12 @@ const items = [
     {
       label: "Resource Table",
       icon: "i-heroicons-table-cells-20-solid",
-      to: '/resource-data',
+      to: "/resource-data",
     },
     {
       label: "Resource Statistics",
       icon: "i-heroicons-chart-bar-20-solid",
-      to: '/resource-statistics'
+      to: "/resource-statistics",
     },
   ],
 ];
@@ -201,7 +201,7 @@ const openMobileBar = () => {
 
 const onFilterUpdate = (newFilter: string) => {
   selectedFilter.value = newFilter;
-  console.log('newFilter', newFilter)
+  console.log("newFilter", newFilter);
   loadMapData(); // Optionally load map data immediately
 };
 
@@ -334,7 +334,20 @@ const drawMap = (geojsonData: GeoJSONData, resources: Resource[]) => {
       : resources;
   });
 
-  console.log('filteredRes', filteredResources.value);
+  const tooltip = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("position", "absolute")
+    .style("visibility", "hidden")
+    .style("background-color", "white")
+    .style("border", "solid 1px #ccc")
+    .style("color", "green")
+    .style("padding", "8px")
+    .style("border-radius", "4px")
+    .style("pointer-events", "none");
+
+  console.log("filteredRes", filteredResources.value);
 
   // Draw resources on the map
   filteredResources.value.forEach((resource) => {
@@ -349,11 +362,27 @@ const drawMap = (geojsonData: GeoJSONData, resources: Resource[]) => {
         .attr("cy", y ?? 0)
         .attr("r", 5) // Adjust radius as needed
         .attr("fill", resource.colorCode)
-        .on("mouseover", function () {
+        .on("mouseover", function (event) {
           d3.select(this).attr("r", 8); // Enlarge the circle on hover
+          tooltip
+            .html(
+              `<strong style="color: ${resource.colorCode}">${resource.name}</strong> <br>
+               <strong>LGA:</strong> ${lgaResource.lga.name}<br>
+               <strong>Lat:</strong> ${locationLat}<br>
+               <strong>Long:</strong> ${locationLong}`
+            )
+            .style("visibility", "visible")
+            .style("top", `${event.pageY - 10}px`)
+            .style("left", `${event.pageX + 10}px`);
+        })
+        .on("mousemove", function (event) {
+          tooltip
+            .style("top", `${event.pageY - 10}px`)
+            .style("left", `${event.pageX + 10}px`);
         })
         .on("mouseout", function () {
           d3.select(this).attr("r", 5); // Reset the circle size
+          tooltip.style("visibility", "hidden");
         })
         .on("click", function () {
           showResourceDetails(resource);
