@@ -29,6 +29,12 @@
           <div class="col-span-12 md:col-span-7">
             <ResourceMetricCompareChart />
           </div>
+          <div class="col-span-12 md:col-span-6">
+            <StateResourceCompareRadar />
+          </div>
+          <div class="col-span-12 md:col-span-6">
+            <StateResourceBoxChart />
+          </div>
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@
         <ULink
           to="/"
           active-class="text-primary"
-          class="inline-flex ring-1 ring-primary-400 rounded-md p-2 items-center justify-center px-6"
+          class="inline-flex ring-1 ring-primary-400 bg-primary rounded-md p-2 items-center justify-center px-6"
           >View Map</ULink
         >
       </div>

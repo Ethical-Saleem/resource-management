@@ -93,6 +93,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
   resources.value = await useApi.get("/resource/fetch-resources-data");
+  resourceId.value = resources.value[0].id
   await fetchData();
 });
 </script>
