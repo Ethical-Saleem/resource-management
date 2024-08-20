@@ -92,36 +92,6 @@
               <div class="relative">
                 <div class="mb-3 flex items-center">
                   <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p class="pl-2">Resource Category</p>
-                </div>
-                <div class="">
-                  <UFormGroup>
-                    <USelectMenu
-                      v-model="selectedResourceCategory"
-                      :options="[
-                        { id: 1, name: 'Solid Minerals' },
-                        { id: 2, name: 'Energy Resource' },
-                        { id: 3, name: 'Agricultural Produce' },
-                      ]"
-                      searchable
-                      option-attribute="name"
-                      value-attribute="id"
-                      placeholder="-- Select --"
-                      @change="loadResources"
-                    />
-                  </UFormGroup>
-                </div>
-              </div>
-            </div>
-          </UCard>
-          <UCard
-            v-if="selectedResourceCategory"
-            class="ring-1 ring-primary-400 dark:ring-primary-500"
-          >
-            <div class="relative">
-              <div class="relative">
-                <div class="mb-3 flex items-center">
-                  <UIcon name="i-heroicons-adjustments-vertical" />
                   <p class="pl-2">Resource Filter</p>
                 </div>
                 <div class="">
@@ -139,6 +109,7 @@
               </div>
             </div>
           </UCard>
+          <UCard />
         </div>
       </div>
     </div>
@@ -181,7 +152,6 @@ import type {
 } from "geojson";
 import type { GeoPermissibleObjects } from "d3";
 import type { State, Lga, Resource } from "~/types";
-import { useLoadingStore } from "~/stores/loading-store";
 import { useApi } from "~/composables/useApi";
 import MapSidePanel from "~/components/MapSidepanel.vue";
 
@@ -192,14 +162,11 @@ interface GeoJSONData extends FeatureCollection {
   features: GeoJsonFeature[];
 }
 
-const loadingStore = useLoadingStore();
-
 // State for the map container and selected filters
 const mapContainer = ref<HTMLDivElement | null>(null);
 const geojsonData = ref<GeoJSONData | null>(null);
 const selectedFilter = ref("state");
 const selectedResource = ref<number | string>("");
-const selectedResourceCategory = ref<number | null>(null);
 const selectedStateOrLga = ref<State | Lga | null>(null);
 const clickedResource = ref<Resource | null>(null);
 const isModal = ref(false);
@@ -297,7 +264,7 @@ const handleResize = () => {
 const availableResources = ref<Resource[]>([]);
 
 // Function to draw the map using D3.js
-const drawMap = (geojsonData: GeoJSONData) => {
+const drawMap = (geojsonData: GeoJSONData, resources: Resource[]) => {
   if (!mapContainer.value) return;
 
   // Clear existing SVG
@@ -326,6 +293,7 @@ const drawMap = (geojsonData: GeoJSONData) => {
     .append("path")
     .attr("d", (d: GeoJsonFeature) => path(d as GeoPermissibleObjects) || "")
     .attr("opacity", 0.4)
+    // .attr("fill", "#46fc54")
     .attr("stroke", "#fff")
     .attr("stroke-width", 2)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -333,10 +301,12 @@ const drawMap = (geojsonData: GeoJSONData) => {
       showStateOrLga(d);
     })
     .on("mouseover", function (event, d) {
-      d3.select(this).attr("opacity", 0.7);
+      d3.select(this).attr("opacity", 0.7); // Highlight the tile on hover
 
+      // Get the centroid of the hovered feature
       const centroid = path.centroid(d);
 
+      // Append a text element at the centroid
       g.append("text")
         .attr("x", centroid[0])
         .attr("y", centroid[1])
@@ -345,37 +315,17 @@ const drawMap = (geojsonData: GeoJSONData) => {
         .attr("font-size", "12px")
         .attr("font-weight", "bold")
         .attr("fill", "#ffffff")
-        .attr("class", "hover-label")
-        .text(d?.properties?.name);
+        .attr("class", "hover-label") // Class for the hover label
+        .text(d?.properties?.name); // Assuming 'name' is the property containing the name of the state or LGA
     })
     .on("mouseout", function () {
-      d3.select(this).attr("opacity", 0.5);
+      d3.select(this).attr("opacity", 0.5); // Reset opacity
+
+      // Remove the hover label when the mouse moves away
       g.selectAll(".hover-label").remove();
     });
 
-  // Setup zoom behavior
-  const zoom = d3
-    .zoom<SVGSVGElement, unknown>()
-    .scaleExtent([1, 8])
-    .on("zoom", (event) => {
-      g.attr("transform", event.transform);
-    });
-
-  svg.call(zoom);
-
-  // Zoom controls
-  const zoomIn = () => svg.transition().call(zoom.scaleBy, 1.2);
-  const zoomOut = () => svg.transition().call(zoom.scaleBy, 0.8);
-
-  document.querySelector("#zoomInButton")?.addEventListener("click", zoomIn);
-  document.querySelector("#zoomOutButton")?.addEventListener("click", zoomOut);
-
-  adjustSvgSize();
-};
-
-const drawResources = (resources: Resource[]) => {
-  if (!mapContainer.value || !geojsonData.value) return;
-
+  // Filter resources based on selectedResource
   const filteredResources = computed(() => {
     return selectedResource.value
       ? resources.filter(
@@ -383,11 +333,6 @@ const drawResources = (resources: Resource[]) => {
         )
       : resources;
   });
-
-  const width = mapContainer.value.clientWidth;
-  const height = mapContainer.value.clientHeight;
-
-  const g = d3.select(mapContainer.value).select("g");
 
   const tooltip = d3
     .select("body")
@@ -402,23 +347,23 @@ const drawResources = (resources: Resource[]) => {
     .style("border-radius", "4px")
     .style("pointer-events", "none");
 
-  const projection: GeoProjection = d3
-    .geoMercator()
-    .fitSize([width, height], geojsonData.value);
+  console.log("filteredRes", filteredResources.value);
 
+  // Draw resources on the map
   filteredResources.value.forEach((resource) => {
     resource.lgaResources.forEach((lgaResource) => {
       const { locationLat, locationLong } = lgaResource;
 
+      // Convert the lat/long to screen coordinates using the projection
       const [x, y] = projection([locationLong, locationLat]) || [];
 
       g.append("circle")
         .attr("cx", x ?? 0)
         .attr("cy", y ?? 0)
-        .attr("r", 5)
+        .attr("r", 5) // Adjust radius as needed
         .attr("fill", resource.colorCode)
         .on("mouseover", function (event) {
-          d3.select(this).attr("r", 8);
+          d3.select(this).attr("r", 8); // Enlarge the circle on hover
           tooltip
             .html(
               `<strong style="color: ${resource.colorCode}">${resource.name}</strong> <br>
@@ -436,7 +381,7 @@ const drawResources = (resources: Resource[]) => {
             .style("left", `${event.pageX + 10}px`);
         })
         .on("mouseout", function () {
-          d3.select(this).attr("r", 5);
+          d3.select(this).attr("r", 5); // Reset the circle size
           tooltip.style("visibility", "hidden");
         })
         .on("click", function () {
@@ -444,54 +389,62 @@ const drawResources = (resources: Resource[]) => {
         });
     });
   });
+
+  const zoom = d3
+    .zoom<SVGSVGElement, unknown>()
+    .scaleExtent([1, 8]) // Set min and max zoom levels
+    .on("zoom", (event) => {
+      g.attr("transform", event.transform); // Apply zoom and pan transform to the group
+    });
+
+  svg.call(zoom); // Apply zoom behavior to the SVG
+
+  // Zoom in and out controls
+  const zoomIn = () => {
+    svg.transition().call(zoom.scaleBy, 1.2); // Zoom in by 20%
+  };
+
+  const zoomOut = () => {
+    svg.transition().call(zoom.scaleBy, 0.8); // Zoom out by 20%
+  };
+
+  // Assuming you have buttons for zoom controls in your template
+  const zoomInButton = document.querySelector("#zoomInButton");
+  const zoomOutButton = document.querySelector("#zoomOutButton");
+
+  if (zoomInButton) {
+    zoomInButton.addEventListener("click", zoomIn);
+  }
+
+  if (zoomOutButton) {
+    zoomOutButton.addEventListener("click", zoomOut);
+  }
+
+  adjustSvgSize();
 };
 
 // Function to load GeoJSON and resource data
 const loadMapData = async () => {
-  loadingStore.showLoading();
-  try {
-    const geoData: GeoJSONData = await useApi.get(
-      `/territory/fetch-geojson/${selectedFilter.value}`
-    );
-    geojsonData.value = geoData;
-    drawMap(geoData);
-  } catch (error) {
-    console.error("Error loading GeoJSON data:", error);
-  } finally {
-    loadingStore.hideLoading();
-    console.log("loading", loadingStore.isLoading);
-  }
+  const geojsonData: GeoJSONData = await useApi.get(
+    `/territory/fetch-geojson/${selectedFilter.value}`
+  );
+  const resources: Resource[] = await useApi.get(
+    "/resource/fetch-all-resources"
+  );
+  availableResources.value = resources;
+  console.log(geojsonData);
+  drawMap(geojsonData, resources);
 };
 
-const loadResources = async () => {
-  loadingStore.showLoading();
-  try {
-    if (selectedResourceCategory.value) {
-      const resources: Resource[] = await useApi.get(
-        `/resource/fetch-resources-by-category/${selectedResourceCategory.value}`
-      );
-      availableResources.value = resources;
-      drawResources(resources);
-      console.log("res", resources);
-    }
-  } catch (error) {
-    console.error("Error loading resources:", error);
-  } finally {
-    loadingStore.hideLoading();
-  }
-};
-
-watch([selectedFilter, selectedResource], async () => {
-  await loadMapData(); // Show overlay during GeoJSON loading
-  drawResources(availableResources.value);
-});
+// Watch for filter changes and redraw the map
+watch([selectedFilter, selectedResource], loadMapData);
 
 // Initialize map on mount
 onMounted(async () => {
   window.addEventListener("resize", handleResize);
 
   // Initial map draw
-  await loadMapData();
+  loadMapData();
   adjustSvgSize();
 });
 
