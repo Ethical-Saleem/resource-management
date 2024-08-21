@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Radar } from "vue-chartjs";
 import { useAnalyticsStore } from "~/stores/analytics-store";
+import { useLoadingStore } from "~/stores/loading-store";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -33,6 +34,7 @@ interface StateMetric {
 }
 
 const analyticsStore = useAnalyticsStore();
+const loadingStore = useLoadingStore();
 
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>();
@@ -76,11 +78,18 @@ const chartData = computed(() => {
 });
 
 const fetchData = async () => {
-  const data = await analyticsStore.dispatchFetchStateLevelMetrics(
+  loadingStore.showLoading()
+  try {
+    const data = await analyticsStore.dispatchFetchStateLevelMetrics(
     resourceId.value,
     selectedStateId.value
   );
   stateMetrics.value = data;
+  } catch (error) {
+    console.log(error)
+  } finally {
+    loadingStore.hideLoading()
+  }
 };
 
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -93,7 +102,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
   resources.value = await useApi.get("/resource/fetch-resources-data");
-  resourceId.value = resources.value[0].id
+  resourceId.value = resources.value[0].id;
   await fetchData();
 });
 </script>
@@ -102,8 +111,27 @@ onMounted(async () => {
   <UCard class="">
     <template #header>
       <div class="flex items-center justify-between">
-        <div class="">
-          <h6 class="text-sm">State Level Metrics</h6>
+        <div class="flex items-center">
+          <h6 class="text-sm pr-1">State Level Metrics</h6>
+          <UPopover mode="hover">
+            <UButton label="?" variant="ghost" class="text-lg" />
+            <template #panel>
+              <div
+                class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
+              >
+                This radar chart compares various metrics for a specific
+                resource across different states. The chart shows how each state
+                performs in areas like market value, quality, and investment
+                opportunities. By hovering over the chart, you can see detailed
+                information on each metric, helping you quickly understand where
+                a state excels or needs improvement in resource management.
+                <br><br>
+                0 - 3 : Low <br>
+                4 - 6 : Average <br>
+                7 - 10 : High
+              </div>
+            </template>
+          </UPopover>
         </div>
       </div>
     </template>

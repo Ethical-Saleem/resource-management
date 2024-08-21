@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Radar } from "vue-chartjs";
 import { useAnalyticsStore } from "~/stores/analytics-store";
+import { useLoadingStore } from "~/stores/loading-store";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -43,6 +44,7 @@ interface StateMetric {
 }
 
 const analyticsStore = useAnalyticsStore();
+const loadingStore = useLoadingStore();
 
 const resourceId1 = ref<number>(93);
 const resourceId2 = ref<number>(94);
@@ -101,12 +103,19 @@ const chartData = computed(() => {
 });
 
 const fetchData = async () => {
-  const data = await analyticsStore.dispatchFetchStateResourceCompareMetrics(
-    resourceId1.value,
-    resourceId2.value,
-    selectedStateId.value
-  );
-  stateMetrics.value = data;
+  loadingStore.showLoading();
+  try {
+    const data = await analyticsStore.dispatchFetchStateResourceCompareMetrics(
+      resourceId1.value,
+      resourceId2.value,
+      selectedStateId.value
+    );
+    stateMetrics.value = data;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingStore.hideLoading();
+  }
 };
 
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -135,8 +144,28 @@ onMounted(async () => {
   <UCard class="">
     <template #header>
       <div class="flex items-center justify-between">
-        <div class="">
-          <h6 class="text-sm">State Level Metrics</h6>
+        <div class="flex items-center">
+          <h6 class="text-sm pr-1">State Level Metrics</h6>
+          <UPopover mode="hover">
+            <UButton label="?" variant="ghost" class="text-lg" />
+            <template #panel>
+              <div
+                class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
+              >
+                This chart compares two resources across various states,
+                evaluating key metrics like market value, quality, access to
+                market, environmental impact, and investment opportunities. The
+                chart helps you visually understand how these resources perform
+                in different regions, highlighting areas of strength or concern
+                for each resource. Hover over a state to see the specific metric
+                values for both resources side by side, enabling a detailed
+                comparison. <br /><br />
+                0 - 3 : Low <br />
+                4 - 6 : Average <br />
+                7 - 10 : High
+              </div>
+            </template>
+          </UPopover>
         </div>
       </div>
     </template>

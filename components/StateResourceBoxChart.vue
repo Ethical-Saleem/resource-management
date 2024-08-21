@@ -1,11 +1,13 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import { useAnalyticsStore } from "~/stores/analytics-store";
-import * as echarts from 'echarts'
+import { useLoadingStore } from "~/stores/loading-store";
+import * as echarts from "echarts";
 
 import type { Resource, State } from "~/types";
 
-const analyticsStore = useAnalyticsStore()
+const analyticsStore = useAnalyticsStore();
+const loadingStore = useLoadingStore();
 
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number>(1);
@@ -20,11 +22,17 @@ const boxPlotContainer = ref<HTMLDivElement | null>(null);
 let myChart: echarts.ECharts | null = null;
 
 const fetchBoxPlotData = async () => {
+  loadingStore.showLoading()
   try {
-    const data = await analyticsStore.dispatchFetchStateResourceOutliers(resourceId.value, selectedStateId.value);
+    const data = await analyticsStore.dispatchFetchStateResourceOutliers(
+      resourceId.value,
+      selectedStateId.value
+    );
     initializeChart(data);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error("Error fetching data:", error);
+  } finally {
+    loadingStore.hideLoading()
   }
 };
 
@@ -38,23 +46,23 @@ const initializeChart = (data: any) => {
 
     const option: echarts.EChartsOption = {
       tooltip: {
-        trigger: 'item',
+        trigger: "item",
         formatter: (params: any) => `${params.seriesName}: ${params.value}`,
       },
       xAxis: {
-        type: 'category',
-        data: ['Quantity Rating', 'Market Value'],
+        type: "category",
+        data: ["Quantity Rating", "Market Value"],
       },
       yAxis: {
-        type: 'value',
-        name: 'Value',
-        nameLocation: 'middle',
+        type: "value",
+        name: "Value",
+        nameLocation: "middle",
         nameGap: 30,
       },
       series: [
         {
-          name: 'Quantity Rating',
-          type: 'boxplot',
+          name: "Quantity Rating",
+          type: "boxplot",
           data: [
             [
               data.quantityRating.min,
@@ -66,8 +74,8 @@ const initializeChart = (data: any) => {
           ],
         },
         {
-          name: 'Market Value',
-          type: 'boxplot',
+          name: "Market Value",
+          type: "boxplot",
           data: [
             [
               data.marketValue.min,
@@ -79,11 +87,17 @@ const initializeChart = (data: any) => {
           ],
         },
         {
-          name: 'Outliers',
-          type: 'scatter',
+          name: "Outliers",
+          type: "scatter",
           data: [
-            ...data.quantityRating.outliers.map((v: number) => ['Quantity Rating', v]),
-            ...data.marketValue.outliers.map((v: number) => ['Market Value', v]),
+            ...data.quantityRating.outliers.map((v: number) => [
+              "Quantity Rating",
+              v,
+            ]),
+            ...data.marketValue.outliers.map((v: number) => [
+              "Market Value",
+              v,
+            ]),
           ],
           tooltip: {
             formatter: (params: any) => `Outlier: ${params.value[1]}`,
@@ -94,7 +108,7 @@ const initializeChart = (data: any) => {
 
     myChart.setOption(option);
   } else {
-    console.error('Box plot container is not available.');
+    console.error("Box plot container is not available.");
   }
 };
 
@@ -103,16 +117,36 @@ onMounted(async () => {
   resources.value = await useApi.get("/resource/fetch-resources-data");
   resourceId.value = resources.value[0].id;
   selectedStateId.value = states.value[0].id;
-  await fetchBoxPlotData()
+  await fetchBoxPlotData();
 });
 </script>
 
 <template>
-    <UCard class="">
+  <UCard class="">
     <template #header>
       <div class="flex items-center justify-between">
-        <div class="">
-          <h6 class="text-sm">State Level Metrics</h6>
+        <div class="flex items-center">
+          <h6 class="text-sm pr-1">State Level Metrics</h6>
+          <UPopover mode="hover">
+            <UButton label="?" variant="ghost" class="text-lg" />
+            <template #panel>
+              <div
+                class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
+              >
+                This box plot chart illustrates the distribution of two key
+                metrics — quantity rating and market value — for a specific
+                resource across different Local Government Areas (LGAs). The
+                chart shows the spread of these metrics, including their
+                minimum, maximum, median, and quartiles. By examining the box
+                plot, you can quickly assess the range and variability of these
+                metrics, helping to identify trends and outliers in the resource
+                data. <br><br>
+                0 - 3 : Low <br>
+                4 - 6 : Average <br>
+                7 - 10 : High
+              </div>
+            </template>
+          </UPopover>
         </div>
       </div>
     </template>
@@ -141,7 +175,7 @@ onMounted(async () => {
       </UFormGroup>
     </div>
     <div class="">
-        <div ref="boxPlotContainer" style="width: 100%; height: 400px;"/>
+      <div ref="boxPlotContainer" style="width: 100%; height: 400px" />
     </div>
   </UCard>
 </template>

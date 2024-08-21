@@ -6,6 +6,10 @@ import type { Resource } from "~/types";
 const loadingStore = useLoadingStore();
 const router = useRouter();
 
+definePageMeta({
+  layout: "withheader"
+})
+
 const columns = [
   { key: "name", label: "Name", sortable: true },
   { key: "category.name", label: "Category", sortable: true },
@@ -23,22 +27,6 @@ const items = (row: { id: number; name: string }) => [
     {
       label: "Duplicate",
       icon: "i-heroicons-document-duplicate-20-solid",
-    },
-  ],
-  [
-    {
-      label: "Archive",
-      icon: "i-heroicons-archive-box-20-solid",
-    },
-    {
-      label: "Move",
-      icon: "i-heroicons-arrow-right-circle-20-solid",
-    },
-  ],
-  [
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash-20-solid",
     },
   ],
 ];
@@ -105,144 +93,141 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <NavHeader />
-    <div class="stat-bg overflow-y-auto p-4 pt-32">
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h4 class="text-xl">Resources Bank</h4>
-            <div class="flex">
-              <UButton
-                color="uiyellow"
-                variant="ghost"
-                icon="i-heroicons-arrow-path-20-solid"
-                class="mr-3"
-                :loading="fetching"
-                @click="fetchData()"
-              />
-              <UButton
-                color="uiyellow"
-                variant="outline"
-                label="More"
-                trailing-icon="i-heroicons-chevron-down-20-solid"
-              />
-            </div>
+  <div class="">
+    <UCard>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h4 class="text-xl">Resources Bank</h4>
+          <div class="flex">
+            <UButton
+              color="uiyellow"
+              variant="ghost"
+              icon="i-heroicons-arrow-path-20-solid"
+              class="mr-3"
+              :loading="fetching"
+              @click="fetchData()"
+            />
+            <UButton
+              color="uiyellow"
+              variant="outline"
+              label="More"
+              trailing-icon="i-heroicons-chevron-down-20-solid"
+            />
           </div>
-        </template>
+        </div>
+      </template>
 
-        <div class="flex items-center justify-between gap-3 px-4 py-3 mb-4">
-          <UInput
-            v-model="q"
-            icon="i-heroicons-magnifying-glass-20-solid"
-            placeholder="Search..."
+      <div class="flex items-center justify-between gap-3 px-4 py-3 mb-4">
+        <UInput
+          v-model="q"
+          icon="i-heroicons-magnifying-glass-20-solid"
+          placeholder="Search..."
+        />
+      </div>
+
+      <div class="flex justify-between items-center w-full px-4 py-3">
+        <div class="flex items-center gap-1.5">
+          <span class="text-sm leading-5">Rows per page:</span>
+
+          <USelect
+            v-model="pageCount"
+            :options="[3, 5, 10, 20, 30, 40]"
+            class="me-2 w-20"
+            size="xs"
           />
         </div>
 
-        <div class="flex justify-between items-center w-full px-4 py-3">
-          <div class="flex items-center gap-1.5">
-            <span class="text-sm leading-5">Rows per page:</span>
-
-            <USelect
-              v-model="pageCount"
-              :options="[3, 5, 10, 20, 30, 40]"
-              class="me-2 w-20"
-              size="xs"
-            />
-          </div>
-
-          <div class="flex gap-1.5 items-center">
-            <USelectMenu v-model="selectedColumns" :options="columns" multiple>
-              <UButton icon="i-heroicons-view-columns" color="gray" size="xs">
-                Columns
-              </UButton>
-            </USelectMenu>
-
-            <UButton
-              icon="i-heroicons-funnel"
-              color="gray"
-              size="xs"
-              :disabled="q === '' && selectedStatus.length === 0"
-              @click="resetFilters"
-            >
-              Reset
+        <div class="flex gap-1.5 items-center">
+          <USelectMenu v-model="selectedColumns" :options="columns" multiple>
+            <UButton icon="i-heroicons-view-columns" color="gray" size="xs">
+              Columns
             </UButton>
-          </div>
+          </USelectMenu>
+
+          <UButton
+            icon="i-heroicons-funnel"
+            color="gray"
+            size="xs"
+            :disabled="q === '' && selectedStatus.length === 0"
+            @click="resetFilters"
+          >
+            Reset
+          </UButton>
         </div>
+      </div>
 
-        <UTable
-          :rows="paginatedFilteredData"
-          :columns="tableColumns"
-          class="w-full"
-          :ui="{
-            table: 'table-relative',
-            tbody: 'divide-y divide-uicream-200 dark:divide-uicream-700',
-            tr: {
-              base: 'whitespace-nowrap',
-              padding: 'px-4 py-4',
-              color: 'text-gray-500 dark:text-gray-400',
-              font: '',
-              size: 'text-sm',
-            },
-            td: {
-              base: 'whitespace-nowrap',
-              padding: 'px-4 py-4',
-              color: 'text-gray-500 dark:text-gray-400',
-              font: '',
-              size: 'text-sm',
-            },
-            default: {
-              checkbox: { color: 'uiyellow', base: 'hidden md:block' },
-            },
-          }"
-        >
-          <template #actions-data="{ row }">
-            <UDropdown :items="items(row)">
-              <UButton
-                color="gray"
-                variant="ghost"
-                icon="i-heroicons-ellipsis-horizontal-20-solid"
-              />
-            </UDropdown>
-          </template>
-          <template #colorCode-data="{ row }">
-            <div :class="`flex items-center`">
-              <span class="p-2" :style="`background-color: ${row.colorCode}`" />
-              <span class="pl-2">{{ row.colorCode.toUpperCase() }}</span>
-            </div>
-          </template>
-        </UTable>
-
-        <template #footer>
-          <div class="flex flex-wrap items-center justify-between">
-            <div>
-              <span class="text-sm leading-5">
-                Showing
-                <span class="font-medium">{{ pageFrom }}</span>
-                to
-                <span class="font-medium">{{ pageTo }}</span>
-                of
-                <span class="font-medium">{{ pageTotal }}</span>
-                results
-              </span>
-            </div>
-            <UPagination
-              v-model="page"
-              :page-count="pageCount"
-              :total="filteredData.length"
-              :ui="{
-                wrapper: 'flex items-center gap-1',
-                default: {
-                  activeButton: {
-                    variant: 'outline',
-                    color: 'uired',
-                  },
-                },
-              }"
+      <UTable
+        :rows="paginatedFilteredData"
+        :columns="tableColumns"
+        class="w-full"
+        :ui="{
+          table: 'table-relative',
+          tbody: 'divide-y divide-uicream-200 dark:divide-uicream-700',
+          tr: {
+            base: 'whitespace-nowrap',
+            padding: 'px-4 py-4',
+            color: 'text-gray-500 dark:text-gray-400',
+            font: '',
+            size: 'text-sm',
+          },
+          td: {
+            base: 'whitespace-nowrap',
+            padding: 'px-4 py-4',
+            color: 'text-gray-500 dark:text-gray-400',
+            font: '',
+            size: 'text-sm',
+          },
+          default: {
+            checkbox: { color: 'uiyellow', base: 'hidden md:block' },
+          },
+        }"
+      >
+        <template #actions-data="{ row }">
+          <UDropdown :items="items(row)">
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-ellipsis-horizontal-20-solid"
             />
+          </UDropdown>
+        </template>
+        <template #colorCode-data="{ row }">
+          <div :class="`flex items-center`">
+            <span class="p-2" :style="`background-color: ${row.colorCode}`" />
+            <span class="pl-2">{{ row.colorCode.toUpperCase() }}</span>
           </div>
         </template>
-      </UCard>
-    </div>
+      </UTable>
+
+      <template #footer>
+        <div class="flex flex-wrap items-center justify-between">
+          <div>
+            <span class="text-sm leading-5">
+              Showing
+              <span class="font-medium">{{ pageFrom }}</span>
+              to
+              <span class="font-medium">{{ pageTo }}</span>
+              of
+              <span class="font-medium">{{ pageTotal }}</span>
+              results
+            </span>
+          </div>
+          <UPagination
+            v-model="page"
+            :page-count="pageCount"
+            :total="filteredData.length"
+            :ui="{
+              wrapper: 'flex items-center gap-1',
+              default: {
+                activeButton: {
+                  variant: 'outline',
+                  color: 'uired',
+                },
+              },
+            }"
+          />
+        </div>
+      </template>
+    </UCard>
   </div>
 </template>

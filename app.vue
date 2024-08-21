@@ -82,7 +82,7 @@ const loadingStore = useLoadingStore();
 .progress-bar {
   width: 20%;
   height: 8px;
-  background-color: #f3f3f3;
+  background-color: #d1eca5;
   border-radius: 4px;
   overflow: hidden;
   position: relative;
@@ -93,7 +93,7 @@ const loadingStore = useLoadingStore();
   position: absolute;
   width: 40%;
   height: 100%;
-  background-color: #3498db;
+  background-color: #d292ff;
   animation: moveBackAndForth 2s linear infinite;
 }
 
