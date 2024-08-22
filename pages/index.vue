@@ -37,7 +37,7 @@
       <div
         class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent"
       >
-        <p class="" />
+      <NuxtImg src="/img/logo_1.png" width="60" height="60" />
         <div class="flex items-center gap-2">
           <ColorScheme
             ><USelect
@@ -191,6 +191,13 @@ interface GeoJSONData extends FeatureCollection {
   type: "FeatureCollection";
   features: GeoJsonFeature[];
 }
+
+useHead({
+  title: 'Home',
+  meta: [
+    { name: 'description', content: 'Map showing the various resource distributions in the country' },
+  ],
+})
 
 const loadingStore = useLoadingStore();
 

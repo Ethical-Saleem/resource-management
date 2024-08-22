@@ -7,7 +7,15 @@ const loadingStore = useLoadingStore();
 const route = useRoute();
 
 definePageMeta({
-  layout: "withheader"
+  layout: "withheader",
+})
+
+useHead({
+  title: 'Resource Data',
+  meta: [
+    { name: 'description', content: 'Data Table showing the varoius resources and their distribution across the country (Nigeria)' },
+    { property: 'og:title', content: `Resource Xplore - ${route.query.resource}` }
+  ],
 })
 
 const columns = [

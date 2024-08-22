@@ -2,6 +2,13 @@
 definePageMeta({
   layout: "withheader",
 });
+
+useHead({
+  title: 'Statistical Data',
+  meta: [
+    { name: 'description', content: 'Statistical data on the resource distribution in the 36 states in Nigeria' }
+  ],
+})
 </script>
 
 <template>

@@ -2,6 +2,21 @@
 import { useLoadingStore } from "~/stores/loading-store";
 
 const loadingStore = useLoadingStore();
+
+useSeoMeta({
+  title: 'Resource Xplore',
+  ogTitle: 'Resource Xplore',
+  description: 'This is a platform showing the various resource distribution within the country',
+  ogDescription: 'This is a platform showing the various resource distribution within the country',
+  ogImage: '/img/logo_1.png',
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  titleTemplate: (titleChunk) => {
+    return titleChunk ? `${titleChunk} - Resource Xplore` : 'Resource Xplore';
+  }
+})
 </script>
 
 <template>

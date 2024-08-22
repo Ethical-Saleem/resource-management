@@ -5,9 +5,19 @@ import type { Resource } from "~/types";
 
 const loadingStore = useLoadingStore();
 const router = useRouter();
+const route = useRoute()
 
 definePageMeta({
-  layout: "withheader"
+  layout: "withheader",
+  title: 'Resource Data',
+})
+
+useHead({
+  title: 'Resource Data',
+  meta: [
+    { name: 'description', content: 'Data Table showing the varoius resources and their distribution across the country (Nigeria)' },
+    { property: 'og:title', content: `Resource Xplore - ${route.meta.title}` }
+  ],
 })
 
 const columns = [
