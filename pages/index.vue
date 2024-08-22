@@ -11,13 +11,13 @@
           <UButton
             id="zoomInButton"
             size="sm"
-            class="text-white rounded-md shadow-md hover:bg-gray-200"
+            class="text-white rounded-md shadow-md bg-uigreen-600 hover:bg-uigreen-500"
             icon="i-heroicons-plus"
           />
           <UButton
             id="zoomOutButton"
             size="sm"
-            class="text-white rounded-md shadow-md hover:bg-gray-200"
+            class="text-white rounded-md shadow-md bg-uigreen-600 hover:bg-uigreen-500"
             icon="i-heroicons-minus"
           />
         </div>
@@ -25,14 +25,15 @@
       <div class="absolute" style="display: none; visibility: hidden" />
     </div>
     <UButton
-      class="fixed bottom-4 right-4 z-20 text-white rounded-full shadow-md lg:hidden"
+      class="fixed bottom-4 right-4 z-20 text-white ring-2 ring-green-500 text-green-500 rounded-full shadow-md lg:hidden"
       variant="outline"
+      color="uiearth"
       @click="openMobileBar"
     >
       <UIcon name="i-heroicons-adjustments-vertical" />
     </UButton>
     <div
-      class="flex-col items-stretch relative w-full border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 lg:w-[300px] flex-shrink-0 hidden lg:flex"
+      class="flex-col items-stretch relative w-full bg-uiearth-950 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 lg:w-[300px] flex-shrink-0 hidden lg:flex"
     >
       <div
         class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent py-2"
@@ -49,26 +50,26 @@
           </div>
           <UDropdown :items="items">
             <UButton
-              class="border-uimuted-200 block hover:ring-uimuted-200 dark:hover:ring-uimuted-700 dark:border-uimuted-700 dark:bg-uimuted-800 dark:ring-offset-uimuted-900 flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
+              class="border-uigreen-600 bg-uigreen-600 block hover:ring-uigreen-200 dark:hover:ring-uiearth-700 dark:border-uiearth-700 dark:bg-uiearth-600 dark:ring-offset-uiearth-900 flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
               icon="i-heroicons-squares-2x2"
             />
           </UDropdown>
         </div>
       </div>
       <div class="p-4 flex-1 flex flex-col overflow-y-auto">
-        <p class="font-medium text-lg flex items-center mb-3">
+        <p class="font-medium text-lg text-uiearth-200 flex items-center mb-3">
           <UIcon name="i-heroicons-funnel" class="" />
           <span class="pl-2">Filters</span>
         </p>
         <div
           class="ptablet:flex-none ptablet:grid ptablet:grid-cols-2 ptablet:pb-10 flex flex-col gap-4"
         >
-          <UCard class="ring-1 ring-primary-400 dark:ring-primary-500">
+          <UCard class="ring-1 ring-uigreen-400 bg-uiearth-800 dark:ring-uigreen-500 dark:bg-uiearth-500">
             <div class="relative">
               <div class="relative">
-                <div class="mb-3 flex items-center">
+                <div class="mb-3 flex items-center text-uiearth-200">
                   <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p class="pl-2">Map Filter</p>
+                  <p class="pl-2 text-uiearth-50">Map Filter</p>
                 </div>
                 <div class="">
                   <UFormGroup>
@@ -87,12 +88,12 @@
               </div>
             </div>
           </UCard>
-          <UCard class="ring-1 ring-primary-400 dark:ring-primary-500">
+          <UCard class="ring-1 ring-uigreen-400 bg-uiearth-800 dark:ring-uigreen-500 dark:bg-uiearth-500">
             <div class="relative">
               <div class="relative">
-                <div class="mb-3 flex items-center">
+                <div class="mb-3 flex items-center text-uiearth-200">
                   <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p class="pl-2">Resource Category</p>
+                  <p class="pl-2 text-uiearth-50">Resource Category</p>
                 </div>
                 <div class="">
                   <UFormGroup>
@@ -116,13 +117,13 @@
           </UCard>
           <UCard
             v-if="selectedResourceCategory"
-            class="ring-1 ring-primary-400 dark:ring-primary-500"
+            class="ring-1 ring-uigreen-400 bg-uiearth-800 dark:ring-uigreen-500 dark:bg-uiearth-500"
           >
             <div class="relative">
               <div class="relative">
-                <div class="mb-3 flex items-center">
+                <div class="mb-3 flex items-center text-uiearth-200">
                   <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p class="pl-2">Resource Filter</p>
+                  <p class="pl-2 text-uiearth-50">Resource Filter</p>
                 </div>
                 <div class="">
                   <UFormGroup>
@@ -332,8 +333,8 @@ const drawMap = (geojsonData: GeoJSONData) => {
     .enter()
     .append("path")
     .attr("d", (d: GeoJsonFeature) => path(d as GeoPermissibleObjects) || "")
-    .attr("opacity", 0.4)
-    .attr("stroke", "#fff")
+    .attr("opacity", 0.8)
+    .attr("stroke", "#9c4010")
     .attr("stroke-width", 2)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .on("click", (event, d: any) => {
@@ -524,10 +525,14 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("/img/map_bg_3.PNG");
+  background-image: linear-gradient(
+      rgba(252, 136, 19, 0.5), /* Adjust the opacity here */
+      rgba(252, 136, 19, 0.5)
+    ),
+    url("/img/map_bg_3.PNG");
   background-size: cover;
   background-position: center;
-  opacity: 0.4; /* Adjust this value to control opacity */
+  opacity: 1; /* Adjust this value to control opacity */
   z-index: -1; /* Ensures the background is behind the content */
 }
 </style>
