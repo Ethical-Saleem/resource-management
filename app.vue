@@ -15,7 +15,11 @@ useSeoMeta({
 useHead({
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} - Resource Xplore` : 'Resource Xplore';
-  }
+  },
+  link: [
+    { rel: 'icon', type: 'img/png', href: '/img/favicon-32x32.png' },
+    { rel: 'icon', type: 'img/png', href: '/img/favicon-16x16.png' },
+  ],
 })
 </script>
 
