@@ -8,7 +8,7 @@ useSeoMeta({
   ogTitle: 'Resource Xplore',
   description: 'This is a platform showing the various resource distribution within the country',
   ogDescription: 'This is a platform showing the various resource distribution within the country',
-  ogImage: '/img/logo_1.png',
+  ogImage: '/img/logo_5.png',
   twitterCard: 'summary_large_image',
 })
 
