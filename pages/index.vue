@@ -35,9 +35,9 @@
       class="flex-col items-stretch relative w-full border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 lg:w-[300px] flex-shrink-0 hidden lg:flex"
     >
       <div
-        class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent"
+        class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent py-2"
       >
-      <NuxtImg src="/img/logo_5.png" width="60" height="60" />
+      <NuxtImg src="/img/logo_5.png" width="70" height="70" />
         <div class="flex items-center gap-2">
           <ColorScheme
             ><USelect
