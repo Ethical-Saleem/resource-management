@@ -37,7 +37,7 @@
       <div
         class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent"
       >
-      <NuxtImg src="/img/logo_1.png" width="60" height="60" />
+      <NuxtImg src="/img/logo_5.png" width="60" height="60" />
         <div class="flex items-center gap-2">
           <ColorScheme
             ><USelect
