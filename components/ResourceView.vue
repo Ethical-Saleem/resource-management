@@ -29,6 +29,19 @@ const cardBgClass = computed(() => {
   }
 });
 
+const viewButtonClass = computed(() => {
+  switch (currentCategory.value) {
+    case 1:
+      return "uiearth";
+    case 2:
+      return "uiyellow";
+    case 3:
+      return "uigreen";
+    default:
+      return "uigreen";
+  }
+});
+
 const filteredData = computed(() => {
   if (!q.value) {
     return resources.value;
@@ -65,9 +78,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="grid gap-4 ptablet:grid-cols-2 sm:grid-cols-4 py-8">
+  <div
+    class="grid gap-4 ptablet:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 py-8"
+  >
     <div class="relative">
-      <UCard>
+      <UCard class="bg-uimuted-300">
         <div class="flex flex-col gap-4">
           <UButton
             label="Solid Minerals"
@@ -95,15 +110,17 @@ onMounted(async () => {
         </div>
       </UCard>
     </div>
-    <div class="relative col-span-3">
-      <div class="flex items-center justify-between gap-3 px-4 py-3 mb-4">
+    <div class="relative sm:col-span-2 lg:col-span-3">
+      <div class="flex items-center justify-between gap-3 py-3 mb-4">
         <UInput
           v-model="q"
+          color="uiearth"
+          class="bg-uimuted-300 text-uiearth-400 rounded-md"
           icon="i-heroicons-magnifying-glass-20-solid"
           placeholder="Search for resource"
         />
       </div>
-      <div class="sm:col-span-3 grid grid-cols-6 gap-4">
+      <div class="grid sm:grid-cols-4 lg:grid-cols-6 gap-4">
         <div v-for="(r, index) in filteredData" :key="index" class="col-span-2">
           <UCard :class="cardBgClass">
             <div class="relative rounded-lg">
@@ -122,11 +139,19 @@ onMounted(async () => {
                   :key="catIndex"
                 >
                   {{ category.category.name }}
-                  <span v-if="catIndex < r.categories.length - 1"
-                    >,
-                  </span>
+                  <span v-if="catIndex < r.categories.length - 1">, </span>
                 </span>
               </p>
+            </div>
+            <div class="mt-2">
+              <UButton
+                label="View"
+                icon="i-heroicons-chevron-right"
+                block
+                trailing
+                :to="`/resource-data/${r.id}/?resource=${r.name}`"
+                :color="viewButtonClass"
+              />
             </div>
           </UCard>
         </div>

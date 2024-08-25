@@ -47,7 +47,7 @@ const items = (row: { id: number; name: string }) => [
 
 const q = ref("");
 const search = ref("");
-const currentView = ref(2);
+const currentView = ref(1);
 const fetching = ref(false);
 const rowData = ref([] as Resource[]);
 const page = ref(1);
@@ -113,11 +113,11 @@ onMounted(async () => {
 
 <template>
   <div class="">
-    <UCard class="mb-2">
+    <UCard class="mb-2 bg-uigreen-50 ring-2 ring-uiearth-300">
       <div class="">
         <div class="flex items-center justify-between">
-          <h4 class="text-xl">Resources Bank</h4>
-          <div class="flex">
+          <h4 class="text-lg lg:text-xl">Resources Bank</h4>
+          <div class="flex items-center">
             <UButton
               color="uiyellow"
               variant="ghost"
@@ -132,19 +132,21 @@ onMounted(async () => {
               >
                 <UButton
                   :variant="currentView === 1 ? 'solid' : 'ghost'"
-                  icon="i-heroicons-list-bullet"
-                  :class="currentView === 1 ? 'text-white' : 'text-uimuted-400'"
+                  :class="currentView === 1 ? 'text-white bg-uiearth-950 hover:bg-uigreen-500' : 'text-uimuted-400'"
                   class="nui-focus relative z-10 flex flex-1 cursor-pointer items-center justify-center font-sans text-sm transition-colors duration-300 rounded-md"
                   @click="setCurrentView(1)"
-                  >List View</UButton
                 >
+                  <UIcon name="i-heroicons-list-bullet" />
+                  <span class="hidden sm:block">List View</span>
+                </UButton>
                 <UButton
                   :variant="currentView === 2 ? 'solid' : 'ghost'"
-                  icon="i-heroicons-rectangle-group"
-                  :class="currentView === 2 ? 'text-white' : 'text-uimuted-400'"
+                  :class="currentView === 2 ? 'text-white bg-uiearth-950 hover:bg-uigreen-500' : 'text-uimuted-400'"
                   class="nui-focus relative z-10 flex flex-1 cursor-pointer items-center justify-center font-sans text-sm transition-colors duration-300 rounded-md"
                   @click="setCurrentView(2)"
-                  >Grid View</UButton
+                >
+                  <UIcon name="i-heroicons-rectangle-group" />
+                  <span class="hidden sm:block">Grid View</span></UButton
                 >
               </div>
             </div>
@@ -152,7 +154,7 @@ onMounted(async () => {
         </div>
       </div>
     </UCard>
-    <UCard v-if="currentView === 1">
+    <UCard v-if="currentView === 1" class="bg-uigreen-50">
       <!-- <template #header>
         <div class="flex items-center justify-between">
           <h4 class="text-xl">Resources Bank</h4>
