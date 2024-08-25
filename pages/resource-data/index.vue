@@ -5,24 +5,28 @@ import type { Resource } from "~/types";
 
 const loadingStore = useLoadingStore();
 const router = useRouter();
-const route = useRoute()
+const route = useRoute();
 
 definePageMeta({
   layout: "withheader",
-  title: 'Resource Data',
-})
+  title: "Resource Data",
+});
 
 useHead({
-  title: 'Resource Data',
+  title: "Resource Data",
   meta: [
-    { name: 'description', content: 'Data Table showing the varoius resources and their distribution across the country (Nigeria)' },
-    { property: 'og:title', content: `Resource Xplore - ${route.meta.title}` }
+    {
+      name: "description",
+      content:
+        "Data Table showing the varoius resources and their distribution across the country (Nigeria)",
+    },
+    { property: "og:title", content: `Resource Xplore - ${route.meta.title}` },
   ],
-})
+});
 
 const columns = [
   { key: "name", label: "Name", sortable: true },
-  { key: "category.name", label: "Category", sortable: true },
+  { key: "category", label: "Category", sortable: true },
   { key: "colorCode", label: "Pointer Color", sortable: true },
   { key: "actions" },
 ];
@@ -43,6 +47,7 @@ const items = (row: { id: number; name: string }) => [
 
 const q = ref("");
 const search = ref("");
+const currentView = ref(2);
 const fetching = ref(false);
 const rowData = ref([] as Resource[]);
 const page = ref(1);
@@ -81,6 +86,10 @@ const paginatedFilteredData = computed(() => {
   return filteredData.value.slice(start, end);
 });
 
+const setCurrentView = (value: number) => {
+  currentView.value = value;
+};
+
 const fetchData = async () => {
   loadingStore.showLoading();
   try {
@@ -104,8 +113,47 @@ onMounted(async () => {
 
 <template>
   <div class="">
-    <UCard>
-      <template #header>
+    <UCard class="mb-2">
+      <div class="">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xl">Resources Bank</h4>
+          <div class="flex">
+            <UButton
+              color="uiyellow"
+              variant="ghost"
+              icon="i-heroicons-arrow-path-20-solid"
+              class="mr-3"
+              :loading="fetching"
+              @click="fetchData()"
+            />
+            <div class="w-full sm:w-60">
+              <div
+                class="rounded-md relative flex items-center bg-uimuted-800 w-full"
+              >
+                <UButton
+                  :variant="currentView === 1 ? 'solid' : 'ghost'"
+                  icon="i-heroicons-list-bullet"
+                  :class="currentView === 1 ? 'text-white' : 'text-uimuted-400'"
+                  class="nui-focus relative z-10 flex flex-1 cursor-pointer items-center justify-center font-sans text-sm transition-colors duration-300 rounded-md"
+                  @click="setCurrentView(1)"
+                  >List View</UButton
+                >
+                <UButton
+                  :variant="currentView === 2 ? 'solid' : 'ghost'"
+                  icon="i-heroicons-rectangle-group"
+                  :class="currentView === 2 ? 'text-white' : 'text-uimuted-400'"
+                  class="nui-focus relative z-10 flex flex-1 cursor-pointer items-center justify-center font-sans text-sm transition-colors duration-300 rounded-md"
+                  @click="setCurrentView(2)"
+                  >Grid View</UButton
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </UCard>
+    <UCard v-if="currentView === 1">
+      <!-- <template #header>
         <div class="flex items-center justify-between">
           <h4 class="text-xl">Resources Bank</h4>
           <div class="flex">
@@ -125,9 +173,11 @@ onMounted(async () => {
             />
           </div>
         </div>
-      </template>
+      </template> -->
 
-      <div class="flex items-center justify-between gap-3 px-4 py-3 mb-4">
+      <div
+        class="flex flex-col sm:flex-row w-full items-center justify-between gap-3 px-4 py-3 mb-4"
+      >
         <UInput
           v-model="q"
           icon="i-heroicons-magnifying-glass-20-solid"
@@ -207,6 +257,17 @@ onMounted(async () => {
             <span class="pl-2">{{ row.colorCode.toUpperCase() }}</span>
           </div>
         </template>
+        <template #category-data="{ row }">
+          <div class="">
+            <span
+              v-for="(category, catIndex) in row.categories"
+              :key="catIndex"
+            >
+              {{ category.category.name }}
+              <span v-if="catIndex < row.categories.length - 1">, </span>
+            </span>
+          </div>
+        </template>
       </UTable>
 
       <template #footer>
@@ -239,5 +300,6 @@ onMounted(async () => {
         </div>
       </template>
     </UCard>
+    <ResourceView v-if="currentView === 2" />
   </div>
 </template>

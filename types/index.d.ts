@@ -28,13 +28,20 @@ export interface Resource {
   id: number;
   name: string;
   description: string | null;
-  categoryId: number;
   amount: number | null;
   value: number | null;
   quality: string | null;
   colorCode: string | null;
+  categories: ResourceCategory[];
   lgaResources: LgaResource[];
   stateResources: StateResource[];
+}
+
+export interface ResourceCategory {
+  id: number;
+  resourceId: number;
+  categoryId: number;
+  category: Category;
 }
 
 export interface LgaResource {

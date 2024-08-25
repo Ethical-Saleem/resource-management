@@ -6,8 +6,16 @@ export default <Partial<Config>>{
       fontFamily: {
         custom: ['Inter'],
       },
+      // backgroundImage: {
+      //   'custom-401-gradient': "linear-gradient(180deg, rgba(247, 149, 48, 0.4) 10%, rgba(247, 149, 48, 0) 30%)",
+      // },
+      // backgroundImage: {
+      //   'custom-gradient': 'linear-gradient(var(--tw-gradient-stops))',
+      // },
       backgroundImage: {
-        'custom-401-gradient': "linear-gradient(180deg, rgba(247, 149, 48, 0.4) 10%, rgba(247, 149, 48, 0) 30%)",
+        'agricultural-produce': 'linear-gradient(rgba(10, 191, 152, 0.5), rgba(3, 98, 82, 0.5)), url("/img/map_bg_3.PNG")',
+        'energy-resource': 'linear-gradient(rgba(211, 133, 31, 0.5), rgba(118, 100, 24, 0.5)), url("/img/map_bg_3.PNG")',
+        'solid-minerals': 'linear-gradient(rgba(252, 136, 19, 0.5), rgba(126, 54, 16, 0.5)), url("/img/map_bg_3.PNG")',
       },
       colors: {
         uigreen: {

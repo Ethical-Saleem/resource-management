@@ -1,8 +1,17 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
   <div class="fixed inset-0 flex overflow-hidden">
-    <div class="map-bg flex flex-1 w-full min-w-0">
-      <div class="flex-col items-stretch relative w-full flex-1 flex">
+    <div :class="['map-bg', gradientClass, 'flex', 'flex-1', 'w-full', 'min-w-0']">
+      <div
+        :class="[
+          'flex-col',
+          'items-stretch',
+          'relative',
+          'w-full',
+          'flex-1',
+          'flex',
+        ]"
+      >
         <div class="p-4 flex-1 flex flex-col overflow-y-auto">
           <div ref="mapContainer" class="map-container" />
         </div>
@@ -11,13 +20,15 @@
           <UButton
             id="zoomInButton"
             size="sm"
-            class="text-white rounded-md shadow-md bg-uigreen-600 hover:bg-uigreen-500"
+            :class="buttonClass"
+            class="text-white rounded-md shadow-md"
             icon="i-heroicons-plus"
           />
           <UButton
             id="zoomOutButton"
             size="sm"
-            class="text-white rounded-md shadow-md bg-uigreen-600 hover:bg-uigreen-500"
+            :class="buttonClass"
+            class="text-white rounded-md shadow-md"
             icon="i-heroicons-minus"
           />
         </div>
@@ -25,7 +36,8 @@
       <div class="absolute" style="display: none; visibility: hidden" />
     </div>
     <UButton
-      class="fixed bottom-4 right-4 z-20 text-white ring-2 ring-green-500 text-green-500 rounded-full shadow-md lg:hidden"
+      :class="outlineButtonClass"
+      class="fixed bottom-4 right-4 z-20 text-white ring-2 rounded-full shadow-md lg:hidden"
       variant="outline"
       color="uiearth"
       @click="openMobileBar"
@@ -33,12 +45,13 @@
       <UIcon name="i-heroicons-adjustments-vertical" />
     </UButton>
     <div
-      class="flex-col items-stretch relative w-full bg-uiearth-950 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 lg:w-[300px] flex-shrink-0 hidden lg:flex"
+      :class="backgroundClass"
+      class="flex-col items-stretch relative w-full border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 lg:w-[300px] flex-shrink-0 hidden lg:flex"
     >
       <div
         class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent py-2"
       >
-      <NuxtImg src="/img/logo_5.png" width="70" height="70" />
+        <NuxtImg src="/img/logo_5.png" width="70" height="70" />
         <div class="flex items-center gap-2">
           <ColorScheme
             ><USelect
@@ -50,26 +63,30 @@
           </div>
           <UDropdown :items="items">
             <UButton
-              class="border-uigreen-600 bg-uigreen-600 block hover:ring-uigreen-200 dark:hover:ring-uiearth-700 dark:border-uiearth-700 dark:bg-uiearth-600 dark:ring-offset-uiearth-900 flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
+              :class="dropdownButtonClass"
+              class="block flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
               icon="i-heroicons-squares-2x2"
             />
           </UDropdown>
         </div>
       </div>
       <div class="p-4 flex-1 flex flex-col overflow-y-auto">
-        <p class="font-medium text-lg text-uiearth-200 flex items-center mb-3">
+        <p
+          :class="headerTextClass"
+          class="font-medium text-lg flex items-center mb-3"
+        >
           <UIcon name="i-heroicons-funnel" class="" />
           <span class="pl-2">Filters</span>
         </p>
         <div
           class="ptablet:flex-none ptablet:grid ptablet:grid-cols-2 ptablet:pb-10 flex flex-col gap-4"
         >
-          <UCard class="ring-1 ring-uigreen-400 bg-uiearth-800 dark:ring-uigreen-500 dark:bg-uiearth-500">
+          <UCard :class="cardClass">
             <div class="relative">
               <div class="relative">
                 <div class="mb-3 flex items-center text-uiearth-200">
                   <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p class="pl-2 text-uiearth-50">Map Filter</p>
+                  <p :class="cardTextClass" class="pl-2">Map Filter</p>
                 </div>
                 <div class="">
                   <UFormGroup>
@@ -88,12 +105,12 @@
               </div>
             </div>
           </UCard>
-          <UCard class="ring-1 ring-uigreen-400 bg-uiearth-800 dark:ring-uigreen-500 dark:bg-uiearth-500">
+          <UCard :class="cardClass">
             <div class="relative">
               <div class="relative">
                 <div class="mb-3 flex items-center text-uiearth-200">
                   <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p class="pl-2 text-uiearth-50">Resource Category</p>
+                  <p :class="cardTextClass" class="pl-2">Resource Category</p>
                 </div>
                 <div class="">
                   <UFormGroup>
@@ -115,15 +132,12 @@
               </div>
             </div>
           </UCard>
-          <UCard
-            v-if="selectedResourceCategory"
-            class="ring-1 ring-uigreen-400 bg-uiearth-800 dark:ring-uigreen-500 dark:bg-uiearth-500"
-          >
+          <UCard v-if="selectedResourceCategory" :class="cardClass">
             <div class="relative">
               <div class="relative">
                 <div class="mb-3 flex items-center text-uiearth-200">
                   <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p class="pl-2 text-uiearth-50">Resource Filter</p>
+                  <p :class="cardTextClass" class="pl-2">Resource Filter</p>
                 </div>
                 <div class="">
                   <UFormGroup>
@@ -194,11 +208,14 @@ interface GeoJSONData extends FeatureCollection {
 }
 
 useHead({
-  title: 'Home',
+  title: "Home",
   meta: [
-    { name: 'description', content: 'Map showing the various resource distributions in the country' },
+    {
+      name: "description",
+      content: "Map showing the various resource distributions in the country",
+    },
   ],
-})
+});
 
 const loadingStore = useLoadingStore();
 
@@ -239,6 +256,123 @@ const openMobileBar = () => {
     customOptions: customOptions,
   });
 };
+
+const gradientClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1: // Solid Minerals
+      return 'bg-solid-minerals';
+    case 2: // Energy Resource
+      return 'bg-energy-resource';
+    case 3: // Agricultural Produce
+      return 'bg-agricultural-produce';
+    default:
+      return 'bg-solid-minerals'; // Default gradient
+  }
+});
+
+const backgroundClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "bg-uiearth-950";
+    case 2:
+      return "bg-uimuted-950";
+    case 3:
+      return "bg-uigreen-950";
+    default:
+      return "bg-uimuted-950";
+  }
+});
+
+const mapStrokes = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "#9c4010";
+    case 2:
+      return "#304159";
+    case 3:
+      return "#036252";
+    default:
+      return "#304159";
+  }
+})
+
+const buttonClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "bg-uiearth-600 hover:bg-uiearth-500";
+    case 2:
+      return "bg-uimuted-600 hover:bg-uimuted-500";
+    case 3:
+      return "bg-uigreen-600 hover:bg-uigreen-500";
+    default:
+      return "bg-uimuted-600 hover:bg-uimuted-500";
+  }
+});
+
+const outlineButtonClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "ring-uiearth-500 text-uiearth-500";
+    case 2:
+      return "ring-uimuted-500 text-uimuted-500";
+    case 3:
+      return "ring-uigreen-500 text-uigreen-500";
+    default:
+      return "ring-uimuted-500 text-uimuted-500";
+  }
+});
+
+const dropdownButtonClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "border-uigreen-600 bg-uigreen-600 dark:bg-uigreen-600 hover:ring-uigreen-200 dark:hover:ring-uiearth-700 dark:border-uiearth-700 dark:ring-offset-uiearth-900";
+    case 2:
+      return "bg-uimuted-600 dark:bg-uimuted-600";
+    case 3:
+      return "border-uiearth-600 bg-uiearth-600 dark:bg-uiearth-600 hover:ring-uiearth-200 dark:hover:ring-uiearth-700 dark:border-uigreen-700 dark:ring-offset-uigreen-900";
+    default:
+      return "bg-uimuted-600 dark:bg-uimuted-600";
+  }
+});
+
+const headerTextClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "text-uiearth-200";
+    case 2:
+      return "text-uimuted-200";
+    case 3:
+      return "text-uigreen-200";
+    default:
+      return "text-uimuted-200";
+  }
+});
+
+const cardClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "ring-uigreen-400 bg-uiearth-800 dark:bg-uiearth-600 dark:ring-uigreen-500";
+    case 2:
+      return "ring-uimuted-400 bg-uimuted-600 dark:bg-uimuted-600";
+    case 3:
+      return "ring-uiearth-400 bg-uigreen-800 dark:bg-uigreen-600 dark:ring-uiearth-500";
+    default:
+      return "ring-uimuted-400 bg-uimuted-600 dark:bg-uimuted-600";
+  }
+});
+
+const cardTextClass = computed(() => {
+  switch (selectedResourceCategory.value) {
+    case 1:
+      return "text-uiearth-200";
+    case 2:
+      return "text-uimuted-200";
+    case 3:
+      return "text-uigreen-200";
+    default:
+      return "text-uimuted-200";
+  }
+});
 
 const onFilterUpdate = (newFilter: string) => {
   selectedFilter.value = newFilter;
@@ -334,7 +468,7 @@ const drawMap = (geojsonData: GeoJSONData) => {
     .append("path")
     .attr("d", (d: GeoJsonFeature) => path(d as GeoPermissibleObjects) || "")
     .attr("opacity", 0.8)
-    .attr("stroke", "#9c4010")
+    .attr("stroke", mapStrokes.value)
     .attr("stroke-width", 2)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .on("click", (event, d: any) => {
@@ -489,6 +623,12 @@ const loadResources = async () => {
   }
 };
 
+watch(selectedResourceCategory, () => {
+  if (geojsonData.value) {
+    drawMap(geojsonData.value); // Re-draw the map with the new stroke color
+  }
+});
+
 watch([selectedFilter, selectedResource], async () => {
   await loadMapData(); // Show overlay during GeoJSON loading
   drawResources(availableResources.value);
@@ -525,11 +665,12 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(
-      rgba(252, 136, 19, 0.5), /* Adjust the opacity here */
+  /* background-image: linear-gradient(var(--tw-gradient-stops)), url("/img/map_bg_3.PNG"); */
+  /* background-image: linear-gradient(
+      rgba(252, 136, 19, 0.5),
       rgba(252, 136, 19, 0.5)
     ),
-    url("/img/map_bg_3.PNG");
+    url("/img/map_bg_3.PNG"); */
   background-size: cover;
   background-position: center;
   opacity: 1; /* Adjust this value to control opacity */

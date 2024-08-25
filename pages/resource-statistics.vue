@@ -58,10 +58,10 @@ useHead({
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("/img/map_bg.PNG");
+  background-image: linear-gradient(rgba(211, 133, 31, 0.5), rgba(118, 100, 24, 0.5)), url("/img/map_bg.PNG");
   background-size: cover;
   background-position: center;
-  opacity: 0.4; /* Adjust this value to control opacity */
+  opacity: 1; /* Adjust this value to control opacity */
   z-index: -1; /* Ensures the background is behind the content */
 }
 </style>
