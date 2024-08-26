@@ -14,7 +14,7 @@ interface Props {
   selectedFilter: string;
   selectedResource: string | number;
   selectedResourceCategory: number | null;
-  customOptions: any;
+  resources: any;
 }
 
 const items = [
@@ -37,6 +37,7 @@ const emit = defineEmits([
   "updateFilter",
   "updateResource",
   "categoryChange",
+  "update:category",
   "loadResource",
   "clickOutside",
 ]);
@@ -44,7 +45,7 @@ const emit = defineEmits([
 const selectedFilter = ref(props.selectedFilter);
 const selectedResource = ref(props.selectedResource);
 const selectedResourceCategory = ref(props.selectedResourceCategory);
-const customOptions = ref(props.customOptions);
+const availableResources = ref(props.resources);
 
 const backgroundClass = computed(() => {
   switch (selectedResourceCategory.value) {
@@ -113,18 +114,26 @@ const cardTextClass = computed(() => {
   }
 });
 
-const loadResources = () => {
-  console.log("options-res", customOptions.value);
-};
+const customOptions = computed(() => {
+  return [{ id: "", name: "All Resources" }, ...availableResources.value];
+});
 
-watch(selectedResourceCategory, () => {
+watch(selectedResourceCategory, (newCategory) => {
   emit("categoryChange");
+  emit("update:category", newCategory)
 });
 
 watch(selectedFilter, (newFilter) => {
   emit("updateFilter", newFilter);
   console.log("new", newFilter);
 });
+
+watch(
+  () => props.resources,
+  (newResources) => {
+    availableResources.value = newResources
+  }
+)
 
 watch(selectedResource, (newResource) => {
   emit("updateResource", newResource);
@@ -225,7 +234,6 @@ watch(selectedResource, (newResource) => {
                           option-attribute="name"
                           value-attribute="id"
                           placeholder="-- Select --"
-                          @change="loadResources"
                         />
                       </UFormGroup>
                     </div>

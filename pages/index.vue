@@ -6,10 +6,11 @@
       class="lg:hidden"
       :selected-filter="selectedFilter"
       :selected-resource="selectedResource"
-      :custom-options="customOptions"
+      :resources="availableResources"
       :selected-resource-category="selectedResourceCategory"
       @update-filter="onFilterUpdate"
       @update-resource="onResourceUpdate"
+      @update:category="(value) => onCategoryUpdate(value)"
       @click-outside="closeMobileSidebar"
     />
     <div
@@ -400,6 +401,11 @@ const onResourceUpdate = (newResource: string | number) => {
   selectedResource.value = newResource;
   // loadMapData(); // Optionally load map data immediately
 };
+
+const onCategoryUpdate = (value: number) => {
+  selectedResourceCategory.value = value
+  loadResources()
+}
 
 const customOptions = computed(() => {
   return [{ id: "", name: "All Resources" }, ...availableResources.value];
