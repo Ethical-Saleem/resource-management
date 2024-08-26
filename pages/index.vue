@@ -1,7 +1,20 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
   <div class="fixed inset-0 flex overflow-hidden">
-    <div :class="['map-bg', gradientClass, 'flex', 'flex-1', 'w-full', 'min-w-0']">
+    <MapSidebar
+    v-if="isMobileSidebarOpen"
+      class="lg:hidden"
+      :selected-filter="selectedFilter"
+      :selected-resource="selectedResource"
+      :custom-options="customOptions"
+      :selected-resource-category="selectedResourceCategory"
+      @update-filter="onFilterUpdate"
+      @update-resource="onResourceUpdate"
+      @click-outside="closeMobileSidebar"
+    />
+    <div
+      :class="['map-bg', gradientClass, 'flex', 'flex-1', 'w-full', 'min-w-0']"
+    >
       <div
         :class="[
           'flex-col',
@@ -175,13 +188,6 @@
         </div>
       </UModal>
     </div>
-    <MapSidePanel
-      :selected-filter="selectedFilter"
-      :selected-resource="selectedResource"
-      :custom-options="customOptions"
-      @update-filter="onFilterUpdate"
-      @update-resource="onResourceUpdate"
-    />
   </div>
 </template>
 
@@ -198,7 +204,6 @@ import type { GeoPermissibleObjects } from "d3";
 import type { State, Lga, Resource } from "~/types";
 import { useLoadingStore } from "~/stores/loading-store";
 import { useApi } from "~/composables/useApi";
-import MapSidePanel from "~/components/MapSidepanel.vue";
 
 // Define the types for your GeoJSON and Resource data
 type GeoJsonFeature = Feature<Geometry, GeoJsonProperties>;
@@ -229,8 +234,17 @@ const selectedStateOrLga = ref<State | Lga | null>(null);
 const clickedResource = ref<Resource | null>(null);
 const isModal = ref(false);
 const resourceModal = ref(false);
+const isMobileSidebarOpen = ref(false);
 let svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
 // const isFilterPaneOpen = ref(false);
+
+const openMobileBar = () => {
+  isMobileSidebarOpen.value = true;
+};
+
+const closeMobileSidebar = () => {
+  isMobileSidebarOpen.value = false;
+};
 
 const items = [
   [
@@ -247,26 +261,27 @@ const items = [
   ],
 ];
 
-const slideOver = useSlideover();
+// const slideOver = useSlideover();
 
-const openMobileBar = () => {
-  slideOver.open(MapSidePanel, {
-    selectedFilter: selectedFilter.value,
-    selectedResource: selectedResource.value,
-    customOptions: customOptions,
-  });
-};
+// const openMobileBar = () => {
+//   slideOver.open(MapSidePanel, {
+//     selectedFilter: selectedFilter.value,
+//     selectedResource: selectedResource.value,
+//     customOptions: customOptions,
+//     selectedResourceCategory: selectedResourceCategory.value,
+//   });
+// };
 
 const gradientClass = computed(() => {
   switch (selectedResourceCategory.value) {
     case 1: // Solid Minerals
-      return 'bg-solid-minerals';
+      return "bg-solid-minerals";
     case 2: // Energy Resource
-      return 'bg-energy-resource';
+      return "bg-energy-resource";
     case 3: // Agricultural Produce
-      return 'bg-agricultural-produce';
+      return "bg-agricultural-produce";
     default:
-      return 'bg-solid-minerals'; // Default gradient
+      return "bg-solid-minerals"; // Default gradient
   }
 });
 
@@ -294,7 +309,7 @@ const mapStrokes = computed(() => {
     default:
       return "#304159";
   }
-})
+});
 
 const buttonClass = computed(() => {
   switch (selectedResourceCategory.value) {
@@ -632,6 +647,12 @@ watch(selectedResourceCategory, () => {
 watch([selectedFilter, selectedResource], async () => {
   await loadMapData(); // Show overlay during GeoJSON loading
   drawResources(availableResources.value);
+});
+
+watch(() => window?.innerWidth > 991, () => {
+  if (isMobileSidebarOpen.value) {
+    closeMobileSidebar();
+  }
 });
 
 // Initialize map on mount
