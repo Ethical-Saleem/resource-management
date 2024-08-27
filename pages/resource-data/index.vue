@@ -148,7 +148,8 @@ const addImage = async () => {
       if (res) {
         alert('Resource Image added successfully');
         closeImageModal();
-        await fetchData()
+        // await fetchData()
+        removeSignFile()
       }
     } else {
       alert('No image selected');
