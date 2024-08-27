@@ -31,7 +31,7 @@ const columns = [
   { key: "actions" },
 ];
 
-const items = (row: { id: number; name: string }) => [
+const items = (row: Resource) => [
   [
     {
       label: "View Resource Locations",
@@ -39,8 +39,9 @@ const items = (row: { id: number; name: string }) => [
       click: () => router.push(`/resource-data/${row.id}?resource=${row.name}`),
     },
     {
-      label: "Duplicate",
+      label: "Upload Image",
       icon: "i-heroicons-document-duplicate-20-solid",
+      click: () => openImageModal(row),
     },
   ],
 ];
@@ -49,7 +50,11 @@ const q = ref("");
 const search = ref("");
 const currentView = ref(1);
 const fetching = ref(false);
+const loading = ref(false);
 const rowData = ref([] as Resource[]);
+const newImage = ref<File | null>(null);
+const selectedResource = ref<Resource | null>(null);
+const imageModal = ref(false);
 const page = ref(1);
 const pageCount = ref(10);
 const pageTotal = ref(rowData.value.length);
@@ -57,6 +62,39 @@ const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
 const pageTo = computed(() =>
   Math.min(page.value * pageCount.value, pageTotal.value)
 );
+
+const signFileUrl = ref<string | null>(null);
+const signFileInput = ref<HTMLInputElement | null>(null);
+const signFile = ref<File | null>(null);
+
+const triggerSignFileInput = () => {
+  signFileInput.value?.click();
+};
+
+const handleSignFileChange = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (file) {
+    newImage.value = file;
+    signFile.value = file;
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      if (e.target?.result) {
+        signFileUrl.value = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const removeSignFile = () => {
+  newImage.value = null;
+  signFileUrl.value = null;
+  signFile.value = null;
+  if (signFileInput.value) {
+    signFileInput.value.value = ""; // Reset the file input
+  }
+};
 
 const selectedColumns = ref(columns);
 const tableColumns = computed(() =>
@@ -67,6 +105,15 @@ const selectedStatus = ref([]);
 const resetFilters = () => {
   search.value = "";
   selectedStatus.value = [];
+};
+
+const openImageModal = (data: Resource) => {
+  imageModal.value = true;
+  selectedResource.value = data;
+};
+const closeImageModal = () => {
+  imageModal.value = false;
+  selectedResource.value = null;
 };
 
 const filteredData = computed(() => {
@@ -89,6 +136,29 @@ const paginatedFilteredData = computed(() => {
 const setCurrentView = (value: number) => {
   currentView.value = value;
 };
+
+const addImage = async () => {
+  loading.value = true
+  try {
+    if (newImage.value) {
+      const data = new FormData();
+      data.append('image', newImage.value);
+      
+      const res = await useApi.postForm(`/resource/add-resource-image/${selectedResource?.value?.id}`, data);
+      if (res) {
+        alert('Resource Image added successfully');
+        closeImageModal();
+        await fetchData()
+      }
+    } else {
+      alert('No image selected');
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    loading.value = false;
+  }
+}
 
 const fetchData = async () => {
   loadingStore.showLoading();
@@ -132,7 +202,11 @@ onMounted(async () => {
               >
                 <UButton
                   :variant="currentView === 1 ? 'solid' : 'ghost'"
-                  :class="currentView === 1 ? 'text-white bg-uiearth-950 hover:bg-uigreen-500' : 'text-uimuted-400'"
+                  :class="
+                    currentView === 1
+                      ? 'text-white bg-uiearth-950 hover:bg-uigreen-500'
+                      : 'text-uimuted-400'
+                  "
                   class="nui-focus relative z-10 flex flex-1 cursor-pointer items-center justify-center font-sans text-sm transition-colors duration-300 rounded-md"
                   @click="setCurrentView(1)"
                 >
@@ -141,7 +215,11 @@ onMounted(async () => {
                 </UButton>
                 <UButton
                   :variant="currentView === 2 ? 'solid' : 'ghost'"
-                  :class="currentView === 2 ? 'text-white bg-uiearth-950 hover:bg-uigreen-500' : 'text-uimuted-400'"
+                  :class="
+                    currentView === 2
+                      ? 'text-white bg-uiearth-950 hover:bg-uigreen-500'
+                      : 'text-uimuted-400'
+                  "
                   class="nui-focus relative z-10 flex flex-1 cursor-pointer items-center justify-center font-sans text-sm transition-colors duration-300 rounded-md"
                   @click="setCurrentView(2)"
                 >
@@ -187,7 +265,9 @@ onMounted(async () => {
         />
       </div>
 
-      <div class="flex flex-col sm:flex-row justify-between items-center w-full px-4 py-3">
+      <div
+        class="flex flex-col sm:flex-row justify-between items-center w-full px-4 py-3"
+      >
         <div class="flex items-center gap-1.5 mb-2">
           <span class="text-xs sm:text-sm leading-5">Rows per page:</span>
 
@@ -303,5 +383,91 @@ onMounted(async () => {
       </template>
     </UCard>
     <ResourceView v-if="currentView === 2" />
+    <UModal v-model="imageModal">
+      <UCard>
+        <template #header>
+          <h3 class="">Resource Image Upload</h3>
+        </template>
+        <div class="">
+          <fieldset class="relative">
+            <UFormGroup label="Resource Name" class="mb-5">
+              <UInput :value="selectedResource?.name" disabled />
+            </UFormGroup>
+            <UFormGroup label="Resource Image">
+              <div
+                class="flex flex-col relative items-center bg-uiblue-50 p-2 rounded-md ring-1 ring-uiyellow-700"
+              >
+                <div
+                  v-if="!signFile"
+                  class="flex flex-col items-center rounded-md p-4"
+                >
+                  <UButton
+                    color="uiblue"
+                    variant="outline"
+                    class="rounded-full"
+                    icon="i-heroicons-camera"
+                    @click="triggerSignFileInput"
+                  />
+                  <p class="text-sm mb-2 mt-1">
+                    Upload a n image of the selected resource
+                  </p>
+                  <span class="text-xs"
+                    >Only images ending with .jpg, .jpeg, and .png are
+                    allowed</span
+                  >
+                </div>
+                <div v-else class="flex items-center justify-center gap-2 p-1">
+                  <img
+                    v-if="signFileUrl"
+                    :src="signFileUrl"
+                    alt="preview"
+                    class="w-20 h-20 object-cover rounded-md"
+                  >
+                  <div class="flex flex-col items-start">
+                    <span class="text-sm font-medium">{{ signFile.name }}</span>
+                    <span class="text-xs text-gray-500"
+                      >{{ (signFile.size / 1024).toFixed(2) }} KB</span
+                    >
+                  </div>
+                  <UButton
+                    icon="i-heroicons-x-mark"
+                    color="uiblue"
+                    class="rounded-full"
+                    variant="ghost"
+                    @click="removeSignFile"
+                  />
+                </div>
+                <input
+                  ref="signFileInput"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleSignFileChange"
+                >
+              </div>
+            </UFormGroup>
+          </fieldset>
+        </div>
+        <template #footer>
+          <div class="flex flex-row justify-end">
+            <UButton
+              label="Close"
+              variant="outline"
+              color="uimuted"
+              class=""
+              @click="closeImageModal"
+            />
+            <UButton
+              label="Upload"
+              variant="solid"
+              color="uiearth"
+              class="ml-3"
+              :loading="loading"
+              @click="addImage"
+            />
+          </div>
+        </template>
+      </UCard>
+    </UModal>
   </div>
 </template>

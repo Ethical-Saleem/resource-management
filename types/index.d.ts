@@ -32,6 +32,8 @@ export interface Resource {
   value: number | null;
   quality: string | null;
   colorCode: string | null;
+  image: Buffer | null;
+  imageUrl?: string;
   categories: ResourceCategory[];
   lgaResources: LgaResource[];
   stateResources: StateResource[];

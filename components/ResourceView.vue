@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import { useLoadingStore } from "~/stores/loading-store";
 
@@ -54,6 +55,12 @@ const filteredData = computed(() => {
   });
 });
 
+const convertBufferToBlobUrl = (buffer: any): string => {
+  const byteArray = new Uint8Array(buffer.data);
+  const blob = new Blob([byteArray], { type: "image/jpeg" });
+  return URL.createObjectURL(blob);
+};
+
 const fetchData = async (categoryId: number) => {
   loadingStore.showLoading();
   currentCategory.value = categoryId;
@@ -63,7 +70,12 @@ const fetchData = async (categoryId: number) => {
     );
     console.log("resources", res);
 
-    resources.value = res;
+    resources.value = res.map((resource: Resource) => {
+      if (resource.image) {
+        resource.imageUrl = convertBufferToBlobUrl(resource.image);
+      }
+      return resource;
+    });
     console.log("resources-value", resources.value);
   } catch (error) {
     console.log(error);
@@ -124,7 +136,7 @@ onMounted(async () => {
         <div v-for="(r, index) in filteredData" :key="index" class="col-span-2">
           <UCard :class="cardBgClass">
             <div class="relative rounded-lg">
-              <NuxtImg src="/img/map_bg_2.PNG" height="250" width="100%" />
+              <NuxtImg :src="r.imageUrl" :alt="r.name" height="250" width="100%" />
             </div>
             <div class="mt-3">
               <h3
