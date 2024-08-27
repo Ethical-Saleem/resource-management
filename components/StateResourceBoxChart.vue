@@ -6,13 +6,26 @@ import * as echarts from "echarts";
 
 import type { Resource, State } from "~/types";
 
+interface MetricsData {
+  quantityRating: any;
+  marketValue: any;
+}
+
 const analyticsStore = useAnalyticsStore();
 const loadingStore = useLoadingStore();
+
+const props = defineProps({
+  categoryId: {
+    type: Number,
+    default: () => 2,
+  },
+});
 
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number>(1);
 const states = ref([] as State[]);
 const resources = ref([] as Resource[]);
+const metricsData = ref({} as MetricsData);
 
 const customStateOptions = computed(() => {
   return [{ id: "", name: "All" }, ...states.value];
@@ -22,17 +35,18 @@ const boxPlotContainer = ref<HTMLDivElement | null>(null);
 let myChart: echarts.ECharts | null = null;
 
 const fetchBoxPlotData = async () => {
-  loadingStore.showLoading()
+  loadingStore.showLoading();
   try {
     const data = await analyticsStore.dispatchFetchStateResourceOutliers(
       resourceId.value,
       selectedStateId.value
     );
+    metricsData.value = data
     initializeChart(data);
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
-    loadingStore.hideLoading()
+    loadingStore.hideLoading();
   }
 };
 
@@ -44,78 +58,102 @@ const initializeChart = (data: any) => {
 
     myChart = echarts.init(boxPlotContainer.value);
 
-    const option: echarts.EChartsOption = {
-      tooltip: {
-        trigger: "item",
-        formatter: (params: any) => `${params.seriesName}: ${params.value}`,
-      },
-      xAxis: {
-        type: "category",
-        data: ["Quantity Rating", "Market Value"],
-      },
-      yAxis: {
-        type: "value",
-        name: "Value",
-        nameLocation: "middle",
-        nameGap: 30,
-      },
-      series: [
-        {
-          name: "Quantity Rating",
-          type: "boxplot",
-          data: [
-            [
-              data.quantityRating.min,
-              data.quantityRating.q1,
-              data.quantityRating.median,
-              data.quantityRating.q3,
-              data.quantityRating.max,
-            ],
-          ],
+    if (data.quantityRating || data.marketValue) {
+      const option: echarts.EChartsOption = {
+        tooltip: {
+          trigger: "item",
+          formatter: (params: any) => `${params.seriesName}: ${params.value}`,
         },
-        {
-          name: "Market Value",
-          type: "boxplot",
-          data: [
-            [
-              data.marketValue.min,
-              data.marketValue.q1,
-              data.marketValue.median,
-              data.marketValue.q3,
-              data.marketValue.max,
-            ],
-          ],
+        xAxis: {
+          type: "category",
+          data: ["Quantity Rating", "Market Value"],
         },
-        {
-          name: "Outliers",
-          type: "scatter",
-          data: [
-            ...data.quantityRating.outliers.map((v: number) => [
-              "Quantity Rating",
-              v,
-            ]),
-            ...data.marketValue.outliers.map((v: number) => [
-              "Market Value",
-              v,
-            ]),
-          ],
-          tooltip: {
-            formatter: (params: any) => `Outlier: ${params.value[1]}`,
+        yAxis: {
+          type: "value",
+          name: "Value",
+          nameLocation: "middle",
+          nameGap: 30,
+        },
+        series: [
+          {
+            name: "Quantity Rating",
+            type: "boxplot",
+            data: [
+              [
+                data.quantityRating.min,
+                data.quantityRating.q1,
+                data.quantityRating.median,
+                data.quantityRating.q3,
+                data.quantityRating.max,
+              ],
+            ],
           },
-        },
-      ],
-    };
+          {
+            name: "Market Value",
+            type: "boxplot",
+            data: [
+              [
+                data.marketValue.min,
+                data.marketValue.q1,
+                data.marketValue.median,
+                data.marketValue.q3,
+                data.marketValue.max,
+              ],
+            ],
+          },
+          {
+            name: "Outliers",
+            type: "scatter",
+            data: [
+              ...data.quantityRating.outliers.map((v: number) => [
+                "Quantity Rating",
+                v,
+              ]),
+              ...data.marketValue.outliers.map((v: number) => [
+                "Market Value",
+                v,
+              ]),
+            ],
+            tooltip: {
+              formatter: (params: any) => `Outlier: ${params.value[1]}`,
+            },
+          },
+        ],
+      };
 
-    myChart.setOption(option);
+      myChart.setOption(option);
+    }
   } else {
     console.error("Box plot container is not available.");
   }
 };
 
+watch(
+  () => props.categoryId,
+  async (newCategoryId) => {
+    await fetchResources(newCategoryId);
+    await fetchBoxPlotData();
+  }
+);
+
+const fetchResources = async (categoryId: number) => {
+  loadingStore.showLoading();
+  try {
+    const data = await useApi.get(
+      `/resource/fetch-resources-data-by-category/${categoryId}`
+    );
+    resources.value = data;
+    resourceId.value = resources.value[0].id;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingStore.hideLoading();
+  }
+};
+
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
-  resources.value = await useApi.get("/resource/fetch-resources-data");
-  resourceId.value = resources.value[0].id;
+  await fetchResources(props.categoryId);
   selectedStateId.value = states.value[0].id;
   await fetchBoxPlotData();
 });
@@ -140,9 +178,9 @@ onMounted(async () => {
                 minimum, maximum, median, and quartiles. By examining the box
                 plot, you can quickly assess the range and variability of these
                 metrics, helping to identify trends and outliers in the resource
-                data. <br><br>
-                0 - 3 : Low <br>
-                4 - 6 : Average <br>
+                data. <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
                 7 - 10 : High
               </div>
             </template>
@@ -175,6 +213,13 @@ onMounted(async () => {
       </UFormGroup>
     </div>
     <div class="">
+      <div v-if="!metricsData.quantityRating && !metricsData.marketValue" class="mx-auto my-8">
+        <div class="mx-auto text-center">
+          <p class="text-sm">
+            No data available to compare the selected resources
+          </p>
+        </div>
+      </div>
       <div ref="boxPlotContainer" style="width: 100%; height: 400px" />
     </div>
   </UCard>

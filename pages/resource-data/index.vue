@@ -187,9 +187,9 @@ onMounted(async () => {
         />
       </div>
 
-      <div class="flex justify-between items-center w-full px-4 py-3">
-        <div class="flex items-center gap-1.5">
-          <span class="text-sm leading-5">Rows per page:</span>
+      <div class="flex flex-col sm:flex-row justify-between items-center w-full px-4 py-3">
+        <div class="flex items-center gap-1.5 mb-2">
+          <span class="text-xs sm:text-sm leading-5">Rows per page:</span>
 
           <USelect
             v-model="pageCount"

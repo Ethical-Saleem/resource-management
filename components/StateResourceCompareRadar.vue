@@ -46,6 +46,13 @@ interface StateMetric {
 const analyticsStore = useAnalyticsStore();
 const loadingStore = useLoadingStore();
 
+const props = defineProps({
+  categoryId: {
+    type: Number,
+    default: () => 2,
+  },
+});
+
 const resourceId1 = ref<number>(93);
 const resourceId2 = ref<number>(94);
 const selectedStateId = ref<number>(1);
@@ -125,17 +132,34 @@ const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-onMounted(async () => {
-  await analyticsStore.dispatchFetchStateResourceCompareMetrics(
-    resourceId1.value,
-    resourceId2.value,
-    selectedStateId.value
-  );
-  states.value = await useApi.get("/territory/fetch-all-states");
-  resources.value = await useApi.get("/resource/fetch-resources-data");
-  selectedStateId.value = states.value[0].id;
-  resourceId1.value = resources.value[0].id;
+watch(
+  () => props.categoryId,
+  async (newCategoryId) => {
+    await fetchResources(newCategoryId);
+    await fetchData()
+  }
+);
+
+const fetchResources = async (categoryId: number) => {
+  loadingStore.showLoading();
+  try {
+    const data = await useApi.get(
+      `/resource/fetch-resources-data-by-category/${categoryId}`
+    );
+    resources.value = data;
+    resourceId1.value = resources.value[0].id;
   resourceId2.value = resources.value[1].id;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingStore.hideLoading();
+  }
+};
+
+onMounted(async () => {
+  states.value = await useApi.get("/territory/fetch-all-states");
+  await fetchResources(props.categoryId)
+  selectedStateId.value = states.value[0].id;
   await fetchData();
 });
 </script>
@@ -159,9 +183,9 @@ onMounted(async () => {
                 in different regions, highlighting areas of strength or concern
                 for each resource. Hover over a state to see the specific metric
                 values for both resources side by side, enabling a detailed
-                comparison. <br /><br />
-                0 - 3 : Low <br />
-                4 - 6 : Average <br />
+                comparison. <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
                 7 - 10 : High
               </div>
             </template>
@@ -170,7 +194,7 @@ onMounted(async () => {
       </div>
     </template>
     <div class="grid grid-cols-12 gap-3 mb-3">
-      <div class="col-span-11 grid grid-cols-3 gap-2">
+      <div class="col-span-12 lg:col-span-11 grid grid-cols-3 gap-2">
         <UFormGroup>
           <USelectMenu
             v-model="resourceId1"
@@ -202,14 +226,23 @@ onMounted(async () => {
           />
         </UFormGroup>
       </div>
-      <UButton
+      <div class="col-span-12 lg:col-span-1 text-end">
+        <UButton
         icon="i-heroicons-magnifying-glass"
         class="text-white rounded-full"
         @click="fetchData"
       />
+      </div>
     </div>
     <div class="">
-      <Radar :data="chartData" />
+      <Radar v-if="stateMetrics.length > 0" :data="chartData" />
+      <div v-else class="mx-auto my-8">
+        <div class="mx-auto text-center">
+          <p class="text-sm">
+            No data available to compare the selected resources
+          </p>
+        </div>
+      </div>
     </div>
   </UCard>
 </template>

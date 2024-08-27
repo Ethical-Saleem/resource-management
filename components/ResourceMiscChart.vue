@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as echarts from "echarts";
 import { useAnalyticsStore } from "~/stores/analytics-store";
+import { useLoadingStore } from "~/stores/loading-store";
 
 import type { Resource } from "~/types";
 
@@ -10,6 +11,14 @@ interface PieChartData {
 }
 
 const analyticsStore = useAnalyticsStore();
+const loadingStore = useLoadingStore();
+
+const props = defineProps({
+  categoryId: {
+    type: Number,
+    default: () => 2,
+  },
+});
 
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>(1);
@@ -28,7 +37,7 @@ const fetchData = async () => {
   try {
     const response = await analyticsStore.dispatchFetchResourceMiscMetrics(resourceId.value, selectedStateId.value);
     pieChartData.value = response.environmentalSustainability;
-    console.log('response', pieChartData.value)
+    console.log('pie-response', response)
     initializeChart(); // Initialize the chart after fetching data
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,10 +87,32 @@ const initializeChart = () => {
   }
 };
 
+watch(
+  () => props.categoryId,
+  async (newCategoryId) => {
+    await fetchResources(newCategoryId);
+    await fetchData()
+  }
+);
+
+const fetchResources = async (categoryId: number) => {
+  loadingStore.showLoading();
+  try {
+    const data = await useApi.get(
+      `/resource/fetch-resources-data-by-category/${categoryId}`
+    );
+    resources.value = data;
+    resourceId.value = resources.value[0].id;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingStore.hideLoading();
+  }
+};
+
 onMounted(async () => {
     states.value = await useApi.get("/territory/fetch-all-states");
-  resources.value = await useApi.get("/resource/fetch-resources-data");
-  resourceId.value = resources.value[0].id
+  await fetchResources(props.categoryId)
   await fetchData();
 });
 </script>

@@ -19,6 +19,13 @@ type ScatterPlotData = {
 const analyticsStore = useAnalyticsStore();
 const loadingStore = useLoadingStore();
 
+const props = defineProps({
+  categoryId: {
+    type: Number,
+    default: () => 2,
+  },
+});
+
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>(1);
 const states = ref([]);
@@ -34,7 +41,7 @@ let currentPage = 1;
 const pageSize = 10; // Adjust page size as needed
 
 const fetchData = async (page: number) => {
-  loadingStore.showLoading()
+  loadingStore.showLoading();
   try {
     const data = await analyticsStore.dispatchFetchResourceMetricsCompare(
       resourceId.value,
@@ -59,7 +66,7 @@ const fetchData = async (page: number) => {
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
-    loadingStore.hideLoading()
+    loadingStore.hideLoading();
   }
 };
 
@@ -150,11 +157,33 @@ const loadMoreData = async () => {
   await fetchData(currentPage);
 };
 
+watch(
+  () => props.categoryId,
+  async (newCategoryId) => {
+    await fetchResources(newCategoryId);
+    await fetchData(currentPage);
+  }
+);
+
+const fetchResources = async (categoryId: number) => {
+  loadingStore.showLoading();
+  try {
+    const data = await useApi.get(
+      `/resource/fetch-resources-data-by-category/${categoryId}`
+    );
+    resources.value = data;
+    resourceId.value = resources.value[0].id;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingStore.hideLoading();
+  }
+};
+
 // Initialize chart on component mount
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
-  resources.value = await useApi.get("/resource/fetch-resources-data");
-  resourceId.value = resources.value[0].id;
+  await fetchResources(props.categoryId);
   await fetchData(currentPage);
 });
 </script>
@@ -178,7 +207,10 @@ onMounted(async () => {
                 environmental impact with industry challenges. By analyzing the
                 distribution of points, you can gain insights into how these
                 metrics relate to each other in different LGAs, helping to
-                identify trends and outliers. <br><br> 0 - 3 : Low <br> 4 - 6 : Average <br> 7 - 10 : High
+                identify trends and outliers. <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
+                7 - 10 : High
               </div>
             </template>
           </UPopover>
@@ -211,6 +243,19 @@ onMounted(async () => {
       </UFormGroup>
     </div>
     <div class="">
+      <div
+        v-if="
+          scatterPlotData.marketValueVsAccessToMarket.length === 0 ||
+          scatterPlotData.environmentalImpactVsIndustryChallenges.length === 0
+        "
+        class="mx-auto"
+      >
+        <div class="mx-auto text-center">
+          <p class="text-sm">
+            No data available to compare the selected resources
+          </p>
+        </div>
+      </div>
       <div ref="scatterPlotContainer" style="width: 100%; height: 400px" />
     </div>
   </UCard>

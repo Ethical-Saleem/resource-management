@@ -1,5 +1,5 @@
 export const useLoadingStore = defineStore("loading-store", () => {
-  const isLoading = ref(true);
+  const isLoading = ref(false);
 
   const showLoading = () => {
     isLoading.value = true;

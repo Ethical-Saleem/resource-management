@@ -36,6 +36,13 @@ interface StateMetric {
 const analyticsStore = useAnalyticsStore();
 const loadingStore = useLoadingStore();
 
+const props = defineProps({
+  categoryId: {
+    type: Number,
+    default: () => 2,
+  },
+});
+
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>();
 const states = ref([]);
@@ -78,17 +85,17 @@ const chartData = computed(() => {
 });
 
 const fetchData = async () => {
-  loadingStore.showLoading()
+  loadingStore.showLoading();
   try {
     const data = await analyticsStore.dispatchFetchStateLevelMetrics(
-    resourceId.value,
-    selectedStateId.value
-  );
-  stateMetrics.value = data;
+      resourceId.value,
+      selectedStateId.value
+    );
+    stateMetrics.value = data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   } finally {
-    loadingStore.hideLoading()
+    loadingStore.hideLoading();
   }
 };
 
@@ -99,10 +106,32 @@ const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+watch(
+  () => props.categoryId,
+  async (newCategoryId) => {
+    await fetchResources(newCategoryId);
+    await fetchData()
+  }
+);
+
+const fetchResources = async (categoryId: number) => {
+  loadingStore.showLoading();
+  try {
+    const data = await useApi.get(
+      `/resource/fetch-resources-data-by-category/${categoryId}`
+    );
+    resources.value = data;
+    resourceId.value = resources.value[0].id;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingStore.hideLoading();
+  }
+};
+
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
-  resources.value = await useApi.get("/resource/fetch-resources-data");
-  resourceId.value = resources.value[0].id;
+  await fetchResources(props.categoryId);
   await fetchData();
 });
 </script>
@@ -125,9 +154,9 @@ onMounted(async () => {
                 opportunities. By hovering over the chart, you can see detailed
                 information on each metric, helping you quickly understand where
                 a state excels or needs improvement in resource management.
-                <br><br>
-                0 - 3 : Low <br>
-                4 - 6 : Average <br>
+                <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
                 7 - 10 : High
               </div>
             </template>
@@ -160,7 +189,14 @@ onMounted(async () => {
       </UFormGroup>
     </div>
     <div class="">
-      <Radar :data="chartData" />
+      <Radar v-if="stateMetrics.length > 0" :data="chartData" />
+      <div v-else class="mx-auto my-8">
+        <div class="mx-auto text-center">
+          <p class="text-sm">
+            No data available to compare the selected resources
+          </p>
+        </div>
+      </div>
     </div>
   </UCard>
 </template>

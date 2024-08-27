@@ -32,6 +32,13 @@ const customStateOptions = computed(() => {
   return [{ id: "", name: "All" }, ...states.value];
 });
 
+const props = defineProps({
+  categoryId: {
+    type: Number,
+    default: () => 2,
+  },
+});
+
 const loadMore = async () => {
   fetchBarChartData();
 };
@@ -59,7 +66,7 @@ const fetchBarChartData = async () => {
 };
 
 const initializeChart = () => {
-  if (chartContainer.value) {
+  // if (chartContainer.value) {
     if (myChart) {
       myChart.dispose();
     }
@@ -108,7 +115,7 @@ const initializeChart = () => {
     };
 
     myChart.setOption(option);
-  }
+  // }
 };
 
 // watch(
@@ -120,11 +127,32 @@ const initializeChart = () => {
 //     }
 //   }
 // );
+const fetchResources = async (categoryId: number) => {
+  loadingStore.showLoading();
+  try {
+    const data = await useApi.get(
+      `/resource/fetch-resources-data-by-category/${categoryId}`
+    );
+    resources.value = data;
+    resourceId.value = resources.value[0].id;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingStore.hideLoading();
+  }
+};
+
+watch(
+  () => props.categoryId,
+  async (newCategoryId) => {
+    await fetchResources(newCategoryId);
+    await fetchBarChartData()
+  }
+);
 
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
-  resources.value = await useApi.get("/resource/fetch-resources-data");
-  resourceId.value = resources.value[0].id;
+  await fetchResources(props.categoryId);
   await fetchBarChartData();
 });
 </script>
@@ -180,6 +208,13 @@ onMounted(async () => {
       </UFormGroup>
     </div>
     <div class="">
+      <div v-if="barChartData.length === 0" class="mx-auto my-8">
+        <div class="mx-auto text-center">
+          <p class="text-sm">
+            No data available to compare the selected resources
+          </p>
+        </div>
+      </div>
       <div ref="chartContainer" style="width: 100%; height: 400px" />
     </div>
   </UCard>
