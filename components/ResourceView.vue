@@ -136,7 +136,7 @@ onMounted(async () => {
         <div v-for="(r, index) in filteredData" :key="index" class="col-span-2">
           <UCard :class="cardBgClass">
             <div class="relative rounded-lg">
-              <NuxtImg :src="r.imageUrl" :alt="r.name" height="250" width="100%" />
+              <NuxtImg :src="r.imageUrl" :alt="r.name" class="w-full h-[200px] object-cover rounded-lg" />
             </div>
             <div class="mt-3">
               <h3
