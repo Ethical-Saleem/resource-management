@@ -15,6 +15,9 @@ const loadingStore = useLoadingStore();
 
 const q = ref<string>("");
 const currentCategory = ref<number>(3);
+const currentPage = ref(1);
+const totalPages = ref(0);
+const totalCount = ref(0);
 const resources = ref([] as Resource[]);
 
 const cardBgClass = computed(() => {
@@ -61,21 +64,24 @@ const convertBufferToBlobUrl = (buffer: any): string => {
   return URL.createObjectURL(blob);
 };
 
-const fetchData = async (categoryId: number) => {
+const fetchData = async (page = 1, categoryId: number) => {
   loadingStore.showLoading();
   currentCategory.value = categoryId;
   try {
     const res = await useApi.get(
-      `/resource/fetch-resources-data-by-category/${categoryId}`
+      `/resource/fetch-resources-data-by-filter?page=${page}&pageSize=${12}&categoryId=${categoryId}`
     );
     console.log("resources", res);
 
-    resources.value = res.map((resource: Resource) => {
+    resources.value = res.data.map((resource: Resource) => {
       if (resource.image) {
         resource.imageUrl = convertBufferToBlobUrl(resource.image);
       }
       return resource;
     });
+    totalPages.value = res.totalPages;
+    currentPage.value = res.currentPage;
+    totalCount.value = res.totalCount;
     console.log("resources-value", resources.value);
   } catch (error) {
     console.log(error);
@@ -85,7 +91,7 @@ const fetchData = async (categoryId: number) => {
 };
 
 onMounted(async () => {
-  await fetchData(3);
+  await fetchData(1, 3);
 });
 </script>
 
@@ -101,7 +107,7 @@ onMounted(async () => {
             block
             :class="currentCategory === 1 ? 'bg-uiearth-700' : 'bg-uimuted-700'"
             class=""
-            @click="fetchData(1)"
+            @click="fetchData(1, 1)"
           />
           <UButton
             label="Energy Resource"
@@ -110,14 +116,14 @@ onMounted(async () => {
               currentCategory === 2 ? 'bg-uiyellow-500' : 'bg-uimuted-700'
             "
             class=""
-            @click="fetchData(2)"
+            @click="fetchData(1, 2)"
           />
           <UButton
             label="Agricultural Produce"
             block
             :class="currentCategory === 3 ? 'bg-uigreen-700' : 'bg-uimuted-700'"
             class=""
-            @click="fetchData(3)"
+            @click="fetchData(1, 3)"
           />
         </div>
       </UCard>
@@ -131,12 +137,31 @@ onMounted(async () => {
           icon="i-heroicons-magnifying-glass-20-solid"
           placeholder="Search for resource"
         />
+        <div class="pagination">
+          <button
+            :disabled="currentPage === 1"
+            @click="fetchData(currentPage - 1, currentCategory)"
+          >
+            Previous
+          </button>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <button
+            :disabled="currentPage === totalPages"
+            @click="fetchData(currentPage + 1, currentCategory)"
+          >
+            Next
+          </button>
+        </div>
       </div>
       <div class="grid sm:grid-cols-4 lg:grid-cols-6 gap-4">
         <div v-for="(r, index) in filteredData" :key="index" class="col-span-2">
           <UCard :class="cardBgClass">
             <div class="relative rounded-lg">
-              <NuxtImg :src="r.imageUrl" :alt="r.name" class="w-full h-[200px] object-cover rounded-lg" />
+              <NuxtImg
+                :src="r.imageUrl"
+                :alt="r.name"
+                class="w-full h-[200px] object-cover rounded-lg"
+              />
             </div>
             <div class="mt-3">
               <h3
