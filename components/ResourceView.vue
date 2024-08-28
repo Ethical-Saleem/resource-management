@@ -115,7 +115,7 @@ onMounted(async () => {
             :class="
               currentCategory === 2 ? 'bg-uiyellow-500' : 'bg-uimuted-700'
             "
-            class=""
+            class="energy_btn"
             @click="fetchData(1, 2)"
           />
           <UButton
