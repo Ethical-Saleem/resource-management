@@ -129,7 +129,7 @@ onMounted(async () => {
       </UCard>
     </div>
     <div class="relative sm:col-span-2 lg:col-span-3">
-      <div class="flex items-center justify-between gap-3 py-3 mb-4">
+      <div class="flex items-center justify-between flex-col sm:flex-row gap-3 py-3 mb-4">
         <UInput
           v-model="q"
           color="uiearth"
@@ -137,9 +137,9 @@ onMounted(async () => {
           icon="i-heroicons-magnifying-glass-20-solid"
           placeholder="Search for resource"
         />
-        <div class="pagination">
+        <div class="pagination mt-4 sm:mt-2">
           <UButton
-            icon="i-heroicons-chevron-left
+            icon="i-heroicons-chevron-left"
             color="uiearth"
             :disabled="currentPage === 1"
             @click="fetchData(currentPage - 1, currentCategory)"
@@ -148,7 +148,7 @@ onMounted(async () => {
           </UButton>
           <span class="text-md">Page {{ currentPage }} of {{ totalPages }}</span>
           <UButton
-            icon="i-heroicons-chevron-right
+            icon="i-heroicons-chevron-right"
             color="uiearth"
             trailing
             :disabled="currentPage === totalPages"
