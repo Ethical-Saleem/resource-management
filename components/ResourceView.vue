@@ -138,19 +138,24 @@ onMounted(async () => {
           placeholder="Search for resource"
         />
         <div class="pagination">
-          <button
+          <UButton
+            icon="i-heroicons-chevron-left
+            color="uiearth"
             :disabled="currentPage === 1"
             @click="fetchData(currentPage - 1, currentCategory)"
           >
             Previous
-          </button>
-          <span>Page {{ currentPage }} of {{ totalPages }}</span>
-          <button
+          </UButton>
+          <span class="text-md">Page {{ currentPage }} of {{ totalPages }}</span>
+          <UButton
+            icon="i-heroicons-chevron-right
+            color="uiearth"
+            trailing
             :disabled="currentPage === totalPages"
             @click="fetchData(currentPage + 1, currentCategory)"
           >
             Next
-          </button>
+          </UButton>
         </div>
       </div>
       <div class="grid sm:grid-cols-4 lg:grid-cols-6 gap-4">
