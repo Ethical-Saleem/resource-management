@@ -51,6 +51,7 @@ const search = ref("");
 const currentView = ref(1);
 const fetching = ref(false);
 const loading = ref(false);
+const selectedCategoryId = ref<number | null>(null);
 const rowData = ref([] as Resource[]);
 const newImage = ref<File | null>(null);
 const selectedResource = ref<Resource | null>(null);
@@ -117,15 +118,22 @@ const closeImageModal = () => {
 };
 
 const filteredData = computed(() => {
-  if (!q.value) {
-    return rowData.value;
+  let filtered = rowData.value;
+
+  if (selectedCategoryId.value) {
+    filtered = filtered.filter((item) =>
+      item.categories.some((cat) => cat.categoryId === selectedCategoryId.value)
+    );
+  }
+  if (q.value) {
+    filtered = filtered.filter((item) => {
+      return Object.values(item).some((value) => {
+        return String(value).toLowerCase().includes(q.value.toLowerCase());
+      });
+    });
   }
 
-  return rowData.value.filter((item) => {
-    return Object.values(item).some((value) => {
-      return String(value).toLowerCase().includes(q.value.toLowerCase());
-    });
-  });
+  return filtered;
 });
 const paginatedFilteredData = computed(() => {
   const start = (page.value - 1) * pageCount.value;
@@ -138,28 +146,31 @@ const setCurrentView = (value: number) => {
 };
 
 const addImage = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     if (newImage.value) {
       const data = new FormData();
-      data.append('image', newImage.value);
-      
-      const res = await useApi.postForm(`/resource/add-resource-image/${selectedResource?.value?.id}`, data);
+      data.append("image", newImage.value);
+
+      const res = await useApi.postForm(
+        `/resource/add-resource-image/${selectedResource?.value?.id}`,
+        data
+      );
       if (res) {
-        alert('Resource Image added successfully');
+        alert("Resource Image added successfully");
         closeImageModal();
         // await fetchData()
-        removeSignFile()
+        removeSignFile();
       }
     } else {
-      alert('No image selected');
+      alert("No image selected");
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   } finally {
     loading.value = false;
   }
-}
+};
 
 const fetchData = async () => {
   loadingStore.showLoading();
@@ -263,6 +274,18 @@ onMounted(async () => {
           v-model="q"
           icon="i-heroicons-magnifying-glass-20-solid"
           placeholder="Search..."
+        />
+        <USelectMenu
+          v-model="selectedCategoryId"
+          :options="[
+            { id: 1, name: 'Solid Minerals' },
+            { id: 2, name: 'Energy Resource' },
+            { id: 3, name: 'Agricultural Produce' },
+          ]"
+          searchable
+          option-attribute="name"
+          value-attribute="id"
+          placeholder="-- Select --"
         />
       </div>
 
@@ -423,7 +446,7 @@ onMounted(async () => {
                     :src="signFileUrl"
                     alt="preview"
                     class="w-20 h-20 object-cover rounded-md"
-                  >
+                  />
                   <div class="flex flex-col items-start">
                     <span class="text-sm font-medium">{{ signFile.name }}</span>
                     <span class="text-xs text-gray-500"
@@ -444,7 +467,7 @@ onMounted(async () => {
                   accept="image/*"
                   class="hidden"
                   @change="handleSignFileChange"
-                >
+                />
               </div>
             </UFormGroup>
           </fieldset>

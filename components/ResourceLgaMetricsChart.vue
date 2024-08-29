@@ -101,7 +101,6 @@ const fetchBarChartData = async (): Promise<BarChartData[]> => {
     resourceId.value,
     skip.value,
     take.value,
-    selectedStateId.value,
   );
   apiData.value = res;
   populateChartData(apiData.value);

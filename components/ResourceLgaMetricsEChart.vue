@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAnalyticsStore } from "~/stores/analytics-store";
-import { useLoadingStore } from "~/stores/loading-store"; 
+import { useLoadingStore } from "~/stores/loading-store";
 import * as echarts from "echarts";
 
 import type { Resource } from "~/types";
@@ -17,9 +17,9 @@ interface BarChartData {
   investmentOpportunities: number;
 }
 
-const skip = ref(0);
-const take = ref(8);
-const hasMore = ref(true);
+const currentPage = ref(1);
+const totalPages = ref(0);
+const totalCount = ref(0);
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>();
 const states = ref([]);
@@ -39,82 +39,86 @@ const props = defineProps({
   },
 });
 
+const loadPrev = async () => {
+  currentPage.value = currentPage.value - 1;
+  fetchBarChartData();
+};
+
 const loadMore = async () => {
+  currentPage.value = currentPage.value + 1;
   fetchBarChartData();
 };
 
 const fetchBarChartData = async () => {
-  loadingStore.showLoading()
+  loadingStore.showLoading();
   try {
     const res = await analyticsStore.dispatchFetchResourceBarMetrics(
       resourceId.value,
-      skip.value,
-      take.value,
+      currentPage.value,
       selectedStateId.value
     );
-    if (res.length < take.value) {
-      hasMore.value = false;
-    }
-    barChartData.value = res;
-    skip.value += take.value;
+    barChartData.value = res.barChartData;
+    totalPages.value = res.totalPages;
+    currentPage.value = res.currentPage;
+    totalCount.value = res.totalCount;
     initializeChart();
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
-    loadingStore.hideLoading()
+    loadingStore.hideLoading();
   }
 };
 
 const initializeChart = () => {
   // if (chartContainer.value) {
-    if (myChart) {
-      myChart.dispose();
-    }
+  if (myChart) {
+    myChart.dispose();
+  }
 
-    myChart = echarts.init(chartContainer.value);
+  myChart = echarts.init(chartContainer.value);
 
-    const option: echarts.EChartsOption = {
-      tooltip: {},
-      legend: {
-        data: [
-          "Environmental Impact",
-          "Industry Challenges",
-          "Stakeholder Engagement",
-          "Investment Opportunities",
-        ],
-      },
-      xAxis: {
-        type: "category",
-        data: barChartData.value.map((item) => item.lgaName),
-      },
-      yAxis: {
-        type: "value",
-      },
-      series: [
-        {
-          name: "Environmental Impact",
-          type: "bar",
-          data: barChartData.value.map((item) => item.environmentalImpact),
-        },
-        {
-          name: "Industry Challenges",
-          type: "bar",
-          data: barChartData.value.map((item) => item.industryChallenges),
-        },
-        {
-          name: "Stakeholder Engagement",
-          type: "bar",
-          data: barChartData.value.map((item) => item.stakeholderEngagement),
-        },
-        {
-          name: "Investment Opportunities",
-          type: "bar",
-          data: barChartData.value.map((item) => item.investmentOpportunities),
-        },
+  const option: echarts.EChartsOption = {
+    tooltip: {},
+    legend: {
+      data: [
+        "Environmental Impact",
+        "Industry Challenges",
+        "Stakeholder Engagement",
+        "Investment Opportunities",
       ],
-    };
+    },
+    xAxis: {
+      type: "category",
+      data: barChartData.value.map((item) => item.lgaName),
+    },
+    yAxis: {
+      type: "value",
+    },
+    series: [
+      {
+        name: "Environmental Impact",
+        type: "bar",
+        data: barChartData.value.map((item) => item.environmentalImpact),
+      },
+      {
+        name: "Industry Challenges",
+        type: "bar",
+        data: barChartData.value.map((item) => item.industryChallenges),
+      },
+      {
+        name: "Stakeholder Engagement",
+        type: "bar",
+        data: barChartData.value.map((item) => item.stakeholderEngagement),
+      },
+      {
+        name: "Investment Opportunities",
+        type: "bar",
+        data: barChartData.value.map((item) => item.investmentOpportunities),
+      },
+    ],
+  };
 
-    myChart.setOption(option);
+  myChart.setOption(option);
   // }
 };
 
@@ -146,7 +150,7 @@ watch(
   () => props.categoryId,
   async (newCategoryId) => {
     await fetchResources(newCategoryId);
-    await fetchBarChartData()
+    await fetchBarChartData();
   }
 );
 
@@ -175,12 +179,31 @@ onMounted(async () => {
                 industry challenges, stakeholder engagement, and investment
                 opportunities. By hovering over the bars, you can see detailed
                 metrics for each LGA, helping you identify areas of strength or
-                concern. <br><br> 0 - 3 : Low <br> 4 - 6 : Average <br> 7 - 10 : High
+                concern. <br /><br />
+                0 - 3 : Low <br />
+                4 - 6 : Average <br />
+                7 - 10 : High
               </div>
             </template>
           </UPopover>
         </div>
-        <UButton v-if="hasMore" @click="loadMore">Load More</UButton>
+        <div class="flex items-center mt-4 sm:mt-2">
+          <UButton
+            icon="i-heroicons-chevron-left"
+            color="uiearth"
+            class="!text-white"
+            :disabled="currentPage === 1"
+            @click="loadPrev"
+          />
+          <UButton
+            icon="i-heroicons-chevron-right"
+            color="uiearth"
+            trailing
+            class="!text-white"
+            :disabled="currentPage === totalPages"
+            @click="loadMore"
+          />
+        </div>
       </div>
     </template>
     <div class="grid grid-cols-2 gap-3 mb-3">

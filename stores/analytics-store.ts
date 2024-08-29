@@ -83,9 +83,9 @@ export const useAnalyticsStore = defineStore("analytics-store", {
       }
     },
 
-    async dispatchFetchResourceBarMetrics(resourceId: number, skip: number, take: number, stateId?: number) {
+    async dispatchFetchResourceBarMetrics(resourceId: number, page: number, stateId?: number) {
       try {
-        const data = await useApi.get(`/analytics/${resourceId}/resource-metrics-by-lga?stateId=${stateId}&page=${skip}&size=${take}`);
+        const data = await useApi.get(`/analytics/${resourceId}/resource-metrics-by-lga?stateId=${stateId}&page=${page}&pageSize=${8}`);
         console.log('resource-lga-level-metrics', data);
         return data;
       } catch (error) {
@@ -119,6 +119,17 @@ export const useAnalyticsStore = defineStore("analytics-store", {
     async dispatchFetchStateResourceOutliers(resourceId: number, stateId?: number) {
       try {
         const data = await useApi.get(`/analytics/${resourceId}/resource-outlier-by-state?stateId=${stateId}`);
+        console.log('state-outlier-metrics', data);
+        return data;
+      } catch (error) {
+        console.log('state-resource-outlier-error', error);
+        throw error;
+      }
+    },
+
+    async dispatchFetchStateResourceHeatmap(stateId: number, resourceIds: number[]) {
+      try {
+        const data = await useApi.get(`/analytics/resource-heatmap/${stateId}?resourceIds=${resourceIds}`);
         console.log('state-outlier-metrics', data);
         return data;
       } catch (error) {

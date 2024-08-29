@@ -140,7 +140,7 @@ onMounted(async () => {
             icon="i-heroicons-magnifying-glass-20-solid"
             placeholder="Search for resource"
           />
-          <div class="flex items-center mt-4 sm:mt-2">
+          <div class="flex items-center gap-4 mt-4 sm:mt-2">
             <UButton
               icon="i-heroicons-chevron-left"
               color="uiearth"
