@@ -43,7 +43,7 @@ const props = defineProps({
   },
 });
 
-const resourceId = ref<number>(1);
+const resourceId = ref<number | null>(null);
 const selectedStateId = ref<number | undefined>();
 const states = ref([]);
 const resources = ref([] as Resource[]);
@@ -87,11 +87,14 @@ const chartData = computed(() => {
 const fetchData = async () => {
   loadingStore.showLoading();
   try {
-    const data = await analyticsStore.dispatchFetchStateLevelMetrics(
-      resourceId.value,
-      selectedStateId.value
-    );
-    stateMetrics.value = data;
+    console.log('resourceId', resourceId.value)
+    if (resourceId.value) {
+      const data = await analyticsStore.dispatchFetchStateLevelMetrics(
+        resourceId.value,
+        selectedStateId.value
+      );
+      stateMetrics.value = data;
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -110,24 +113,33 @@ watch(
   () => props.categoryId,
   async (newCategoryId) => {
     await fetchResources(newCategoryId);
-    await fetchData()
+    await fetchData();
   }
 );
 
 const fetchResources = async (categoryId: number) => {
   loadingStore.showLoading();
   try {
-    const data = await useApi.get(
+    const data: Resource[] = await useApi.get(
       `/resource/fetch-resources-data-by-category/${categoryId}`
     );
     resources.value = data;
-    resourceId.value = resources.value[0].id;
+    if (data.length > 0) {
+      resourceId.value = data[0].id; // Set the first resource as the default
+    }
+    console.log('data', data)
   } catch (error) {
     console.log(error);
   } finally {
     loadingStore.hideLoading();
   }
 };
+
+watchEffect(() => {
+  if (resourceId.value) {
+    fetchData();
+  }
+});
 
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
@@ -154,9 +166,9 @@ onMounted(async () => {
                 opportunities. By hovering over the chart, you can see detailed
                 information on each metric, helping you quickly understand where
                 a state excels or needs improvement in resource management.
-                <br ><br >
-                0 - 3 : Low <br >
-                4 - 6 : Average <br >
+                <br /><br />
+                0 - 3 : Low <br />
+                4 - 6 : Average <br />
                 7 - 10 : High
               </div>
             </template>
