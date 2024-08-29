@@ -129,35 +129,43 @@ onMounted(async () => {
       </UCard>
     </div>
     <div class="relative sm:col-span-2 lg:col-span-3">
-      <div class="flex items-center justify-between flex-col sm:flex-row gap-3 py-3 mb-4">
-        <UInput
-          v-model="q"
-          color="uiearth"
-          class="bg-uimuted-300 text-uiearth-400 rounded-md"
-          icon="i-heroicons-magnifying-glass-20-solid"
-          placeholder="Search for resource"
-        />
-        <div class="pagination mt-4 sm:mt-2">
-          <UButton
-            icon="i-heroicons-chevron-left"
+      <UCard class="mb-4 bg-uimuted-300">
+        <div
+          class="flex items-center justify-between flex-col sm:flex-row gap-3"
+        >
+          <UInput
+            v-model="q"
             color="uiearth"
-            :disabled="currentPage === 1"
-            @click="fetchData(currentPage - 1, currentCategory)"
-          >
-            Previous
-          </UButton>
-          <span class="text-md">Page {{ currentPage }} of {{ totalPages }}</span>
-          <UButton
-            icon="i-heroicons-chevron-right"
-            color="uiearth"
-            trailing
-            :disabled="currentPage === totalPages"
-            @click="fetchData(currentPage + 1, currentCategory)"
-          >
-            Next
-          </UButton>
+            class="bg-uimuted-300 dark:bg-uimuted-800 text-uiearth-400 rounded-md"
+            icon="i-heroicons-magnifying-glass-20-solid"
+            placeholder="Search for resource"
+          />
+          <div class="flex items-center mt-4 sm:mt-2">
+            <UButton
+              icon="i-heroicons-chevron-left"
+              color="uiearth"
+              class="!text-white"
+              :disabled="currentPage === 1"
+              @click="fetchData(currentPage - 1, currentCategory)"
+            >
+              Previous
+            </UButton>
+            <span class="text-md px-3"
+              >Page <strong class="text-uigreen-500">{{ currentPage }}</strong> of <strong class="text-uigreen-500">{{ totalPages }}</strong></span
+            >
+            <UButton
+              icon="i-heroicons-chevron-right"
+              color="uiearth"
+              trailing
+              class="!text-white"
+              :disabled="currentPage === totalPages"
+              @click="fetchData(currentPage + 1, currentCategory)"
+            >
+              Next
+            </UButton>
+          </div>
         </div>
-      </div>
+      </UCard>
       <div class="grid sm:grid-cols-4 lg:grid-cols-6 gap-4">
         <div v-for="(r, index) in filteredData" :key="index" class="col-span-2">
           <UCard :class="cardBgClass">
