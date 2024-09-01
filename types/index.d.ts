@@ -31,7 +31,7 @@ export interface Resource {
   amount: number | null;
   value: number | null;
   quality: string | null;
-  colorCode: string | null;
+  colorCode: string;
   image: Buffer | null;
   imageUrl?: string;
   categories: ResourceCategory[];

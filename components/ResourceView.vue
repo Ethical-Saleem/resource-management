@@ -58,11 +58,11 @@ const filteredData = computed(() => {
   });
 });
 
-const convertBufferToBlobUrl = (buffer: any): string => {
-  const byteArray = new Uint8Array(buffer.data);
-  const blob = new Blob([byteArray], { type: "image/jpeg" });
-  return URL.createObjectURL(blob);
-};
+// const convertBufferToBlobUrl = (buffer: any): string => {
+//   const byteArray = new Uint8Array(buffer.data);
+//   const blob = new Blob([byteArray], { type: "image/jpeg" });
+//   return URL.createObjectURL(blob);
+// };
 
 const fetchData = async (page = 1, categoryId: number) => {
   loadingStore.showLoading();
@@ -73,12 +73,13 @@ const fetchData = async (page = 1, categoryId: number) => {
     );
     console.log("resources", res);
 
-    resources.value = res.data.map((resource: Resource) => {
-      if (resource.image) {
-        resource.imageUrl = convertBufferToBlobUrl(resource.image);
-      }
-      return resource;
-    });
+    // resources.value = res.data.map((resource: Resource) => {
+    //   if (resource.image) {
+    //     resource.imageUrl = convertBufferToBlobUrl(resource.image);
+    //   }
+    //   return resource;
+    // });
+    resources.value = res.data;
     totalPages.value = res.totalPages;
     currentPage.value = res.currentPage;
     totalCount.value = res.totalCount;

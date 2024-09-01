@@ -72,9 +72,9 @@ const selectedResourceCategory = ref<number | null>(null);
       <div class="col-span-12 md:col-span-6">
         <StateResourceBoxChart :category-id="selectedResourceCategory" />
       </div>
-      <div class="col-span-12 md:col-span-12">
+      <!-- <div class="col-span-12 md:col-span-12">
         <ResourceHeatMap :category-id="selectedResourceCategory" />
-      </div>
+      </div> -->
     </div>
     <div v-else class="">
       <UCard>
