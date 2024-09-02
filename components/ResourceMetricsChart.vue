@@ -1,27 +1,12 @@
 <script setup lang="ts">
-import { Radar } from "vue-chartjs";
+import { Pie } from "vue-chartjs";
 import { useAnalyticsStore } from "~/stores/analytics-store";
-import { useLoadingStore } from "~/stores/loading-store";
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-} from "chart.js";
+// import { useLoadingStore } from "~/stores/loading-store";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 import type { Resource } from "~/types";
 
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface StateMetric {
   stateName: string;
@@ -34,7 +19,7 @@ interface StateMetric {
 }
 
 const analyticsStore = useAnalyticsStore();
-const loadingStore = useLoadingStore();
+// const loadingStore = useLoadingStore();
 
 const props = defineProps({
   categoryId: {
@@ -44,84 +29,59 @@ const props = defineProps({
 });
 
 const resourceId = ref<number | null>(null);
-const selectedStateId = ref<number | undefined>();
+const selectedStateId = ref<number | null>(null);
 const states = ref([]);
 const loading = ref(false);
 const resources = ref([] as Resource[]);
 const stateMetrics = ref([] as StateMetric[]);
-
-const customStateOptions = computed(() => {
-  return [{ id: "", name: "All" }, ...states.value];
+const chartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false, // Important to allow custom sizing
 });
 
 const chartData = computed(() => {
-  const labels = [
-    "Access to Market",
-    "Market Value",
-    "Quality",
-    "Environmental Impact",
-    "Investment Opportunities",
-  ];
-  const datasets = stateMetrics.value.map((metric) => ({
-    label: metric.stateName,
-    data: [
-      metric.accessToMarket,
-      metric.marketValue,
-      metric.quality,
-      metric.environmentalImpact,
-      metric.investmentOpportunities,
-    ],
-    backgroundColor: hexToRgba(metric.color, 0.4),
-    borderColor: metric.color,
-    pointBackgroundColor: metric.color,
-    pointBorderColor: "#fff",
-    pointHoverBackgroundColor: "#fff",
-    pointHoverBorderColor: metric.color,
-  }));
+  const labels = stateMetrics.value.map((item) => item.name);
+  const data = stateMetrics.value.map((item) => item.value);
 
   return {
     labels,
-    datasets,
+    datasets: [
+      {
+        data,
+        backgroundColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
   };
 });
-
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      labels: {
-        font: {
-          size: 16, // Increase the legend label font size
-        },
-      },
-    },
-  },
-  scales: {
-    r: {
-      pointLabels: {
-        font: {
-          size: 14, // Increase the radar point label font size
-        },
-      },
-      ticks: {
-        font: {
-          size: 12, // Increase the radar ticks font size
-        },
-      },
-    },
-  },
-};
 
 const fetchData = async () => {
   loading.value = true;
   try {
     console.log("resourceId", resourceId.value);
-    if (resourceId.value) {
-      const data = await analyticsStore.dispatchFetchStateLevelMetrics(
+    if (resourceId.value && selectedStateId.value) {
+      const data = await analyticsStore.dispatchFetchStateResourceValueMetrics(
         resourceId.value,
         selectedStateId.value
       );
-      stateMetrics.value = data;
+      //   stateMetrics.value = data;
+      stateMetrics.value = data.map((item) => ({
+        name: item.name,
+        value: item.value,
+      }));
     }
   } catch (error) {
     console.log(error);
@@ -130,23 +90,23 @@ const fetchData = async () => {
   }
 };
 
-const hexToRgba = (hex: string, alpha: number): string => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
+// const hexToRgba = (hex: string, alpha: number): string => {
+//   const r = parseInt(hex.slice(1, 3), 16);
+//   const g = parseInt(hex.slice(3, 5), 16);
+//   const b = parseInt(hex.slice(5, 7), 16);
+//   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+// };
 
 watch(
   () => props.categoryId,
   async (newCategoryId) => {
     await fetchResources(newCategoryId);
-    await fetchData();
+    // await fetchData();
   }
 );
 
 const fetchResources = async (categoryId: number) => {
-  loadingStore.showLoading();
+  loading.value = true;
   try {
     const data: Resource[] = await useApi.get(
       `/resource/fetch-resources-data-by-category/${categoryId}`
@@ -159,20 +119,20 @@ const fetchResources = async (categoryId: number) => {
   } catch (error) {
     console.log(error);
   } finally {
-    loadingStore.hideLoading();
+    loading.value = false;
   }
 };
 
-watchEffect(() => {
-  if (resourceId.value) {
-    fetchData();
-  }
-});
+// watchEffect(() => {
+//   if (resourceId.value) {
+//     fetchData();
+//   }
+// });
 
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
   await fetchResources(props.categoryId);
-  await fetchData();
+  //   await fetchData();
 });
 </script>
 
@@ -204,32 +164,41 @@ onMounted(async () => {
         </div>
       </div>
     </template>
-    <div class="grid grid-cols-2 gap-3 mb-3">
-      <UFormGroup>
-        <USelectMenu
-          v-model="resourceId"
-          :options="resources"
-          option-attribute="name"
-          value-attribute="id"
-          searchable
-          placeholder="-- Select --"
-          @change="fetchData"
+    <div class="grid grid-cols-12 gap-3 mb-3">
+      <div class="col-span-12 lg:col-span-11 grid grid-cols-2 gap-2">
+        <UFormGroup>
+          <USelectMenu
+            v-model="resourceId"
+            :options="resources"
+            option-attribute="name"
+            value-attribute="id"
+            searchable
+            placeholder="-- Select --"
+          />
+        </UFormGroup>
+        <UFormGroup>
+          <USelectMenu
+            v-model="selectedStateId"
+            :options="states"
+            option-attribute="name"
+            value-attribute="id"
+            searchable
+            placeholder="-- Select --"
+          />
+        </UFormGroup>
+      </div>
+      <div class="col-span-12 lg:col-span-1 text-end">
+        <UButton
+          icon="i-heroicons-magnifying-glass"
+          class="text-white rounded-full"
+          @click="fetchData"
         />
-      </UFormGroup>
-      <UFormGroup>
-        <USelectMenu
-          v-model="selectedStateId"
-          :options="customStateOptions"
-          option-attribute="name"
-          value-attribute="id"
-          searchable
-          placeholder="-- Select --"
-          @change="fetchData"
-        />
-      </UFormGroup>
+      </div>
     </div>
     <div v-if="!loading" class="">
-      <Radar v-if="stateMetrics.length > 0" :data="chartData" :options="chartOptions" />
+      <div v-if="stateMetrics.length > 0" style="height: '300px'">
+        <Pie :data="chartData" :options="chartOptions" />
+      </div>
       <div v-else class="mx-auto my-8">
         <div class="mx-auto text-center">
           <p class="text-sm">
@@ -248,8 +217,8 @@ onMounted(async () => {
 .spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid #9C4010;
-  border-top-color: #9C4010;
+  border: 5px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

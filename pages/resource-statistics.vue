@@ -60,18 +60,21 @@ const selectedResourceCategory = ref<number | null>(null);
       <div class="col-span-12 md:col-span-6">
         <ResourceLgaMetricsEChart :category-id="selectedResourceCategory" />
       </div>
-      <div class="col-span-12 md:col-span-5">
+      <!-- <div class="col-span-12 md:col-span-5">
         <ResourceMiscChart :category-id="selectedResourceCategory" />
-      </div>
+      </div> -->
       <div class="col-span-12 md:col-span-7">
-        <ResourceMetricCompareChart :category-id="selectedResourceCategory" />
+        <ResourceMetricsChart :category-id="selectedResourceCategory" />
+      </div>
+      <div class="col-span-12 md:col-span-6">
+        <ResourceValueChainBar :category-id="selectedResourceCategory" />
       </div>
       <div class="col-span-12 md:col-span-6">
         <StateResourceCompareRadar :category-id="selectedResourceCategory" />
       </div>
-      <div class="col-span-12 md:col-span-6">
+      <!-- <div class="col-span-12 md:col-span-6">
         <StateResourceBoxChart :category-id="selectedResourceCategory" />
-      </div>
+      </div> -->
       <!-- <div class="col-span-12 md:col-span-12">
         <ResourceHeatMap :category-id="selectedResourceCategory" />
       </div> -->

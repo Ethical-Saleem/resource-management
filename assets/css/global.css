@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --spinner-border-color: rgba(0, 0, 0, 0.2); /* Light theme border */
+  --spinner-border-top-color: #000; /* Light theme border top */
+}
+
+[data-theme="dark"] {
+  --spinner-border-color: rgba(255, 255, 255, 0.2); /* Dark theme border */
+  --spinner-border-top-color: #fff; /* Dark theme border top */
+}

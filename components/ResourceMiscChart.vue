@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as echarts from "echarts";
 import { useAnalyticsStore } from "~/stores/analytics-store";
-import { useLoadingStore } from "~/stores/loading-store";
+// import { useLoadingStore } from "~/stores/loading-store";
 
 import type { Resource } from "~/types";
 
@@ -11,7 +11,7 @@ interface PieChartData {
 }
 
 const analyticsStore = useAnalyticsStore();
-const loadingStore = useLoadingStore();
+// const loadingStore = useLoadingStore();
 
 const props = defineProps({
   categoryId: {
@@ -21,6 +21,7 @@ const props = defineProps({
 });
 
 const resourceId = ref<number>(1);
+const loading = ref(false);
 const selectedStateId = ref<number | undefined>(1);
 const states = ref([]);
 const resources = ref([] as Resource[]);
@@ -34,6 +35,7 @@ const pieChartData = ref<PieChartData[]>([]);
 let myChart: echarts.ECharts | null = null;
 
 const fetchData = async () => {
+  loading.value = true
   try {
     const response = await analyticsStore.dispatchFetchResourceMiscMetrics(resourceId.value, selectedStateId.value);
     pieChartData.value = response.environmentalSustainability;
@@ -41,6 +43,8 @@ const fetchData = async () => {
     initializeChart(); // Initialize the chart after fetching data
   } catch (error) {
     console.error("Error fetching data:", error);
+  } finally {
+    loading.value = false
   }
 };
 
@@ -96,7 +100,7 @@ watch(
 );
 
 const fetchResources = async (categoryId: number) => {
-  loadingStore.showLoading();
+  // loadingStore.showLoading();
   try {
     const data = await useApi.get(
       `/resource/fetch-resources-data-by-category/${categoryId}`
@@ -106,7 +110,7 @@ const fetchResources = async (categoryId: number) => {
   } catch (error) {
     console.log(error);
   } finally {
-    loadingStore.hideLoading();
+    // loadingStore.hideLoading();
   }
 };
 
@@ -118,7 +122,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UCard>
+  <UCard class="bg-uigreen-50 ring-2 ring-uiearth-700">
     <template #header>
       <div class="flex items-center justify-between">
         <div class="">
@@ -153,5 +157,8 @@ onMounted(async () => {
     <div class="">
       <div ref="pieChartContainer" style="width: 100%; height: 400px" />
     </div>
+    <!-- <div v-if="loading" class="flex items-center justify-center my-4">
+      <div class="spinner" />
+    </div> -->
   </UCard>
 </template>

@@ -137,5 +137,27 @@ export const useAnalyticsStore = defineStore("analytics-store", {
         throw error;
       }
     },
+
+    async dispatchFetchStateResourceValueMetrics(resourceId: number, stateId: number) {
+      try {
+        const data = await useApi.get(`/analytics/${resourceId}/resource-value-metrics-compare/stateId=${stateId}`);
+        console.log('state-outlier-metrics', data);
+        return data;
+      } catch (error) {
+        console.log('state-resource-outlier-error', error);
+        throw error;
+      }
+    },
+
+    async dispatchFetchValueChainAnalysisByState(resourceId: number) {
+      try {
+        const data = await useApi.get(`/analytics/${resourceId}/resource-value-chain-data`);
+        console.log('state-value-chain', data);
+        return data;
+      } catch (error) {
+        console.log('state-value-chain-error', error);
+        throw error;
+      }
+    },
   },
 });

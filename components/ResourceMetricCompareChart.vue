@@ -27,6 +27,7 @@ const props = defineProps({
 });
 
 const resourceId = ref<number>(1);
+const loading = ref(false);
 const selectedStateId = ref<number | undefined>(1);
 const states = ref([]);
 const resources = ref([] as Resource[]);
@@ -166,7 +167,7 @@ watch(
 );
 
 const fetchResources = async (categoryId: number) => {
-  loadingStore.showLoading();
+  loading.value = true;
   try {
     const data = await useApi.get(
       `/resource/fetch-resources-data-by-category/${categoryId}`
@@ -176,7 +177,7 @@ const fetchResources = async (categoryId: number) => {
   } catch (error) {
     console.log(error);
   } finally {
-    loadingStore.hideLoading();
+    loading.value = false;
   }
 };
 
@@ -242,7 +243,7 @@ onMounted(async () => {
         />
       </UFormGroup>
     </div>
-    <div class="">
+    <div v-if="!loading" class="">
       <div
         v-if="
           scatterPlotData.marketValueVsAccessToMarket.length === 0 ||
@@ -257,6 +258,9 @@ onMounted(async () => {
         </div>
       </div>
       <div ref="scatterPlotContainer" style="width: 100%; height: 400px" />
+    </div>
+    <div v-if="loading" class="flex items-center justify-center my-4">
+      <div class="spinner" />
     </div>
   </UCard>
 </template>

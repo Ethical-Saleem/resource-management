@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useAnalyticsStore } from "~/stores/analytics-store";
-import { useLoadingStore } from "~/stores/loading-store";
+// import { useLoadingStore } from "~/stores/loading-store";
 import * as echarts from "echarts";
 
 import type { Resource } from "~/types";
 
 const analyticsStore = useAnalyticsStore();
-const loadingStore = useLoadingStore();
+// const loadingStore = useLoadingStore();
 
 interface BarChartData {
   lgaId: number;
@@ -20,6 +20,7 @@ interface BarChartData {
 const currentPage = ref(1);
 const totalPages = ref(0);
 const totalCount = ref(0);
+const loading = ref(false);
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>();
 const states = ref([]);
@@ -50,7 +51,7 @@ const loadMore = async () => {
 };
 
 const fetchBarChartData = async () => {
-  loadingStore.showLoading();
+  loading.value = true;
   try {
     const res = await analyticsStore.dispatchFetchResourceBarMetrics(
       resourceId.value,
@@ -65,7 +66,7 @@ const fetchBarChartData = async () => {
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
-    loadingStore.hideLoading();
+    loading.value = false;
   }
 };
 
@@ -132,7 +133,7 @@ const initializeChart = () => {
 //   }
 // );
 const fetchResources = async (categoryId: number) => {
-  loadingStore.showLoading();
+  // loadingStore.showLoading();
   try {
     const data = await useApi.get(
       `/resource/fetch-resources-data-by-category/${categoryId}`
@@ -142,7 +143,7 @@ const fetchResources = async (categoryId: number) => {
   } catch (error) {
     console.log(error);
   } finally {
-    loadingStore.hideLoading();
+    // loadingStore.hideLoading();
   }
 };
 
@@ -162,7 +163,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UCard>
+  <UCard class="bg-uigreen-50 ring-2 ring-uiearth-700">
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
@@ -240,5 +241,8 @@ onMounted(async () => {
       </div>
       <div ref="chartContainer" style="width: 100%; height: 400px" />
     </div>
+    <!-- <div v-if="loading" class="flex items-center justify-center my-4">
+      <div class="spinner" />
+    </div> -->
   </UCard>
 </template>

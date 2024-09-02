@@ -102,7 +102,7 @@ onMounted(async () => {
 
 <template>
   <div class="">
-    <UCard>
+    <UCard class="bg-uigreen-50 ring-2 ring-uiearth-700">
       <template #header>
         <div class="flex items-center justify-between">
           <div class="">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Radar } from "vue-chartjs";
 import { useAnalyticsStore } from "~/stores/analytics-store";
-import { useLoadingStore } from "~/stores/loading-store";
+// import { useLoadingStore } from "~/stores/loading-store";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -44,7 +44,7 @@ interface StateMetric {
 }
 
 const analyticsStore = useAnalyticsStore();
-const loadingStore = useLoadingStore();
+// const loadingStore = useLoadingStore();
 
 const props = defineProps({
   categoryId: {
@@ -55,6 +55,7 @@ const props = defineProps({
 
 const resourceId1 = ref<number>(93);
 const resourceId2 = ref<number>(94);
+const loading = ref(false);
 const selectedStateId = ref<number>(1);
 const states = ref([] as State[]);
 const resources = ref([] as Resource[]);
@@ -110,7 +111,7 @@ const chartData = computed(() => {
 });
 
 const fetchData = async () => {
-  loadingStore.showLoading();
+  loading.value = true;
   try {
     const data = await analyticsStore.dispatchFetchStateResourceCompareMetrics(
       resourceId1.value,
@@ -121,7 +122,7 @@ const fetchData = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    loadingStore.hideLoading();
+    loading.value = false;
   }
 };
 
@@ -141,7 +142,7 @@ watch(
 );
 
 const fetchResources = async (categoryId: number) => {
-  loadingStore.showLoading();
+  // loadingStore.showLoading();
   try {
     const data = await useApi.get(
       `/resource/fetch-resources-data-by-category/${categoryId}`
@@ -152,7 +153,7 @@ const fetchResources = async (categoryId: number) => {
   } catch (error) {
     console.log(error);
   } finally {
-    loadingStore.hideLoading();
+    // loadingStore.hideLoading();
   }
 };
 
@@ -165,7 +166,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UCard class="">
+  <UCard class="bg-uigreen-50 ring-2 ring-uiearth-700">
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
@@ -234,7 +235,7 @@ onMounted(async () => {
       />
       </div>
     </div>
-    <div class="">
+    <div v-if="!loading" class="">
       <Radar v-if="stateMetrics.length > 0" :data="chartData" />
       <div v-else class="mx-auto my-8">
         <div class="mx-auto text-center">
@@ -243,6 +244,9 @@ onMounted(async () => {
           </p>
         </div>
       </div>
+    </div>
+    <div v-if="loading" class="flex items-center justify-center my-4">
+      <div class="spinner" />
     </div>
   </UCard>
 </template>
