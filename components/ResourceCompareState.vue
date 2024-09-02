@@ -1,22 +1,39 @@
 <script setup lang="ts">
-import { Pie } from "vue-chartjs";
+import { Radar } from "vue-chartjs";
 import { useAnalyticsStore } from "~/stores/analytics-store";
 // import { useLoadingStore } from "~/stores/loading-store";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-import type { Resource } from "~/types";
+import type { Resource, State } from "~/types";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 interface StateMetric {
-  stateName: string;
-  accessToMarket: number;
-  marketValue: number;
-  quality: number;
-  environmentalImpact: number;
-  investmentOpportunities: number;
-  color: string; // Color field
+  resourceName: string;
+  colors: { state1: string; state2: string };
+  metrics: Metric[];
 }
+
+type Metric = {
+  metricName: string;
+  state1: number;
+  state2: number;
+};
 
 const analyticsStore = useAnalyticsStore();
 // const loadingStore = useLoadingStore();
@@ -28,62 +45,48 @@ const props = defineProps({
   },
 });
 
-const resourceId = ref<number | null>(null);
-const selectedStateId = ref<number | null>(null);
-const states = ref([]);
-const resourceStates = ref([]);
+const resourceId = ref<number>(93);
+const selectedStateId1 = ref<number>(1);
+const selectedStateId2 = ref<number>(2);
 const loading = ref(false);
+const states = ref([] as State[]);
 const resources = ref([] as Resource[]);
-const stateMetrics = ref([] as StateMetric[]);
-const chartOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false, // Important to allow custom sizing
-});
+const stateMetrics = ref({} as StateMetric);
 
 const chartData = computed(() => {
-  const labels = stateMetrics.value.map((item) => item.name);
-  const data = stateMetrics.value.map((item) => item.value);
+  const labels = stateMetrics.value.metrics?.map((metric) => metric.metricName);
+  const datasets = [
+    {
+      label: "State 1",
+      data: stateMetrics.value.metrics?.map((metric) => metric.state1),
+      backgroundColor: "rgba(255, 99, 132, 0.2)",
+      borderColor: stateMetrics.value.colors?.state1,
+      borderWidth: 2,
+    },
+    {
+      label: "State 2",
+      data: stateMetrics.value.metrics?.map((metric) => metric.state2),
+      backgroundColor: "rgba(54, 162, 235, 0.2)",
+      borderColor: stateMetrics.value.colors?.state2,
+      borderWidth: 2,
+    },
+  ];
 
   return {
     labels,
-    datasets: [
-      {
-        data,
-        backgroundColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
+    datasets,
   };
 });
 
 const fetchData = async () => {
   loading.value = true;
   try {
-    console.log("resourceId", resourceId.value);
-    if (resourceId.value && selectedStateId.value) {
-      const data = await analyticsStore.dispatchFetchStateResourceValueMetrics(
-        resourceId.value,
-        selectedStateId.value
-      );
-      //   stateMetrics.value = data;
-      stateMetrics.value = data.map((item) => ({
-        name: item.name,
-        value: item.value,
-      }));
-    }
+    const data = await analyticsStore.dispatchFetchResourceStatesCompareMetrics(
+      resourceId.value,
+      selectedStateId1.value,
+      selectedStateId2.value
+    );
+    stateMetrics.value = data;
   } catch (error) {
     console.log(error);
   } finally {
@@ -107,23 +110,20 @@ watch(
 );
 
 const fetchResources = async (categoryId: number) => {
-  loading.value = true;
+  // loadingStore.showLoading();
   try {
-    const data: Resource[] = await useApi.get(
+    const data = await useApi.get(
       `/resource/fetch-resources-data-by-category/${categoryId}`
     );
     resources.value = data;
-    if (data.length > 0) {
-      resourceId.value = data[0].id; // Set the first resource as the default
-    }
+    resourceId.value = resources.value[0].id;
     if (resourceId.value) {
       await fetchResourceStates();
     }
-    console.log("data", data);
   } catch (error) {
     console.log(error);
   } finally {
-    loading.value = false;
+    // loadingStore.hideLoading();
   }
 };
 
@@ -134,7 +134,6 @@ const fetchResourceStates = async () => {
       const data = await analyticsStore.dispatchFetchResourceStates(
         resourceId.value
       );
-      resourceStates.value = data;
       states.value = data;
       console.log("data", data);
     }
@@ -145,16 +144,8 @@ const fetchResourceStates = async () => {
   }
 };
 
-// watchEffect(() => {
-//   if (resourceId.value) {
-//     fetchData();
-//   }
-// });
-
 onMounted(async () => {
-  //   states.value = await useApi.get("/territory/fetch-all-states");
   await fetchResources(props.categoryId);
-  //   await fetchData();
 });
 </script>
 
@@ -178,22 +169,23 @@ onMounted(async () => {
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <h6 class="text-sm pr-1">State Level Metrics</h6>
+          <h6 class="text-sm pr-1">State Level Metrics Comparison</h6>
           <UPopover mode="hover">
             <UButton label="?" variant="ghost" class="text-lg" />
             <template #panel>
               <div
                 class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
               >
-                This radar chart compares various metrics for a specific
-                resource across different states. The chart shows how each state
-                performs in areas like market value, quality, and investment
-                opportunities. By hovering over the chart, you can see detailed
-                information on each metric, helping you quickly understand where
-                a state excels or needs improvement in resource management.
-                <br /><br />
-                0 - 3 : Low <br />
-                4 - 6 : Average <br />
+                This chart compares a resource across two different states it
+                can be found, evaluating key metrics like market value, quality,
+                access to market, environmental impact, and investment
+                opportunities. The chart helps you visually understand how these
+                resource perform in different regions, highlighting areas of
+                strength or concern for the resource. Hover over each
+                data-point of a particular metric to compare the value against
+                the selected states. <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
                 7 - 10 : High
               </div>
             </template>
@@ -202,7 +194,17 @@ onMounted(async () => {
       </div>
     </template>
     <div class="grid grid-cols-12 gap-3 mb-3">
-      <div class="col-span-12 lg:col-span-11 grid grid-cols-2 gap-2">
+      <div class="col-span-12 lg:col-span-11 grid grid-cols-3 gap-2">
+        <UFormGroup label="State One">
+          <USelectMenu
+            v-model="selectedStateId1"
+            :options="states"
+            option-attribute="name"
+            value-attribute="id"
+            searchable
+            placeholder="-- Select --"
+          />
+        </UFormGroup>
         <UFormGroup label="Resource">
           <USelectMenu
             v-model="resourceId"
@@ -214,9 +216,9 @@ onMounted(async () => {
             @change="fetchResourceStates"
           />
         </UFormGroup>
-        <UFormGroup label="State">
+        <UFormGroup label="State Two">
           <USelectMenu
-            v-model="selectedStateId"
+            v-model="selectedStateId2"
             :options="states"
             option-attribute="name"
             value-attribute="id"
@@ -234,9 +236,7 @@ onMounted(async () => {
       </div>
     </div>
     <div v-if="!loading" class="">
-      <div v-if="stateMetrics.length > 0" style="height: '300px'">
-        <Pie :data="chartData" :options="chartOptions" />
-      </div>
+      <Radar v-if="stateMetrics" :data="chartData" />
       <div v-else class="mx-auto my-8">
         <div class="mx-auto text-center">
           <p class="text-sm">
@@ -250,5 +250,3 @@ onMounted(async () => {
     </div>
   </UCard>
 </template>
-
-<style></style>

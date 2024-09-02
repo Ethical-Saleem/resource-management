@@ -83,6 +83,17 @@ export const useAnalyticsStore = defineStore("analytics-store", {
       }
     },
 
+    async dispatchFetchResourceStatesCompareMetrics(resourceId: number, stateId1: number, stateId2: number) {
+      try {
+        const data = await useApi.get(`/analytics/${resourceId}/states-resource-metrics-compare?stateId1=${stateId1}&stateId2=${stateId2}`);
+        console.log('state-resource-compare-metrics', data);
+        return data;
+      } catch (error) {
+        console.log('state-resource-compare-metrics-error', error);
+        throw error;
+      }
+    },
+
     async dispatchFetchResourceBarMetrics(resourceId: number, page: number, stateId?: number) {
       try {
         const data = await useApi.get(`/analytics/${resourceId}/resource-metrics-by-lga?stateId=${stateId}&page=${page}&pageSize=${8}`);
@@ -156,6 +167,17 @@ export const useAnalyticsStore = defineStore("analytics-store", {
         return data;
       } catch (error) {
         console.log('state-value-chain-error', error);
+        throw error;
+      }
+    },
+
+    async dispatchFetchResourceStates(resourceId: number) {
+      try {
+        const data = await useApi.get(`/analytics/resource-states/${resourceId}`);
+        console.log('respurce-states', data);
+        return data;
+      } catch (error) {
+        console.log('respurce-states-error', error);
         throw error;
       }
     },

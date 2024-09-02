@@ -184,6 +184,22 @@ onMounted(async () => {
       <div class="flex items-center justify-between">
         <div class="flex items-center">
           <h6 class="text-sm pr-1">Value Chain Analysis by State</h6>
+          <UPopover mode="hover">
+            <UButton label="?" variant="ghost" class="text-lg" />
+            <template #panel>
+              <div
+                class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
+              >
+                This chart compares the value chain rating of a resource across
+                all states it can be found, evaluating the overall value chain
+                rating for the resource in each state. The length of the bar
+                determine is used as the mode of comparison here. <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
+                7 - 10 : High
+              </div>
+            </template>
+          </UPopover>
         </div>
       </div>
     </template>

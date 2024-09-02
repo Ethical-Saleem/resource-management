@@ -145,6 +145,13 @@ watch(
   }
 );
 
+watch(
+  () => resourceId.value,
+  async () => {
+    await fetchResourceStates();
+  }
+);
+
 const fetchResources = async (categoryId: number) => {
   loadingStore.showLoading();
   try {
@@ -155,11 +162,31 @@ const fetchResources = async (categoryId: number) => {
     if (data.length > 0) {
       resourceId.value = data[0].id; // Set the first resource as the default
     }
+    if (resourceId.value) {
+      await fetchResourceStates();
+    }
     console.log("data", data);
   } catch (error) {
     console.log(error);
   } finally {
     loadingStore.hideLoading();
+  }
+};
+
+const fetchResourceStates = async () => {
+  loading.value = true;
+  try {
+    if (resourceId.value) {
+      const data = await analyticsStore.dispatchFetchResourceStates(
+        resourceId.value
+      );
+      states.value = data;
+      console.log("data", data);
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -170,7 +197,6 @@ watchEffect(() => {
 });
 
 onMounted(async () => {
-  states.value = await useApi.get("/territory/fetch-all-states");
   await fetchResources(props.categoryId);
   await fetchData();
 });

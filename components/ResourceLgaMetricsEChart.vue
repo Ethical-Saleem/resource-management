@@ -140,10 +140,30 @@ const fetchResources = async (categoryId: number) => {
     );
     resources.value = data;
     resourceId.value = resources.value[0].id;
+    if (resourceId.value) {
+      await fetchResourceStates();
+    }
   } catch (error) {
     console.log(error);
   } finally {
     // loadingStore.hideLoading();
+  }
+};
+
+const fetchResourceStates = async () => {
+  loading.value = true;
+  try {
+    if (resourceId.value) {
+      const data = await analyticsStore.dispatchFetchResourceStates(
+        resourceId.value
+      );
+      states.value = data;
+      console.log("data", data);
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -155,8 +175,15 @@ watch(
   }
 );
 
+watch(
+  () => resourceId.value,
+  async () => {
+    await fetchResourceStates(); 
+  }
+)
+
 onMounted(async () => {
-  states.value = await useApi.get("/territory/fetch-all-states");
+  // states.value = await useApi.get("/territory/fetch-all-states");
   await fetchResources(props.categoryId);
   await fetchBarChartData();
 });

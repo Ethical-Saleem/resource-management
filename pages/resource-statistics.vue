@@ -70,6 +70,9 @@ const selectedResourceCategory = ref<number | null>(null);
         <StateResourceCompareRadar :category-id="selectedResourceCategory" />
       </div>
       <div class="col-span-12 md:col-span-6">
+        <ResourceCompareState :category-id="selectedResourceCategory" />
+      </div>
+      <div class="col-span-12 md:col-span-6">
         <ResourceValueChainBar :category-id="selectedResourceCategory" />
       </div>
       <!-- <div class="col-span-12 md:col-span-6">

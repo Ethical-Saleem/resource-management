@@ -29,8 +29,10 @@ const setSystemColorMode = (event: Event) => {
         class="bg-uiearth-950 group-[&.scrolled]/landing:dark:bg-muted-950/95 group-[&.scrolled]/landing:border-muted-200 group-[&.scrolled]/landing:dark:border-muted-700 group-[&.scrolled]/landing:motion-safe:shadow-muted-300/30 group-[&.scrolled]/landing:motion-safe:dark:shadow-muted-800/20 flex items-center justify-between rounded-2xl border p-4 group-[&:not(.scrolled)]/landing:border-transparent group-[&.scrolled]/landing:bg-uiearth/95 motion-safe:transition-all motion-safe:duration-200 group-[&.scrolled]/landing:motion-safe:shadow-xl"
       >
         <div class="flex w-1/2 items-center gap-2 md:w-1/5">
-          <NuxtImg src="/img/rmrdc.png" width="100" height="100" />
-          <span class="text-xl text-uigreen-500 font-bold">RMRDC</span>
+          <NuxtLink to="/" class="flex items-center">
+            <NuxtImg src="/img/rmrdc.png" width="100" height="100" />
+            <span class="text-xl text-uigreen-500 font-bold">RMRDC</span>
+          </NuxtLink>
         </div>
         <div
           :class="[
@@ -68,7 +70,7 @@ const setSystemColorMode = (event: Event) => {
               type="checkbox"
               class="sr-only"
               @change="toggleColorScheme"
-            >
+            />
             <span
               class="toggle-inner block relative bg-uimuted-950 ring-1 ring-uiearth-300 rounded-full w-14 h-7 flex items-center justify-between px-2"
             >
