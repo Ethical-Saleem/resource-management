@@ -38,8 +38,6 @@ onMounted(async () => {
     attribution: "© OpenStreetMap contributors",
   }).addTo(map.value);
   
-  await loadStateMapResources()
-  
 });
 
 // function displayLgasOnMap(resources) {

@@ -51,8 +51,9 @@
     </div>
     <UButton
       :class="outlineButtonClass"
-      class="fixed bottom-4 right-4 z-20 text-white ring-2 rounded-full shadow-md lg:hidden"
-      variant="outline"
+      class="fixed text-white bottom-4 right-4 z-20 text-white ring-2 rounded-full shadow-md lg:hidden"
+      variant="solid"
+      size="xl"
       color="uiearth"
       @click="openMobileBar"
     >
@@ -65,7 +66,7 @@
       <div
         class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent py-2"
       >
-        <NuxtImg src="/img/logo_5.png" width="70" height="70" />
+        <NuxtImg src="/img/rmrdc.png" width="100" height="100" />
         <div class="flex items-center gap-2">
           <ColorScheme
             ><USelect
@@ -469,6 +470,14 @@ const drawMap = (geojsonData: GeoJSONData) => {
   const width = mapContainer.value.clientWidth;
   const height = mapContainer.value.clientHeight;
 
+  // const abujaCoordinates: [number, number] = [7.3986, 9.0765];
+
+  // const projection: GeoProjection = d3
+  //   .geoMercator()
+  //   .center(abujaCoordinates)
+  //   .scale(4000)
+  //   .translate([width / 2, height / 2]);
+
   const projection: GeoProjection = d3
     .geoMercator()
     .fitSize([width, height], geojsonData);
@@ -481,6 +490,8 @@ const drawMap = (geojsonData: GeoJSONData) => {
     .attr("height", height);
 
   const g = svg.append("g"); // Group for zooming
+
+  const statesToDisplay = ["Lagos", "Kano", "F.C.T", "Rivers", "Ondo", "Oyo"];
 
   // Draw states or LGAs
   g.selectAll("path")
@@ -512,9 +523,26 @@ const drawMap = (geojsonData: GeoJSONData) => {
         .text(d?.properties?.name);
     })
     .on("mouseout", function () {
-      d3.select(this).attr("opacity", 0.5);
+      d3.select(this).attr("opacity", 0.8);
       g.selectAll(".hover-label").remove();
     });
+  
+    g.selectAll("text.initial-label")
+    .data(geojsonData.features)
+    .enter()
+    .filter((d: GeoJsonFeature) =>
+      statesToDisplay.includes(d.properties?.name)
+    )
+    .append("text")
+    .attr("x", (d: GeoJsonFeature) => path.centroid(d)[0])
+    .attr("y", (d: GeoJsonFeature) => path.centroid(d)[1])
+    .attr("dy", ".35em")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "12px")
+    .attr("font-weight", "bold")
+    .attr("fill", "#ffffff")
+    .attr("class", "initial-label")
+    .text((d: GeoJsonFeature) => d.properties?.name);
 
   // Setup zoom behavior
   const zoom = d3

@@ -174,6 +174,7 @@ onMounted(async () => {
               <NuxtImg
                 :src="r.imageUrl"
                 :alt="r.name"
+                referrerpolicy="no-referrer"
                 class="w-full h-[200px] object-cover rounded-lg"
               />
             </div>
