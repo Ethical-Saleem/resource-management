@@ -4,17 +4,17 @@ import { useLoadingStore } from "~/stores/loading-store";
 const loadingStore = useLoadingStore();
 
 useSeoMeta({
-  title: 'Resource Xplore',
-  ogTitle: 'Resource Xplore',
-  description: 'This is a platform showing the various resource distribution within the country',
-  ogDescription: 'This is a platform showing the various resource distribution within the country',
-  ogImage: '/img/logo_5.png',
+  title: 'RMRDC - Resource Exploration',
+  ogTitle: 'RMRDC - Resource Exploration',
+  description: 'This is a platform showing the various resource distribution and statistical data, within Nigeria',
+  ogDescription: 'This is a platform showing the various resource distribution and statistical data, within Nigeria',
+  ogImage: '/img/rmrdc.png',
   twitterCard: 'summary_large_image',
 })
 
 useHead({
   titleTemplate: (titleChunk) => {
-    return titleChunk ? `${titleChunk} - Resource Xplore` : 'Resource Xplore';
+    return titleChunk ? `${titleChunk} | RMRDC - Resource Exploration` : 'RMRDC - Resource Exploration';
   },
   link: [
     { rel: 'icon', type: 'img/png', href: '/img/favicon-32x32.png' },

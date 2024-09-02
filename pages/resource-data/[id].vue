@@ -20,7 +20,7 @@ useHead({
     },
     {
       property: "og:title",
-      content: `Resource Xplore - ${route.query.resource}`,
+      content: `RMRDC - Resource Exploration | ${route.query.resource}`,
     },
   ],
 });
