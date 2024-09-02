@@ -177,7 +177,22 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UCard class="bg-uigreen-50 ring-2 ring-uiearth-700">
+  <UCard
+    :ui="{
+      base: 'mb-4',
+      divide: 'divide-y divide-uiearth-700 dark:divide-uiearth-800',
+      ring: 'ring-1 ring-uiearth-200 dark:ring-uiearth-800',
+      body: {
+        padding: 'p-3 sm:p-6',
+      },
+      footer: {
+        base: '',
+        background: '',
+        padding: 'px-2 pt-2 pb-2 sm:px-2',
+      },
+    }"
+    class="bg-uigreen-50 ring-2 ring-uiearth-700"
+  >
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
@@ -205,7 +220,7 @@ onMounted(async () => {
       </div>
     </template>
     <div class="grid grid-cols-2 gap-3 mb-3">
-      <UFormGroup>
+      <UFormGroup label="Resource">
         <USelectMenu
           v-model="resourceId"
           :options="resources"
@@ -216,7 +231,7 @@ onMounted(async () => {
           @change="fetchData"
         />
       </UFormGroup>
-      <UFormGroup>
+      <UFormGroup label="State">
         <USelectMenu
           v-model="selectedStateId"
           :options="customStateOptions"
@@ -229,7 +244,11 @@ onMounted(async () => {
       </UFormGroup>
     </div>
     <div v-if="!loading" class="">
-      <Radar v-if="stateMetrics.length > 0" :data="chartData" :options="chartOptions" />
+      <Radar
+        v-if="stateMetrics.length > 0"
+        :data="chartData"
+        :options="chartOptions"
+      />
       <div v-else class="mx-auto my-8">
         <div class="mx-auto text-center">
           <p class="text-sm">
@@ -248,8 +267,8 @@ onMounted(async () => {
 .spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid #9C4010;
-  border-top-color: #9C4010;
+  border: 5px solid #9c4010;
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

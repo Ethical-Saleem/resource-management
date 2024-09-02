@@ -137,7 +137,22 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UCard class="bg-uigreen-50 ring-2 ring-uiearth-700">
+  <UCard
+    :ui="{
+      base: 'mb-4',
+      divide: 'divide-y divide-uiearth-700 dark:divide-uiearth-800',
+      ring: 'ring-1 ring-uiearth-200 dark:ring-uiearth-800',
+      body: {
+        padding: 'p-3 sm:p-6',
+      },
+      footer: {
+        base: '',
+        background: '',
+        padding: 'px-2 pt-2 pb-2 sm:px-2',
+      },
+    }"
+    class="bg-uigreen-50 ring-2 ring-uiearth-700"
+  >
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
@@ -166,7 +181,7 @@ onMounted(async () => {
     </template>
     <div class="grid grid-cols-12 gap-3 mb-3">
       <div class="col-span-12 lg:col-span-11 grid grid-cols-2 gap-2">
-        <UFormGroup>
+        <UFormGroup label="Resource">
           <USelectMenu
             v-model="resourceId"
             :options="resources"
@@ -176,7 +191,7 @@ onMounted(async () => {
             placeholder="-- Select --"
           />
         </UFormGroup>
-        <UFormGroup>
+        <UFormGroup label="State">
           <USelectMenu
             v-model="selectedStateId"
             :options="states"
@@ -214,18 +229,4 @@ onMounted(async () => {
 </template>
 
 <style>
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255, 255, 255, 0.5);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 </style>

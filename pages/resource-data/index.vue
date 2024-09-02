@@ -208,7 +208,11 @@ onMounted(async () => {
               :loading="fetching"
               @click="fetchData()"
             />
-            <a class="flex items-center p-2 mx-2 rounded-md ring-1 ring-uiearth-900 text-uiearth-900 text-sm" href="https://onedrive.live.com/edit?id=3642FDBE2FA8CAA8!s49f93fdcc2df4cf3ad24ec960d309a66&resid=3642FDBE2FA8CAA8!s49f93fdcc2df4cf3ad24ec960d309a66&cid=3642fdbe2fa8caa8&ithint=file%2Cdocx&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3cvYy8zNjQyZmRiZTJmYThjYWE4L0Vkd18tVW5md3ZOTXJTVHNsZzB3bW1ZQmQxbHRUR2pZYmlOU0F5a2lmMHY0Y2c_ZT10cHRRM1c&migratedtospo=true&wdo=2" target="_blank">
+            <a
+              class="flex items-center p-2 mx-2 rounded-md ring-1 ring-uiearth-900 text-uiearth-900 text-sm"
+              href="https://onedrive.live.com/edit?id=3642FDBE2FA8CAA8!s49f93fdcc2df4cf3ad24ec960d309a66&resid=3642FDBE2FA8CAA8!s49f93fdcc2df4cf3ad24ec960d309a66&cid=3642fdbe2fa8caa8&ithint=file%2Cdocx&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3cvYy8zNjQyZmRiZTJmYThjYWE4L0Vkd18tVW5md3ZOTXJTVHNsZzB3bW1ZQmQxbHRUR2pZYmlOU0F5a2lmMHY0Y2c_ZT10cHRRM1c&migratedtospo=true&wdo=2"
+              target="_blank"
+            >
               <UIcon name="i-heroicons-eye-20-solid" />
               <span class="pl-1">View Resource Report</span>
             </a>
@@ -248,7 +252,23 @@ onMounted(async () => {
         </div>
       </div>
     </UCard>
-    <UCard v-if="currentView === 1" class="bg-uigreen-50 ring-2 ring-uiearth-700">
+    <UCard
+      v-if="currentView === 1"
+      :ui="{
+        base: 'mb-4',
+        divide: 'divide-y divide-uiearth-700 dark:divide-uiearth-800',
+        ring: 'ring-1 ring-uiearth-200 dark:ring-uiearth-800',
+        body: {
+          padding: 'p-3 sm:p-6',
+        },
+        footer: {
+          base: '',
+          background: '',
+          padding: 'px-2 pt-2 pb-2 sm:px-2',
+        },
+      }"
+      class="bg-uigreen-50 ring-2 ring-uiearth-700"
+    >
       <!-- <template #header>
         <div class="flex items-center justify-between">
           <h4 class="text-xl">Resources Bank</h4>
@@ -332,7 +352,7 @@ onMounted(async () => {
         class="w-full"
         :ui="{
           table: 'table-relative',
-          tbody: 'divide-y divide-uicream-200 dark:divide-uicream-700',
+          tbody: 'divide-y divide-uiearth-500 dark:divide-uiearth-700',
           tr: {
             base: 'whitespace-nowrap',
             padding: 'px-4 py-4',
@@ -450,7 +470,7 @@ onMounted(async () => {
                     :src="signFileUrl"
                     alt="preview"
                     class="w-20 h-20 object-cover rounded-md"
-                  />
+                  >
                   <div class="flex flex-col items-start">
                     <span class="text-sm font-medium">{{ signFile.name }}</span>
                     <span class="text-xs text-gray-500"
@@ -471,7 +491,7 @@ onMounted(async () => {
                   accept="image/*"
                   class="hidden"
                   @change="handleSignFileChange"
-                />
+                >
               </div>
             </UFormGroup>
           </fieldset>

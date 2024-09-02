@@ -8,15 +8,22 @@ const route = useRoute();
 
 definePageMeta({
   layout: "withheader",
-})
+});
 
 useHead({
-  title: 'Resource Data',
+  title: "Resource Data",
   meta: [
-    { name: 'description', content: 'Data Table showing the varoius resources and their distribution across the country (Nigeria)' },
-    { property: 'og:title', content: `Resource Xplore - ${route.query.resource}` }
+    {
+      name: "description",
+      content:
+        "Data Table showing the varoius resources and their distribution across the country (Nigeria)",
+    },
+    {
+      property: "og:title",
+      content: `Resource Xplore - ${route.query.resource}`,
+    },
   ],
-})
+});
 
 const columns = [
   { key: "SampleId", label: "Sample ID", sortable: true },
@@ -102,7 +109,22 @@ onMounted(async () => {
 
 <template>
   <div class="">
-    <UCard class="bg-uigreen-50 ring-2 ring-uiearth-700">
+    <UCard
+      :ui="{
+        base: 'mb-4',
+        divide: 'divide-y divide-uiearth-700 dark:divide-uiearth-800',
+        ring: 'ring-1 ring-uiearth-200 dark:ring-uiearth-800',
+        body: {
+          padding: 'p-3 sm:p-6',
+        },
+        footer: {
+          base: '',
+          background: '',
+          padding: 'px-2 pt-2 pb-2 sm:px-2',
+        },
+      }"
+      class="bg-uigreen-50 ring-2 ring-uiearth-700"
+    >
       <template #header>
         <div class="flex items-center justify-between">
           <div class="">
@@ -173,7 +195,7 @@ onMounted(async () => {
         class="w-full"
         :ui="{
           table: 'table-relative',
-          tbody: 'divide-y divide-uicream-200 dark:divide-uicream-700',
+          tbody: 'divide-y divide-uiearth-500 dark:divide-uiearth-700',
           tr: {
             base: 'whitespace-nowrap',
             padding: 'px-4 py-4',

@@ -412,11 +412,11 @@ const customOptions = computed(() => {
   return [{ id: "", name: "All Resources" }, ...availableResources.value];
 });
 
-const showStateOrLga = (item: State | Lga) => {
-  selectedStateOrLga.value = item;
-  isModal.value = true;
-  console.log("clicked-state-lga", selectedStateOrLga.value);
-};
+// const showStateOrLga = (item: State | Lga) => {
+//   selectedStateOrLga.value = item;
+//   isModal.value = true;
+//   console.log("clicked-state-lga", selectedStateOrLga.value);
+// };
 const closeStateOrLga = () => {
   isModal.value = false;
   selectedStateOrLga.value = null;
@@ -503,9 +503,9 @@ const drawMap = (geojsonData: GeoJSONData) => {
     .attr("stroke", mapStrokes.value)
     .attr("stroke-width", 2)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .on("click", (event, d: any) => {
-      showStateOrLga(d);
-    })
+    // .on("click", (event, d: any) => {
+    //   showStateOrLga(d);
+    // })
     .on("mouseover", function (event, d) {
       d3.select(this).attr("opacity", 0.7);
 
