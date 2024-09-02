@@ -4,23 +4,30 @@ import { useLoadingStore } from "~/stores/loading-store";
 const loadingStore = useLoadingStore();
 
 useSeoMeta({
-  title: 'RMRDC - Resource Exploration',
-  ogTitle: 'RMRDC - Resource Exploration',
-  description: 'This is a platform showing the various resource distribution and statistical data, within Nigeria',
-  ogDescription: 'This is a platform showing the various resource distribution and statistical data, within Nigeria',
-  ogImage: '/img/rmrdc.png',
-  twitterCard: 'summary_large_image',
-})
+  title: "RMRDC - Resource Exploration",
+  ogTitle: "RMRDC - Resource Exploration",
+  description:
+    "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
+  ogDescription:
+    "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
+  ogImage: "/img/rmrdc.png",
+  twitterCard: "summary_large_image",
+});
 
 useHead({
   titleTemplate: (titleChunk) => {
-    return titleChunk ? `${titleChunk} | RMRDC - Resource Exploration` : 'RMRDC - Resource Exploration';
+    return titleChunk
+      ? `${titleChunk} | RMRDC - Resource Exploration`
+      : "RMRDC - Resource Exploration";
   },
   link: [
-    { rel: 'icon', type: 'img/png', href: '/img/favicon-32x32.png' },
-    { rel: 'icon', type: 'img/png', href: '/img/favicon-16x16.png' },
+    { rel: "icon", type: "img/png", href: "/img/favicon-32x32.png" },
+    { rel: "icon", type: "img/png", href: "/img/favicon-16x16.png" },
   ],
-})
+  meta: [
+    { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics' },
+  ],
+});
 </script>
 
 <template>
@@ -90,7 +97,8 @@ useHead({
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -108,7 +116,7 @@ useHead({
 }
 
 .progress-bar::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 40%;
   height: 100%;
