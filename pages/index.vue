@@ -130,9 +130,12 @@ onMounted(() => {
             <h1
               class="text-white text-center lg:text-start text-4xl font-bold mb-4"
             >
-              Elevate Your Raw Materials Management with Us
+              <span class="">Elevate Your</span>
+              <span class="text-uigreen-500"
+                >Raw Materials Management with Us</span
+              >
             </h1>
-            <div class="w-1/4">
+            <div class="w-1/3 sm:w-1/4">
               <UButton
                 class="text-white"
                 block
@@ -221,7 +224,11 @@ onMounted(() => {
               <div
                 class="w-full md:w-1/2 md:order-first flex items-center justify-center mb-4"
               >
-                <NuxtImg src="/img/datatable-image.jpg" width="150" height="150" />
+                <NuxtImg
+                  src="/img/datatable-image.jpg"
+                  width="150"
+                  height="150"
+                />
               </div>
               <div
                 class="w-full md:w-1/2 text-center sm:text-start md:order-last mb-4"
@@ -305,18 +312,51 @@ onMounted(() => {
         </div>
       </div>
     </section>
-    <footer class="home-footer bg-uimuted-200">
-      <UContainer>
-        <div class="flex items-center">
+    <footer class="bg-uimuted-200">
+      <UContainer class="home-footer">
+        <div class="flex flex-col sm:flex-row items-center sm:justify-between">
           <div class="">
             <NuxtImg src="/img/rmrdc.png" width="150" height="150" />
-            <h3 class="text-lg text-uiearth-700 font-medium">RAW MATERIALS RESEARCH AND DEVELOPMENT COUNCIL</h3>
+            <h3 class="text-sm sm:text-lg text-uiearth-700 font-medium">
+              RAW MATERIALS RESEARCH AND DEVELOPMENT COUNCIL
+            </h3>
+          </div>
+          <div class="flex justify-start mt-4">
+            <div class="flex flex-row sm:flex-col gap-2">
+              <UIcon
+                name="i-fa6-brands-square-facebook"
+                class="text-2xl text-uigreen-600"
+              />
+              <UIcon
+                name="i-fa6-brands-linkedin"
+                class="text-2xl text-uigreen-600"
+              />
+              <UIcon
+                name="i-fa6-brands-square-twitter"
+                class="text-2xl text-uigreen-600"
+              />
+              <UIcon
+                name="i-fa6-brands-square-instagram"
+                class="text-2xl text-uigreen-600"
+              />
+            </div>
           </div>
         </div>
-        <div class="flex flex-col md:flex-row items-center">
-
-        </div>
+        <div class="flex flex-col md:flex-row items-center"></div>
       </UContainer>
+      <div class="bg-uimuted-400 px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-center py-3">
+          <p class="flex items-center gap-3 text-xs sm:text-sm">
+            <span class=""
+              ><strong class="text-uiearth-600">©</strong> 2024 Copyright</span
+            >
+            <span class="text-uigreen-900">|</span>
+            <span class="text-uiearth-600">RMRDC</span>
+            <span class="text-uigreen-900">|</span>
+            <span class="">All Rights Reserved</span>
+          </p>
+        </div>
+      </div>
     </footer>
   </div>
 </template>

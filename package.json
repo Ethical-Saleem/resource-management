@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@iconify-json/fa6-brands": "^1.2.0",
     "@nuxt/devtools": "latest",
     "@nuxt/eslint": "^0.5.0",
     "@nuxt/fonts": "^0.7.1",

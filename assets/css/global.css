@@ -276,6 +276,10 @@
 }
 
 /* Footer */
+.home-footer {
+  padding: 4.5em 0;
+}
+
 @media (min-width: 992px) {
   .home-footer {
     padding: 6em 0;
