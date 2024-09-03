@@ -66,7 +66,7 @@ onMounted(() => {
 
       <!--mobile navigation-->
 
-      <div class="mobile-nav-overlay md:hidden" id="mobile-nav-overlay">
+      <div class="mobile-nav-overlay hidden" id="mobile-nav-overlay">
         <nav class="mobile-nav">
           <ul>
             <li><a href="#features">Features</a></li>
