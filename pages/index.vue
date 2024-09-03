@@ -269,7 +269,7 @@ onMounted(() => {
                 <h4
                   class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium"
                 >
-                  Intearctive Charts
+                  Interactive Charts
                 </h4>
                 <p class="sm:ml-24 text-lg">
                   Engage with dynamic charts that provide detailed visual
