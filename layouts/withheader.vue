@@ -55,7 +55,7 @@ const setSystemColorMode = (event: Event) => {
             >Resource Statistics</ULink
           >
           <ULink
-            to="/"
+            to="/map-view"
             active-class="text-uiearth-500"
             class="inline-flex text-white ring-1 ring-uigreen-400 bg-uigreen-700 rounded-md p-2 items-center justify-center px-6"
             >View Map</ULink

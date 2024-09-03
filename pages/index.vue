@@ -1,734 +1,296 @@
-<!-- eslint-disable @typescript-eslint/no-explicit-any -->
-<template>
-  <div class="fixed inset-0 flex overflow-hidden">
-    <MapSidebar
-    v-if="isMobileSidebarOpen"
-      class="lg:hidden"
-      :selected-filter="selectedFilter"
-      :selected-resource="selectedResource"
-      :resources="availableResources"
-      :selected-resource-category="selectedResourceCategory"
-      @update-filter="onFilterUpdate"
-      @update-resource="onResourceUpdate"
-      @update:category="(value) => onCategoryUpdate(value)"
-      @click-outside="closeMobileSidebar"
-    />
-    <div
-      :class="['map-bg', gradientClass, 'flex', 'flex-1', 'w-full', 'min-w-0']"
-    >
-      <div
-        :class="[
-          'flex-col',
-          'items-stretch',
-          'relative',
-          'w-full',
-          'flex-1',
-          'flex',
-        ]"
-      >
-        <div class="p-4 flex-1 flex flex-col overflow-y-auto">
-          <div ref="mapContainer" class="map-container" />
-        </div>
-
-        <div class="absolute top-2 left-2 z-10 flex flex-col space-y-2">
-          <UButton
-            id="zoomInButton"
-            size="sm"
-            :class="buttonClass"
-            class="text-white rounded-md shadow-md"
-            icon="i-heroicons-plus"
-          />
-          <UButton
-            id="zoomOutButton"
-            size="sm"
-            :class="buttonClass"
-            class="text-white rounded-md shadow-md"
-            icon="i-heroicons-minus"
-          />
-        </div>
-      </div>
-      <div class="absolute" style="display: none; visibility: hidden" />
-    </div>
-    <UButton
-      :class="outlineButtonClass"
-      class="fixed text-white bottom-4 right-4 z-20 text-white ring-2 rounded-full shadow-md lg:hidden"
-      variant="solid"
-      size="xl"
-      color="uiearth"
-      @click="openMobileBar"
-    >
-      <UIcon name="i-heroicons-adjustments-vertical" />
-    </UButton>
-    <div
-      :class="backgroundClass"
-      class="flex-col items-stretch relative w-full border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 lg:w-[300px] flex-shrink-0 hidden lg:flex"
-    >
-      <div
-        class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent py-2"
-      >
-        <NuxtImg src="/img/rmrdc.png" width="100" height="100" />
-        <div class="flex items-center gap-2">
-          <ColorScheme
-            ><USelect
-              v-model="$colorMode.preference"
-              :options="['system', 'light', 'dark']"
-          /></ColorScheme>
-          <div class="group inline-flex items-center justify-center text-right">
-            <div class="relative size-9 text-left" />
-          </div>
-          <UDropdown :items="items">
-            <UButton
-              :class="dropdownButtonClass"
-              class="block flex size-9 items-center justify-center rounded-full border ring-1 ring-transparent transition-all duration-300 hover:ring-offset-4"
-              icon="i-heroicons-squares-2x2"
-            />
-          </UDropdown>
-        </div>
-      </div>
-      <div class="p-4 flex-1 flex flex-col overflow-y-auto">
-        <p
-          :class="headerTextClass"
-          class="font-medium text-lg flex items-center mb-3"
-        >
-          <UIcon name="i-heroicons-funnel" class="" />
-          <span class="pl-2">Filters</span>
-        </p>
-        <div
-          class="ptablet:flex-none ptablet:grid ptablet:grid-cols-2 ptablet:pb-10 flex flex-col gap-4"
-        >
-          <UCard :class="cardClass">
-            <div class="relative">
-              <div class="relative">
-                <div class="mb-3 flex items-center text-uiearth-200">
-                  <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p :class="cardTextClass" class="pl-2">Map Filter</p>
-                </div>
-                <div class="">
-                  <UFormGroup>
-                    <USelectMenu
-                      v-model="selectedFilter"
-                      :options="[
-                        { label: 'State', value: 'state' },
-                        { label: 'LGA', value: 'lga' },
-                      ]"
-                      option-attribute="label"
-                      value-attribute="value"
-                      placeholder="-- Select --"
-                    />
-                  </UFormGroup>
-                </div>
-              </div>
-            </div>
-          </UCard>
-          <UCard :class="cardClass">
-            <div class="relative">
-              <div class="relative">
-                <div class="mb-3 flex items-center text-uiearth-200">
-                  <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p :class="cardTextClass" class="pl-2">Resource Category</p>
-                </div>
-                <div class="">
-                  <UFormGroup>
-                    <USelectMenu
-                      v-model="selectedResourceCategory"
-                      :options="[
-                        { id: 1, name: 'Solid Minerals' },
-                        { id: 2, name: 'Energy Resource' },
-                        { id: 3, name: 'Agricultural Produce' },
-                      ]"
-                      searchable
-                      option-attribute="name"
-                      value-attribute="id"
-                      placeholder="-- Select --"
-                      @change="loadResources"
-                    />
-                  </UFormGroup>
-                </div>
-              </div>
-            </div>
-          </UCard>
-          <UCard v-if="selectedResourceCategory" :class="cardClass">
-            <div class="relative">
-              <div class="relative">
-                <div class="mb-3 flex items-center text-uiearth-200">
-                  <UIcon name="i-heroicons-adjustments-vertical" />
-                  <p :class="cardTextClass" class="pl-2">Resource Filter</p>
-                </div>
-                <div class="">
-                  <UFormGroup>
-                    <USelectMenu
-                      v-model="selectedResource"
-                      :options="customOptions"
-                      searchable
-                      option-attribute="name"
-                      value-attribute="id"
-                      placeholder="-- Select --"
-                    />
-                  </UFormGroup>
-                </div>
-              </div>
-            </div>
-          </UCard>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <UModal v-model="isModal" prevent-close>
-        <div class="p-4">
-          <div class="flex items-center justify-between">
-            <h4>Territory Data</h4>
-            <UButton
-              variant="ghost"
-              icon="i-heroicons-x-mark"
-              @click="closeStateOrLga"
-            />
-          </div>
-          <div class="">
-            <p>Territory Name: {{ selectedStateOrLga?.name }}</p>
-          </div>
-        </div>
-      </UModal>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import * as d3 from "d3";
-import type { GeoPath, GeoProjection } from "d3-geo";
-import type {
-  FeatureCollection,
-  Feature,
-  Geometry,
-  GeoJsonProperties,
-} from "geojson";
-import type { GeoPermissibleObjects } from "d3";
-import type { State, Lga, Resource } from "~/types";
-import { useLoadingStore } from "~/stores/loading-store";
-import { useApi } from "~/composables/useApi";
+const router = useRouter();
 
-// Define the types for your GeoJSON and Resource data
-type GeoJsonFeature = Feature<Geometry, GeoJsonProperties>;
-interface GeoJSONData extends FeatureCollection {
-  type: "FeatureCollection";
-  features: GeoJsonFeature[];
+const images = ref<string[]>([
+  "/img/map_bg.PNG",
+  "/img/tomato-farm.jpg",
+  "/img/map_bg_2.PNG",
+  "/img/lithium_mining.jpg",
+  "/img/map_bg_3.PNG",
+  "/img/coal_mine.jpeg",
+]);
+
+const currentSlide = ref(0);
+
+function nextSlide() {
+  currentSlide.value = (currentSlide.value + 1) % images.value.length;
 }
 
-useHead({
-  title: "Home",
-  meta: [
-    {
-      name: "description",
-      content: "Map showing the various resource distributions in the country",
-    },
-  ],
-});
-
-const loadingStore = useLoadingStore();
-
-// State for the map container and selected filters
-const mapContainer = ref<HTMLDivElement | null>(null);
-const geojsonData = ref<GeoJSONData | null>(null);
-const selectedFilter = ref("state");
-const selectedResource = ref<number | string>("");
-const selectedResourceCategory = ref<number | null>(null);
-const selectedStateOrLga = ref<State | Lga | null>(null);
-const clickedResource = ref<Resource | null>(null);
-const isModal = ref(false);
-const resourceModal = ref(false);
-const isMobileSidebarOpen = ref(false);
-let svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
-// const isFilterPaneOpen = ref(false);
-
-const openMobileBar = () => {
-  isMobileSidebarOpen.value = true;
-};
-
-const closeMobileSidebar = () => {
-  isMobileSidebarOpen.value = false;
-};
-
-const items = [
-  [
-    {
-      label: "Resource Table",
-      icon: "i-heroicons-table-cells-20-solid",
-      to: "/resource-data",
-    },
-    {
-      label: "Resource Statistics",
-      icon: "i-heroicons-chart-bar-20-solid",
-      to: "/resource-statistics",
-    },
-  ],
-];
-
-// const slideOver = useSlideover();
-
-// const openMobileBar = () => {
-//   slideOver.open(MapSidePanel, {
-//     selectedFilter: selectedFilter.value,
-//     selectedResource: selectedResource.value,
-//     customOptions: customOptions,
-//     selectedResourceCategory: selectedResourceCategory.value,
-//   });
-// };
-
-const gradientClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1: // Solid Minerals
-      return "bg-solid-minerals";
-    case 2: // Energy Resource
-      return "bg-energy-resource";
-    case 3: // Agricultural Produce
-      return "bg-agricultural-produce";
-    default:
-      return "bg-solid-minerals"; // Default gradient
-  }
-});
-
-const backgroundClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "bg-uiearth-950";
-    case 2:
-      return "bg-uimuted-950";
-    case 3:
-      return "bg-uigreen-950";
-    default:
-      return "bg-uimuted-950";
-  }
-});
-
-const mapStrokes = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "#9c4010";
-    case 2:
-      return "#304159";
-    case 3:
-      return "#036252";
-    default:
-      return "#304159";
-  }
-});
-
-const buttonClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "bg-uiearth-600 hover:bg-uiearth-500";
-    case 2:
-      return "bg-uimuted-600 hover:bg-uimuted-500";
-    case 3:
-      return "bg-uigreen-600 hover:bg-uigreen-500";
-    default:
-      return "bg-uimuted-600 hover:bg-uimuted-500";
-  }
-});
-
-const outlineButtonClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "ring-uiearth-500 text-uiearth-500";
-    case 2:
-      return "ring-uimuted-500 text-uimuted-500";
-    case 3:
-      return "ring-uigreen-500 text-uigreen-500";
-    default:
-      return "ring-uimuted-500 text-uimuted-500";
-  }
-});
-
-const dropdownButtonClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "border-uigreen-600 bg-uigreen-600 dark:bg-uigreen-600 hover:ring-uigreen-200 dark:hover:ring-uiearth-700 dark:border-uiearth-700 dark:ring-offset-uiearth-900";
-    case 2:
-      return "bg-uimuted-600 dark:bg-uimuted-600";
-    case 3:
-      return "border-uiearth-600 bg-uiearth-600 dark:bg-uiearth-600 hover:ring-uiearth-200 dark:hover:ring-uiearth-700 dark:border-uigreen-700 dark:ring-offset-uigreen-900";
-    default:
-      return "bg-uimuted-600 dark:bg-uimuted-600";
-  }
-});
-
-const headerTextClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "text-uiearth-200";
-    case 2:
-      return "text-uimuted-200";
-    case 3:
-      return "text-uigreen-200";
-    default:
-      return "text-uimuted-200";
-  }
-});
-
-const cardClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "ring-uigreen-400 bg-uiearth-800 dark:bg-uiearth-600 dark:ring-uigreen-500";
-    case 2:
-      return "ring-uimuted-400 bg-uimuted-600 dark:bg-uimuted-600";
-    case 3:
-      return "ring-uiearth-400 bg-uigreen-800 dark:bg-uigreen-600 dark:ring-uiearth-500";
-    default:
-      return "ring-uimuted-400 bg-uimuted-600 dark:bg-uimuted-600";
-  }
-});
-
-const cardTextClass = computed(() => {
-  switch (selectedResourceCategory.value) {
-    case 1:
-      return "text-uiearth-200";
-    case 2:
-      return "text-uimuted-200";
-    case 3:
-      return "text-uigreen-200";
-    default:
-      return "text-uimuted-200";
-  }
-});
-
-const onFilterUpdate = (newFilter: string) => {
-  selectedFilter.value = newFilter;
-  console.log("newFilter", newFilter);
-  loadMapData(); // Optionally load map data immediately
-};
-
-// Handle resource updates from the slideover
-const onResourceUpdate = (newResource: string | number) => {
-  selectedResource.value = newResource;
-  // loadMapData(); // Optionally load map data immediately
-};
-
-const onCategoryUpdate = (value: number) => {
-  selectedResourceCategory.value = value
-  loadResources()
-}
-
-const customOptions = computed(() => {
-  return [{ id: "", name: "All Resources" }, ...availableResources.value];
-});
-
-// const showStateOrLga = (item: State | Lga) => {
-//   selectedStateOrLga.value = item;
-//   isModal.value = true;
-//   console.log("clicked-state-lga", selectedStateOrLga.value);
-// };
-const closeStateOrLga = () => {
-  isModal.value = false;
-  selectedStateOrLga.value = null;
-};
-
-const showResourceDetails = (item: Resource) => {
-  clickedResource.value = item;
-  resourceModal.value = true;
-  console.log("clicked-resource", clickedResource.value);
-};
-// const closeResourceDetails = () => {
-//   resourceModal.value = false;
-//   clickedResource.value = null;
-// };
-
-const adjustSvgSize = () => {
-  if (!mapContainer.value || !svg || !geojsonData.value) return;
-
-  const width = mapContainer.value.clientWidth;
-  const height = mapContainer.value.clientHeight;
-
-  svg.attr("width", width).attr("height", height);
-
-  // Update projection and path if necessary
-  const projection: GeoProjection = d3
-    .geoMercator()
-    .fitSize([width, height], geojsonData.value);
-  const path: GeoPath<GeoPermissibleObjects> = d3
-    .geoPath()
-    .projection(projection);
-
-  svg.selectAll("path").attr("d", path as never);
-  svg.selectAll("circle");
-};
-
-// Call this function after rendering the map
-const handleResize = () => {
-  adjustSvgSize();
-};
-
-// Available resources fetched from the API
-const availableResources = ref<Resource[]>([]);
-
-// Function to draw the map using D3.js
-const drawMap = (geojsonData: GeoJSONData) => {
-  if (!mapContainer.value) return;
-
-  // Clear existing SVG
-  d3.select(mapContainer.value).select("svg").remove();
-
-  const width = mapContainer.value.clientWidth;
-  const height = mapContainer.value.clientHeight;
-
-  // const abujaCoordinates: [number, number] = [7.3986, 9.0765];
-
-  // const projection: GeoProjection = d3
-  //   .geoMercator()
-  //   .center(abujaCoordinates)
-  //   .scale(4000)
-  //   .translate([width / 2, height / 2]);
-
-  const projection: GeoProjection = d3
-    .geoMercator()
-    .fitSize([width, height], geojsonData);
-  const path: GeoPath = d3.geoPath().projection(projection);
-
-  const svg = d3
-    .select(mapContainer.value)
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-  const g = svg.append("g"); // Group for zooming
-
-  const statesToDisplay = ["Lagos", "Kano", "F.C.T", "Rivers", "Ondo", "Oyo"];
-
-  // Draw states or LGAs
-  g.selectAll("path")
-    .data(geojsonData.features)
-    .enter()
-    .append("path")
-    .attr("d", (d: GeoJsonFeature) => path(d as GeoPermissibleObjects) || "")
-    .attr("opacity", 0.8)
-    .attr("stroke", mapStrokes.value)
-    .attr("stroke-width", 2)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // .on("click", (event, d: any) => {
-    //   showStateOrLga(d);
-    // })
-    .on("mouseover", function (event, d) {
-      d3.select(this).attr("opacity", 0.7);
-
-      const centroid = path.centroid(d);
-
-      g.append("text")
-        .attr("x", centroid[0])
-        .attr("y", centroid[1])
-        .attr("dy", ".35em")
-        .attr("text-anchor", "middle")
-        .attr("font-size", "12px")
-        .attr("font-weight", "bold")
-        .attr("fill", "#ffffff")
-        .attr("class", "hover-label")
-        .text(d?.properties?.name);
-    })
-    .on("mouseout", function () {
-      d3.select(this).attr("opacity", 0.8);
-      g.selectAll(".hover-label").remove();
-    });
-  
-    g.selectAll("text.initial-label")
-    .data(geojsonData.features)
-    .enter()
-    .filter((d: GeoJsonFeature) =>
-      statesToDisplay.includes(d.properties?.name)
-    )
-    .append("text")
-    .attr("x", (d: GeoJsonFeature) => path.centroid(d)[0])
-    .attr("y", (d: GeoJsonFeature) => path.centroid(d)[1])
-    .attr("dy", ".35em")
-    .attr("text-anchor", "middle")
-    .attr("font-size", "12px")
-    .attr("font-weight", "bold")
-    .attr("fill", "#ffffff")
-    .attr("class", "initial-label")
-    .text((d: GeoJsonFeature) => d.properties?.name);
-
-  // Setup zoom behavior
-  const zoom = d3
-    .zoom<SVGSVGElement, unknown>()
-    .scaleExtent([1, 8])
-    .on("zoom", (event) => {
-      g.attr("transform", event.transform);
-    });
-
-  svg.call(zoom);
-
-  // Zoom controls
-  const zoomIn = () => svg.transition().call(zoom.scaleBy, 1.2);
-  const zoomOut = () => svg.transition().call(zoom.scaleBy, 0.8);
-
-  document.querySelector("#zoomInButton")?.addEventListener("click", zoomIn);
-  document.querySelector("#zoomOutButton")?.addEventListener("click", zoomOut);
-
-  adjustSvgSize();
-};
-
-const drawResources = (resources: Resource[]) => {
-  if (!mapContainer.value || !geojsonData.value) return;
-
-  const filteredResources = computed(() => {
-    return selectedResource.value
-      ? resources.filter(
-          (resource) => resource.id === Number(selectedResource.value)
-        )
-      : resources;
-  });
-
-  const width = mapContainer.value.clientWidth;
-  const height = mapContainer.value.clientHeight;
-
-  const g = d3.select(mapContainer.value).select("g");
-
-  const tooltip = d3
-    .select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("position", "absolute")
-    .style("visibility", "hidden")
-    .style("background-color", "white")
-    .style("border", "solid 1px #ccc")
-    .style("color", "green")
-    .style("padding", "8px")
-    .style("border-radius", "4px")
-    .style("pointer-events", "none");
-
-  const projection: GeoProjection = d3
-    .geoMercator()
-    .fitSize([width, height], geojsonData.value);
-
-  filteredResources.value.forEach((resource) => {
-    resource.lgaResources.forEach((lgaResource) => {
-      const { locationLat, locationLong } = lgaResource;
-
-      const [x, y] = projection([locationLong, locationLat]) || [];
-
-      g.append("circle")
-        .attr("cx", x ?? 0)
-        .attr("cy", y ?? 0)
-        .attr("r", 5)
-        .attr("fill", resource.colorCode)
-        .on("mouseover", function (event) {
-          d3.select(this).attr("r", 8);
-          tooltip
-            .html(
-              `<strong style="color: ${resource.colorCode}">${resource.name}</strong> <br>
-               <strong>LGA:</strong> ${lgaResource.lga.name}<br>
-               <strong>Lat:</strong> ${locationLat}<br>
-               <strong>Long:</strong> ${locationLong}`
-            )
-            .style("visibility", "visible")
-            .style("top", `${event.pageY - 10}px`)
-            .style("left", `${event.pageX + 10}px`);
-        })
-        .on("mousemove", function (event) {
-          tooltip
-            .style("top", `${event.pageY - 10}px`)
-            .style("left", `${event.pageX + 10}px`);
-        })
-        .on("mouseout", function () {
-          d3.select(this).attr("r", 5);
-          tooltip.style("visibility", "hidden");
-        })
-        .on("click", function () {
-          showResourceDetails(resource);
-        });
-    });
-  });
-};
-
-// Function to load GeoJSON and resource data
-const loadMapData = async () => {
-  loadingStore.showLoading();
-  try {
-    const geoData: GeoJSONData = await useApi.get(
-      `/territory/fetch-geojson/${selectedFilter.value}`
-    );
-    geojsonData.value = geoData;
-    drawMap(geoData);
-  } catch (error) {
-    console.error("Error loading GeoJSON data:", error);
-  } finally {
-    loadingStore.hideLoading();
-    console.log("loading", loadingStore.isLoading);
-  }
-};
-
-const loadResources = async () => {
-  loadingStore.showLoading();
-  try {
-    if (selectedResourceCategory.value) {
-      const resources: Resource[] = await useApi.get(
-        `/resource/fetch-resources-by-category/${selectedResourceCategory.value}`
-      );
-      availableResources.value = resources;
-      drawResources(resources);
-      console.log("res", resources);
-    }
-  } catch (error) {
-    console.error("Error loading resources:", error);
-  } finally {
-    loadingStore.hideLoading();
-  }
-};
-
-watch(selectedResourceCategory, () => {
-  if (geojsonData.value) {
-    drawMap(geojsonData.value); // Re-draw the map with the new stroke color
-  }
-});
-
-watch([selectedFilter, selectedResource], async () => {
-  await loadMapData(); // Show overlay during GeoJSON loading
-  drawResources(availableResources.value);
-});
-
-watch(() => window?.innerWidth > 991, () => {
-  if (isMobileSidebarOpen.value) {
-    closeMobileSidebar();
-  }
-});
-
-// Initialize map on mount
-onMounted(async () => {
-  window.addEventListener("resize", handleResize);
-
-  // Initial map draw
-  await loadMapData();
-  adjustSvgSize();
-});
-
-onBeforeUnmount(() => {
-  // Clean up the resize listener when the component is destroyed
-  window.removeEventListener("resize", handleResize);
+onMounted(() => {
+  setInterval(nextSlide, 5000); // Change image every 5 seconds
 });
 </script>
 
-<style scoped>
-.map-container {
-  height: 700px;
+<template>
+  <div class="">
+    <header class="hero-section">
+      <div
+        class="slideshow"
+        v-for="(image, index) in images"
+        :key="index"
+        :style="{
+          backgroundImage: `url(${image})`,
+          opacity: index === currentSlide ? 1 : 0,
+        }"
+      ></div>
+      <!--navigation-->
+
+      <nav class="navbar navbar-default" data-spy="affix" data-offset-top="450">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+              <NuxtImg src="/img/rmrdc.png" class="logo" /><NuxtImg
+                src="/img/rmrdc.png"
+                class="logo-nav"
+            /></a>
+          </div>
+          <ul class="nav navbar-nav navbar-right hidden">
+            <li class="hidden-xs hidden-sm">
+              <a href="#features">Features</a>
+            </li>
+            <li class="hidden-xs hidden-sm"><a href="#pricing">Pricing</a></li>
+            <li class="hidden-xs hidden-sm"><a href="#reviews">Reviews</a></li>
+            <li class="hidden-xs"><a href="signin.html">Sign In</a></li>
+            <li><a href="signup.html" class="btn btn-nav">Sign Up</a></li>
+            <li class="hidden-md hidden-lg">
+              <a id="toggle"
+                ><i class="fa fa-bars fa-2x"></i
+                ><i class="fa fa-times fa-2x"></i
+              ></a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!--navigation end-->
+
+      <!--mobile navigation-->
+
+      <div class="mobile-nav-overlay md:hidden" id="mobile-nav-overlay">
+        <nav class="mobile-nav">
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#reviews">Reviews</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#team">Team</a></li>
+            <li class="hidden-sm"><a href="signin.html">Sign In</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <!--mobile navigation end-->
+
+      <!--welcome message-->
+
+      <section
+        class="container welcome-message text-center mt-0 sm:mt-16 lg:mt-24 w-full"
+      >
+        <!-- <div
+          class="flex flex-col lg:flex-row items-center lg:items-start justify-between mx-auto"
+        >
+          <div
+            class="md:col-span-5 col-span-12 flex flex-col items-center lg:items-start mb-8 lg:mb-0 max-w-2xl lg:max-w-md lg:pr-8 lg:flex-grow-0 lg:flex-shrink-0"
+          >
+          <h3 class="text-white text-sm text-center lg:text-start text-4xl font-bold mb-4">
+            Raw Materials Research and Development Council
+          </h3>
+            <h1
+              class="text-white text-center lg:text-start text-4xl font-bold mb-4"
+            >
+              Elevate Your Raw Materials Management with Us
+            </h1>
+          </div>
+          <div
+            class="md:col-span-7 col-span-12 flex justify-center lg:justify-start lg:flex-grow"
+          >
+          </div>
+        </div> -->
+        <div
+          class="flex flex-col lg:flex-row items-center justify-center mx-auto"
+        >
+          <div
+            class="col-span-12 flex flex-col items-center mb-8 lg:mb-0 lg:pr-8 lg:flex-grow-0 lg:flex-shrink-0"
+          >
+            <h3
+              class="text-white text-lg text-center lg:text-start text-4xl font-bold mb-4"
+            >
+              Raw Materials Research and Development Council
+            </h3>
+            <h1
+              class="text-white text-center lg:text-start text-4xl font-bold mb-4"
+            >
+              Elevate Your Raw Materials Management with Us
+            </h1>
+            <div class="w-1/4">
+              <UButton
+                class="text-white"
+                block
+                color="uiearth"
+                label="Explore"
+                size="lg"
+                @click="() => router.push('/map-view')"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!--welcome message end-->
+    </header>
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <div class="md:col-sapn-11 block mx-auto">
+          <div class="flex flex-col md:flex-row justify-between mx-auto gap-8">
+            <div
+              class="md:col-span-7 col-span-12 items-center mb-8 lg:mb-0 max-w-2xl md:max-w-md md:pr-8 md:flex-grow-0 md:flex-shrink-0"
+            >
+              <h4 class="text-xl text-uiearth-800 font-bold">Our motto</h4>
+              <div class="mt-16">
+                <p class="text-3xl">
+                  Transform Your Raw Materials Data with R&D Excellence
+                </p>
+              </div>
+            </div>
+            <div
+              class="md:col-span-5 col-span-12 flex justify-center lg:justify-start lg:flex-grow lg:max-w-lg"
+            >
+              <p class="text-sm md:text-base">
+                Welcome to the Raw Materials Research and Development Council’s
+                portal, your gateway to advanced categorization and database
+                management. Our platform is designed to support cutting-edge
+                research and development by providing comprehensive tools for
+                organizing and managing raw materials data. Join us in driving
+                innovation and efficiency in the raw materials sector. Explore
+                our resources and elevate your materials management today.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <div class="mb-12 text-center">
+          <h2 class="text-2xl mb-2 text-uiearth-800 font-bold">
+            Core Features
+          </h2>
+          <h3 class="text-xl">
+            Understanding the core pillars/functions of the portal
+          </h3>
+        </div>
+        <div class="flex flex-row">
+          <div class="md:col-span-11 text-left block mx-auto">
+            <div class="flex flex-row items-center flex-wrap mb-8">
+              <div
+                class="w-full md:w-1/2 md:order-last flex items-center justify-center mb-4"
+              >
+                <NuxtImg src="/img/rs_map.PNG" width="150" height="150" />
+              </div>
+              <div class="w-full md:w-1/2 md:order-first text-center md:text-start mb-4">
+                <div
+                  class="bullet sm:absolute w-16 h-16 flex items-center justify-center rounded-full text-white bg-uiearth-800 font-bold m-auto"
+                >
+                  <span>1</span>
+                </div>
+                <h4 class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium">
+                  Intuitive Map
+                </h4>
+                <p class="sm:ml-24 text-lg">
+                  An interactive map to show to location distribution of various
+                  resources across the 36 states and F.C.T
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-row items-center flex-wrap mb-8">
+              <div
+                class="w-full md:w-1/2 md:order-first flex items-center justify-center mb-4"
+              >
+                <NuxtImg src="/img/rs_map.PNG" width="150" height="150" />
+              </div>
+              <div class="w-full md:w-1/2 text-center md:text-start md:order-last mb-4">
+                <div
+                  class="bullet sm:absolute w-16 h-16 flex items-center justify-center rounded-full text-white bg-uiearth-800 font-bold m-auto"
+                >
+                  <span>2</span>
+                </div>
+                <h4 class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium">
+                  Resource Database Management
+                </h4>
+                <p class="sm:ml-24 text-lg">
+                  An interactive map to show to location distribution of various
+                  resources across the 36 states and F.C.T
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-row items-center flex-wrap mb-8">
+              <div
+                class="w-full md:w-1/2 md:order-last flex items-center justify-center mb-4"
+              >
+                <NuxtImg src="/img/rs_map.PNG" width="150" height="150" />
+              </div>
+              <div class="w-full md:w-1/2 md:order-first text-center md:text-start mb-4">
+                <div
+                  class="bullet sm:absolute w-16 h-16 flex items-center justify-center rounded-full text-white bg-uiearth-800 font-bold m-auto"
+                >
+                  <span>3</span>
+                </div>
+                <h4 class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium">
+                  Intearctive Charts
+                </h4>
+                <p class="sm:ml-24 text-lg">
+                  An interactive map to show to location distribution of various
+                  resources across the 36 states and F.C.T
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<style>
+.welcome-message {
+  @apply relative z-10 text-white text-center;
+}
+.slideshow {
+  @apply absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out transform;
+  opacity: 0.2;
+  animation: zoomIn 5s infinite alternate ease-in-out;
+}
+.slideshow {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  animation: zoomIn 20s ease-in-out infinite alternate;
+  transition: background-image 2s ease-in-out;
 }
-.map-bg {
-  position: relative;
-}
-.map-bg::before {
+.slideshow::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  /* background-image: linear-gradient(var(--tw-gradient-stops)), url("/img/map_bg_3.PNG"); */
-  /* background-image: linear-gradient(
-      rgba(252, 136, 19, 0.5),
-      rgba(252, 136, 19, 0.5)
-    ),
-    url("/img/map_bg_3.PNG"); */
-  background-size: cover;
-  background-position: center;
-  opacity: 1; /* Adjust this value to control opacity */
-  z-index: -1; /* Ensures the background is behind the content */
+  background: rgba(0, 0, 0, 0.5); /* Adjust opacity for the fade effect */
+  z-index: 1; /* Ensure the overlay is above the background but below the text */
+}
+@keyframes zoomIn {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
 }
 </style>
