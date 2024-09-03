@@ -46,8 +46,8 @@ const props = defineProps({
 });
 
 const resourceId = ref<number>(93);
-const selectedStateId1 = ref<number>(1);
-const selectedStateId2 = ref<number>(2);
+const selectedStateId1 = ref<number | null>(null);
+const selectedStateId2 = ref<number | null>(null);
 const loading = ref(false);
 const fetching = ref(false);
 const states = ref([] as State[]);
@@ -82,12 +82,14 @@ const chartData = computed(() => {
 const fetchData = async () => {
   loading.value = true;
   try {
-    const data = await analyticsStore.dispatchFetchResourceStatesCompareMetrics(
+    if (resourceId.value && selectedStateId1.value && selectedStateId2.value) {
+      const data = await analyticsStore.dispatchFetchResourceStatesCompareMetrics(
       resourceId.value,
       selectedStateId1.value,
       selectedStateId2.value
     );
     stateMetrics.value = data;
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -233,9 +235,10 @@ onMounted(async () => {
       </div>
       <div class="col-span-12 lg:col-span-1 text-end">
         <UButton
+          v-if="selectedStateId1 && selectedStateId2"
           icon="i-heroicons-magnifying-glass"
           class="text-white rounded-full"
-          :disabled="!selectedStateId1 && !selectedStateId2"
+          :disabled="loading || fetching"
           @click="fetchData"
         />
       </div>

@@ -236,9 +236,10 @@ onMounted(async () => {
       </div>
       <div class="col-span-12 lg:col-span-1 text-end">
         <UButton
+          v-if="selectedStateId"
           icon="i-heroicons-magnifying-glass"
           class="text-white rounded-full"
-          :disabled="!selectedStateId"
+          :disabled="loading || fetching"
           @click="fetchData"
         />
       </div>

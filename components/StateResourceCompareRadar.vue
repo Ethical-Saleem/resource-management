@@ -53,12 +53,12 @@ const props = defineProps({
   },
 });
 
-const resourceId1 = ref<number>(93);
-const resourceId2 = ref<number>(94);
+const resourceId1 = ref<number | null>(null);
+const resourceId2 = ref<number | null>(null);
 const loading = ref(false);
-const selectedStateId = ref<number>(1);
+const fetching = ref(false);
+const selectedStateId = ref<number | null>(null);
 const states = ref([] as State[]);
-const resourceState = ref([] as State[])
 const resources = ref([] as Resource[]);
 const stateMetrics = ref([] as StateMetric[]);
 
@@ -114,12 +114,14 @@ const chartData = computed(() => {
 const fetchData = async () => {
   loading.value = true;
   try {
-    const data = await analyticsStore.dispatchFetchStateResourceCompareMetrics(
-      resourceId1.value,
-      resourceId2.value,
-      selectedStateId.value
-    );
-    stateMetrics.value = data;
+    if (selectedStateId.value && resourceId1.value && resourceId2.value) {
+      const data = await analyticsStore.dispatchFetchStateResourceCompareMetrics(
+        resourceId1.value,
+        resourceId2.value,
+        selectedStateId.value
+      );
+      stateMetrics.value = data;
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -134,37 +136,55 @@ const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-watch(
-  () => props.categoryId,
-  async (newCategoryId) => {
-    await fetchResources(newCategoryId);
-    await fetchData();
-  }
-);
+// const fetchResources = async (categoryId: number) => {
+//   // loadingStore.showLoading();
+//   try {
+//     const data = await useApi.get(
+//       `/resource/fetch-resources-data-by-category/${categoryId}`
+//     );
+//     resources.value = data;
+//     resourceId1.value = resources.value[0].id;
+//     resourceId2.value = resources.value[1].id;
+//   } catch (error) {
+//     console.log(error);
+//   } finally {
+//     // loadingStore.hideLoading();
+//   }
+// };
 
-const fetchResources = async (categoryId: number) => {
-  // loadingStore.showLoading();
+const fetchStateResources = async () => {
+  fetching.value = true;
   try {
-    const data = await useApi.get(
-      `/resource/fetch-resources-data-by-category/${categoryId}`
-    );
-    resources.value = data;
-    resourceId1.value = resources.value[0].id;
-    resourceId2.value = resources.value[1].id;
+    if (selectedStateId.value) {
+      const data = await analyticsStore.dispatchFetchStateResources(selectedStateId.value, props.categoryId);
+      console.log(data);
+      resources.value = data;
+    }
   } catch (error) {
-    console.log(error);
+    console.log(error)
   } finally {
-    // loadingStore.hideLoading();
+    fetching.value = false;
   }
-};
+}
 
-// const fetchResourceStates = async () => {
-//   fetching.value = true;
-// }
+// watch(
+//   () => props.categoryId,
+//   async (newCategoryId) => {
+//     await fetchResources(newCategoryId);
+//     await fetchData();
+//   }
+// );
+
+watch(
+  () => selectedStateId.value,
+  async () => {
+    fetchStateResources();
+  }
+)
 
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
-  await fetchResources(props.categoryId);
+  // await fetchResources(props.categoryId);
   selectedStateId.value = states.value[0].id;
   await fetchData();
 });
@@ -216,10 +236,12 @@ onMounted(async () => {
     </template>
     <div class="grid grid-cols-12 gap-3 mb-3">
       <div class="col-span-12 lg:col-span-11 grid grid-cols-3 gap-2">
-        <UFormGroup label="Resource">
+        <UFormGroup v-if="selectedStateId" label="Resource One">
           <USelectMenu
             v-model="resourceId1"
             :options="resources"
+            :loading="fetching"
+            :disabled="fetching"
             option-attribute="name"
             value-attribute="id"
             searchable
@@ -236,10 +258,12 @@ onMounted(async () => {
             placeholder="-- Select --"
           />
         </UFormGroup>
-        <UFormGroup label="Resource">
+        <UFormGroup v-if="selectedStateId" label="Resource Two">
           <USelectMenu
             v-model="resourceId2"
             :options="resources"
+            :loading="fetching"
+            :disabled="fetching"
             option-attribute="name"
             value-attribute="id"
             searchable
@@ -249,8 +273,10 @@ onMounted(async () => {
       </div>
       <div class="col-span-12 lg:col-span-1 text-end">
         <UButton
+          v-if="resourceId1 && resourceId2"
           icon="i-heroicons-magnifying-glass"
           class="text-white rounded-full"
+          :disabled="loading || fetching"
           @click="fetchData"
         />
       </div>

@@ -181,5 +181,16 @@ export const useAnalyticsStore = defineStore("analytics-store", {
         throw error;
       }
     },
+
+    async dispatchFetchStateResources(stateId: number, categoryId: number) {
+      try {
+        const data = await useApi.get(`/analytics/state-resources/${stateId}?categoryId=${categoryId}`);
+        console.log('state-resources', data);
+        return data;
+      } catch (error) {
+        console.log('state-resources-error', error);
+        throw error;
+      }
+    },
   },
 });
