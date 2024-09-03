@@ -194,9 +194,9 @@ onMounted(async () => {
                 all states it can be found, evaluating the overall value chain
                 rating for the resource in each state. The length of the bar
                 determine is used as the mode of comparison here. <br ><br >
-                0 - 3 : Low <br >
+                <!-- 0 - 3 : Low <br >
                 4 - 6 : Average <br >
-                7 - 10 : High
+                7 - 10 : High -->
               </div>
             </template>
           </UPopover>

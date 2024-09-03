@@ -58,6 +58,7 @@ const resourceId2 = ref<number>(94);
 const loading = ref(false);
 const selectedStateId = ref<number>(1);
 const states = ref([] as State[]);
+const resourceState = ref([] as State[])
 const resources = ref([] as Resource[]);
 const stateMetrics = ref([] as StateMetric[]);
 
@@ -157,6 +158,10 @@ const fetchResources = async (categoryId: number) => {
   }
 };
 
+// const fetchResourceStates = async () => {
+//   fetching.value = true;
+// }
+
 onMounted(async () => {
   states.value = await useApi.get("/territory/fetch-all-states");
   await fetchResources(props.categoryId);
@@ -199,9 +204,9 @@ onMounted(async () => {
                 in different regions, highlighting areas of strength or concern
                 for each resource. Hover over a state to see the specific metric
                 values for both resources side by side, enabling a detailed
-                comparison. <br /><br />
-                0 - 3 : Low <br />
-                4 - 6 : Average <br />
+                comparison. <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
                 7 - 10 : High
               </div>
             </template>

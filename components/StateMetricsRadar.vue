@@ -47,6 +47,7 @@ const resourceId = ref<number | null>(null);
 const selectedStateId = ref<number | undefined>();
 const states = ref([]);
 const loading = ref(false);
+const fetching = ref(false);
 const resources = ref([] as Resource[]);
 const stateMetrics = ref([] as StateMetric[]);
 
@@ -174,7 +175,7 @@ const fetchResources = async (categoryId: number) => {
 };
 
 const fetchResourceStates = async () => {
-  loading.value = true;
+  fetching.value = true;
   try {
     if (resourceId.value) {
       const data = await analyticsStore.dispatchFetchResourceStates(
@@ -186,7 +187,7 @@ const fetchResourceStates = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    loading.value = false;
+    fetching.value = false;
   }
 };
 
@@ -222,7 +223,7 @@ onMounted(async () => {
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <h6 class="text-sm pr-1">State Level Metrics</h6>
+          <h6 class="text-sm pr-1">State Level Market/Investment Potential Analysis</h6>
           <UPopover mode="hover">
             <UButton label="?" variant="ghost" class="text-lg" />
             <template #panel>
@@ -235,9 +236,9 @@ onMounted(async () => {
                 opportunities. By hovering over the chart, you can see detailed
                 information on each metric, helping you quickly understand where
                 a state excels or needs improvement in resource management.
-                <br /><br />
-                0 - 3 : Low <br />
-                4 - 6 : Average <br />
+                <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
                 7 - 10 : High
               </div>
             </template>
@@ -261,6 +262,8 @@ onMounted(async () => {
         <USelectMenu
           v-model="selectedStateId"
           :options="customStateOptions"
+          :loading="fetching"
+          :disabled="fetching"
           option-attribute="name"
           value-attribute="id"
           searchable

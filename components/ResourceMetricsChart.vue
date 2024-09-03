@@ -8,14 +8,14 @@ import type { Resource } from "~/types";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface StateMetric {
-  stateName: string;
-  accessToMarket: number;
-  marketValue: number;
-  quality: number;
-  environmentalImpact: number;
-  investmentOpportunities: number;
-  color: string; // Color field
+type StateMetric = {
+  name: string;
+  average: number;
+}
+
+interface Data {
+  valueChainRating: number;
+  data: StateMetric[];
 }
 
 const analyticsStore = useAnalyticsStore();
@@ -33,8 +33,10 @@ const selectedStateId = ref<number | null>(null);
 const states = ref([]);
 const resourceStates = ref([]);
 const loading = ref(false);
+const fetching = ref(false);
 const resources = ref([] as Resource[]);
 const stateMetrics = ref([] as StateMetric[]);
+const valueRating = ref<number | null>(null);
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false, // Important to allow custom sizing
@@ -42,7 +44,7 @@ const chartOptions = ref({
 
 const chartData = computed(() => {
   const labels = stateMetrics.value.map((item) => item.name);
-  const data = stateMetrics.value.map((item) => item.value);
+  const data = stateMetrics.value.map((item) => item.average);
 
   return {
     labels,
@@ -74,15 +76,16 @@ const fetchData = async () => {
   try {
     console.log("resourceId", resourceId.value);
     if (resourceId.value && selectedStateId.value) {
-      const data = await analyticsStore.dispatchFetchStateResourceValueMetrics(
+      const res: Data = await analyticsStore.dispatchFetchStateResourceValueMetrics(
         resourceId.value,
         selectedStateId.value
       );
       //   stateMetrics.value = data;
-      stateMetrics.value = data.map((item) => ({
+      stateMetrics.value = res.data.map((item) => ({
         name: item.name,
-        value: item.value,
+        average: item.average,
       }));
+      valueRating.value = res.valueChainRating;
     }
   } catch (error) {
     console.log(error);
@@ -128,7 +131,7 @@ const fetchResources = async (categoryId: number) => {
 };
 
 const fetchResourceStates = async () => {
-  loading.value = true;
+  fetching.value = true;
   try {
     if (resourceId.value) {
       const data = await analyticsStore.dispatchFetchResourceStates(
@@ -141,7 +144,7 @@ const fetchResourceStates = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    loading.value = false;
+    fetching.value = false;
   }
 };
 
@@ -185,15 +188,19 @@ onMounted(async () => {
               <div
                 class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
               >
-                This radar chart compares various metrics for a specific
-                resource across different states. The chart shows how each state
-                performs in areas like market value, quality, and investment
-                opportunities. By hovering over the chart, you can see detailed
-                information on each metric, helping you quickly understand where
-                a state excels or needs improvement in resource management.
-                <br /><br />
-                0 - 3 : Low <br />
-                4 - 6 : Average <br />
+                <strong>Value-Chain Drivers</strong> <br><br>
+                This chart compares various metrics for a specific resource
+                across different states. The focus is to undertsand how each
+                metric contributes to the value chain of the resource in the
+                particular state The chart shows how each state performs in
+                areas like market access, market value, environmental impact,
+                and industry challenges. By hovering over the chart, you can see
+                detailed information on each metric, helping you quickly
+                understand where a state excels or needs improvement in resource
+                management.
+                <br><br>
+                0 - 3 : Low <br>
+                4 - 6 : Average <br>
                 7 - 10 : High
               </div>
             </template>
@@ -218,6 +225,8 @@ onMounted(async () => {
           <USelectMenu
             v-model="selectedStateId"
             :options="states"
+            :loading="fetching"
+            :disabled="fetching"
             option-attribute="name"
             value-attribute="id"
             searchable
@@ -229,13 +238,21 @@ onMounted(async () => {
         <UButton
           icon="i-heroicons-magnifying-glass"
           class="text-white rounded-full"
+          :disabled="!selectedStateId"
           @click="fetchData"
         />
       </div>
     </div>
     <div v-if="!loading" class="">
-      <div v-if="stateMetrics.length > 0" style="height: '300px'">
-        <Pie :data="chartData" :options="chartOptions" />
+      <div v-if="stateMetrics.length > 0">
+        <div style="height: '300px'">
+          <Pie :data="chartData" :options="chartOptions" />
+        </div>
+        <div class="flex items-center justify-end">
+          <p v-if="valueRating" class="text-xs font-medium">
+            Value Chain Rating: <span class="text-sm font-semibold">{{ valueRating.toFixed(3) }}</span>
+          </p>
+        </div>
       </div>
       <div v-else class="mx-auto my-8">
         <div class="mx-auto text-center">

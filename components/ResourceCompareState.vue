@@ -49,6 +49,7 @@ const resourceId = ref<number>(93);
 const selectedStateId1 = ref<number>(1);
 const selectedStateId2 = ref<number>(2);
 const loading = ref(false);
+const fetching = ref(false);
 const states = ref([] as State[]);
 const resources = ref([] as Resource[]);
 const stateMetrics = ref({} as StateMetric);
@@ -128,7 +129,7 @@ const fetchResources = async (categoryId: number) => {
 };
 
 const fetchResourceStates = async () => {
-  loading.value = true;
+  fetching.value = true;
   try {
     if (resourceId.value) {
       const data = await analyticsStore.dispatchFetchResourceStates(
@@ -140,7 +141,7 @@ const fetchResourceStates = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    loading.value = false;
+    fetching.value = false;
   }
 };
 
@@ -169,7 +170,7 @@ onMounted(async () => {
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <h6 class="text-sm pr-1">State Level Metrics Comparison</h6>
+          <h6 class="text-sm pr-1">Inter-State Metrics Comparison</h6>
           <UPopover mode="hover">
             <UButton label="?" variant="ghost" class="text-lg" />
             <template #panel>
@@ -199,6 +200,7 @@ onMounted(async () => {
           <USelectMenu
             v-model="selectedStateId1"
             :options="states"
+            :loading="fetching"
             option-attribute="name"
             value-attribute="id"
             searchable
@@ -220,6 +222,8 @@ onMounted(async () => {
           <USelectMenu
             v-model="selectedStateId2"
             :options="states"
+            :loading="fetching"
+            :disabled="fetching"
             option-attribute="name"
             value-attribute="id"
             searchable
@@ -231,6 +235,7 @@ onMounted(async () => {
         <UButton
           icon="i-heroicons-magnifying-glass"
           class="text-white rounded-full"
+          :disabled="!selectedStateId1 && !selectedStateId2"
           @click="fetchData"
         />
       </div>

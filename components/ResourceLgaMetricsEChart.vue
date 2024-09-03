@@ -21,6 +21,7 @@ const currentPage = ref(1);
 const totalPages = ref(0);
 const totalCount = ref(0);
 const loading = ref(false);
+const fetching = ref(false);
 const resourceId = ref<number>(1);
 const selectedStateId = ref<number | undefined>();
 const states = ref([]);
@@ -151,7 +152,7 @@ const fetchResources = async (categoryId: number) => {
 };
 
 const fetchResourceStates = async () => {
-  loading.value = true;
+  fetching.value = true;
   try {
     if (resourceId.value) {
       const data = await analyticsStore.dispatchFetchResourceStates(
@@ -163,7 +164,7 @@ const fetchResourceStates = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    loading.value = false;
+    fetching.value = false;
   }
 };
 
@@ -209,7 +210,7 @@ onMounted(async () => {
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <h6 class="text-sm pr-1">State Level Metrics</h6>
+          <h6 class="text-sm pr-1">State Level Insights and Strategic Assessment</h6>
           <UPopover mode="hover">
             <UButton label="?" variant="ghost" class="text-lg" />
             <template #panel>
@@ -222,9 +223,9 @@ onMounted(async () => {
                 industry challenges, stakeholder engagement, and investment
                 opportunities. By hovering over the bars, you can see detailed
                 metrics for each LGA, helping you identify areas of strength or
-                concern. <br /><br />
-                0 - 3 : Low <br />
-                4 - 6 : Average <br />
+                concern. <br ><br >
+                0 - 3 : Low <br >
+                4 - 6 : Average <br >
                 7 - 10 : High
               </div>
             </template>
@@ -265,6 +266,8 @@ onMounted(async () => {
         <USelectMenu
           v-model="selectedStateId"
           :options="customStateOptions"
+          :loading="fetching"
+          :disabled="fetching"
           option-attribute="name"
           value-attribute="id"
           searchable
