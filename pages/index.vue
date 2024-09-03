@@ -132,7 +132,7 @@ onMounted(() => {
             >
               <span class="">Elevate Your</span>
               <span class="text-uigreen-500"
-                >Raw Materials Management with Us</span
+                > Raw Materials Management with Us</span
               >
             </h1>
             <div class="w-1/3 sm:w-1/4">
