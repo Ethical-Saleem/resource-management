@@ -25,7 +25,7 @@ useHead({
     { rel: "icon", type: "img/png", href: "/img/favicon-16x16.png" },
   ],
   meta: [
-    { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics' },
+    { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics, RMRDC Portal, Portal' },
   ],
 });
 </script>

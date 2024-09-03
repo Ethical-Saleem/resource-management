@@ -59,7 +59,7 @@
 
 @media (max-width: 599px) {
   .welcome-message {
-    padding: 2em 15px 7em;
+    padding: 5em 15px 7em;
   }
 }
 
@@ -273,4 +273,11 @@
 .navbar-default.affix .navbar-nav > li > .btn-nav:focus {
   background: #30a7e9;
   color: #fff;
+}
+
+/* Footer */
+@media (min-width: 992px) {
+  .home-footer {
+    padding: 6em 0;
+  }
 }

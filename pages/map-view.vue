@@ -215,7 +215,7 @@ interface GeoJSONData extends FeatureCollection {
 }
 
 useHead({
-  title: "Home",
+  title: "Map",
   meta: [
     {
       name: "description",

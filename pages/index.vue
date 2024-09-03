@@ -1,6 +1,16 @@
 <script setup lang="ts">
 const router = useRouter();
 
+useHead({
+  title: "Home",
+  meta: [
+    {
+      name: "description",
+      content: "RMRDC Portal Home Page",
+    },
+  ],
+});
+
 const images = ref<string[]>([
   "/img/map_bg.PNG",
   "/img/tomato-farm.jpg",
@@ -84,7 +94,7 @@ onMounted(() => {
       <!--welcome message-->
 
       <section
-        class="container welcome-message text-center mt-0 sm:mt-16 lg:mt-24 w-full"
+        class="container welcome-message text-center mt-12 sm:mt-16 lg:mt-24 w-full"
       >
         <!-- <div
           class="flex flex-col lg:flex-row items-center lg:items-start justify-between mx-auto"
@@ -187,18 +197,23 @@ onMounted(() => {
               >
                 <NuxtImg src="/img/rs_map.PNG" width="150" height="150" />
               </div>
-              <div class="w-full md:w-1/2 md:order-first text-center md:text-start mb-4">
+              <div
+                class="w-full md:w-1/2 md:order-first text-center sm:text-start mb-4"
+              >
                 <div
                   class="bullet sm:absolute w-16 h-16 flex items-center justify-center rounded-full text-white bg-uiearth-800 font-bold m-auto"
                 >
                   <span>1</span>
                 </div>
-                <h4 class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium">
+                <h4
+                  class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium"
+                >
                   Intuitive Map
                 </h4>
                 <p class="sm:ml-24 text-lg">
-                  An interactive map to show to location distribution of various
-                  resources across the 36 states and F.C.T
+                  An interactive map showcasing the geographical distribution of
+                  diverse resources across all 36 states and the Federal Capital
+                  Territory.
                 </p>
               </div>
             </div>
@@ -206,20 +221,27 @@ onMounted(() => {
               <div
                 class="w-full md:w-1/2 md:order-first flex items-center justify-center mb-4"
               >
-                <NuxtImg src="/img/rs_map.PNG" width="150" height="150" />
+                <NuxtImg src="/img/datatable-image.jpg" width="150" height="150" />
               </div>
-              <div class="w-full md:w-1/2 text-center md:text-start md:order-last mb-4">
+              <div
+                class="w-full md:w-1/2 text-center sm:text-start md:order-last mb-4"
+              >
                 <div
                   class="bullet sm:absolute w-16 h-16 flex items-center justify-center rounded-full text-white bg-uiearth-800 font-bold m-auto"
                 >
                   <span>2</span>
                 </div>
-                <h4 class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium">
+                <h4
+                  class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium"
+                >
                   Resource Database Management
                 </h4>
                 <p class="sm:ml-24 text-lg">
-                  An interactive map to show to location distribution of various
-                  resources across the 36 states and F.C.T
+                  A well-organized data table underpins an interactive map that
+                  visualizes resource distribution across Nigeria’s 36 states
+                  and the Federal Capital Territory. This tool enables users to
+                  explore and analyze data, supporting informed decision-making
+                  for strategic investments and enhancements.
                 </p>
               </div>
             </div>
@@ -227,20 +249,55 @@ onMounted(() => {
               <div
                 class="w-full md:w-1/2 md:order-last flex items-center justify-center mb-4"
               >
-                <NuxtImg src="/img/rs_map.PNG" width="150" height="150" />
+                <NuxtImg src="/img/chart-mix.png" width="150" height="150" />
               </div>
-              <div class="w-full md:w-1/2 md:order-first text-center md:text-start mb-4">
+              <div
+                class="w-full md:w-1/2 md:order-first text-center sm:text-start mb-4"
+              >
                 <div
                   class="bullet sm:absolute w-16 h-16 flex items-center justify-center rounded-full text-white bg-uiearth-800 font-bold m-auto"
                 >
                   <span>3</span>
                 </div>
-                <h4 class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium">
+                <h4
+                  class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium"
+                >
                   Intearctive Charts
                 </h4>
                 <p class="sm:ml-24 text-lg">
-                  An interactive map to show to location distribution of various
-                  resources across the 36 states and F.C.T
+                  Engage with dynamic charts that provide detailed visual
+                  insights into the distribution and trends of various
+                  resources. These interactive elements help you easily
+                  understand complex data patterns, making it simpler to analyze
+                  and interpret the resource landscape across Nigeria.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-row items-center flex-wrap mb-8">
+              <div
+                class="w-full md:w-1/2 md:order-first flex items-center justify-center mb-4"
+              >
+                <NuxtImg src="/img/report.svg" width="150" height="150" />
+              </div>
+              <div
+                class="w-full md:w-1/2 text-center sm:text-start md:order-last mb-4"
+              >
+                <div
+                  class="bullet sm:absolute w-16 h-16 flex items-center justify-center rounded-full text-white bg-uiearth-800 font-bold m-auto"
+                >
+                  <span>4</span>
+                </div>
+                <h4
+                  class="sm:ml-24 mb-4 mt-3 md:mt-0 text-lg text-uigreen-700 font-medium"
+                >
+                  Report
+                </h4>
+                <p class="sm:ml-24 text-lg">
+                  A thorough assessment of how resources are spread throughout
+                  the country, providing valuable insights for strategic
+                  investments and improvements. This report offers direct
+                  knowledge on diverse resources, investment prospects, and
+                  their value, empowering you to make well-informed decisions.
                 </p>
               </div>
             </div>
@@ -248,6 +305,19 @@ onMounted(() => {
         </div>
       </div>
     </section>
+    <footer class="home-footer bg-uimuted-200">
+      <UContainer>
+        <div class="flex items-center">
+          <div class="">
+            <NuxtImg src="/img/rmrdc.png" width="150" height="150" />
+            <h3 class="text-lg text-uiearth-700 font-medium">RAW MATERIALS RESEARCH AND DEVELOPMENT COUNCIL</h3>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row items-center">
+
+        </div>
+      </UContainer>
+    </footer>
   </div>
 </template>
 
