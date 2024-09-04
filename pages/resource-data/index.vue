@@ -197,9 +197,11 @@ onMounted(async () => {
   <div class="">
     <UCard class="mb-2 bg-uigreen-50 ring-2 ring-uiearth-300">
       <div class="">
-        <div class="flex items-center justify-between">
-          <h4 class="text-lg lg:text-xl">Resources Bank</h4>
-          <div class="flex items-center">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <div class="w-full">
+            <h4 class="text-lg lg:text-xl text-left">Resources Bank</h4>
+          </div>
+          <div class="flex flex-row items-center justify-end w-full">
             <UButton
               color="uiyellow"
               variant="ghost"
@@ -209,14 +211,14 @@ onMounted(async () => {
               @click="fetchData()"
             />
             <a
-              class="flex items-center p-2 mx-2 rounded-md ring-1 ring-uiearth-900 text-uiearth-900 text-sm"
-              href="https://drive.google.com/file/d/1wnXijjwkMELBwJlywW6HRAV8HVlH1W7l/view?usp=sharing"
+              class="flex sm:w-40 items-center p-2 mx-2 rounded-md ring-1 ring-uiearth-900 text-uiearth-900 text-sm"
+              href="https://drive.google.com/file/d/1susvOozh-nggovY6j08pXq6qDdIqeEMW/view?usp=sharing"
               target="_blank"
             >
               <UIcon name="i-heroicons-eye-20-solid" />
-              <span class="pl-1">View Resource Report</span>
+              <span class="pl-1">View Report</span>
             </a>
-            <div class="w-full sm:w-60">
+            <div class=" sm:w-60">
               <div
                 class="rounded-md relative flex items-center bg-uimuted-800 w-full"
               >
