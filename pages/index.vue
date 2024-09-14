@@ -35,14 +35,14 @@ onMounted(() => {
   <div class="">
     <header class="hero-section">
       <div
-        class="slideshow"
         v-for="(image, index) in images"
         :key="index"
+        class="slideshow"
         :style="{
           backgroundImage: `url(${image})`,
           opacity: index === currentSlide ? 1 : 0,
         }"
-      ></div>
+      />
       <!--navigation-->
 
       <nav class="navbar navbar-default" data-spy="affix" data-offset-top="450">
@@ -64,9 +64,7 @@ onMounted(() => {
             <li><a href="signup.html" class="btn btn-nav">Sign Up</a></li>
             <li class="hidden-md hidden-lg">
               <a id="toggle"
-                ><i class="fa fa-bars fa-2x"></i
-                ><i class="fa fa-times fa-2x"></i
-              ></a>
+                ><i class="fa fa-bars fa-2x"/><i class="fa fa-times fa-2x"/></a>
             </li>
           </ul>
         </div>
@@ -76,7 +74,7 @@ onMounted(() => {
 
       <!--mobile navigation-->
 
-      <div class="mobile-nav-overlay hidden" id="mobile-nav-overlay">
+      <div id="mobile-nav-overlay" class="mobile-nav-overlay hidden">
         <nav class="mobile-nav">
           <ul>
             <li><a href="#features">Features</a></li>
@@ -342,7 +340,7 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div class="flex flex-col md:flex-row items-center"></div>
+        <div class="flex flex-col md:flex-row items-center"/>
       </UContainer>
       <div class="bg-uimuted-400 px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-center py-3">

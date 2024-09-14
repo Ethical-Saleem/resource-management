@@ -10,7 +10,8 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "@nuxt/eslint",
     "@vueuse/nuxt",
-    "nuxt-echarts"
+    "nuxt-echarts",
+    "@nuxtjs/mdc",
   ],
 
   runtimeConfig: {

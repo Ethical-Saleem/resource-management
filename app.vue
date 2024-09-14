@@ -28,12 +28,17 @@ useHead({
     { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics, RMRDC Portal, Portal' },
   ],
 });
+
+const isChatOpen = ref(true);
 </script>
 
 <template>
   <div class="">
     <NuxtLayout>
       <NuxtPage />
+
+      <ChatAIButton @open="isChatOpen = true" />
+      <ChatBar :is-open="isChatOpen" @close="isChatOpen = false" />
     </NuxtLayout>
 
     <div v-if="loadingStore.isLoading" class="loading-overlay">

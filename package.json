@@ -26,6 +26,7 @@
     "nuxt-echarts": "^0.2.2"
   },
   "dependencies": {
+    "@nuxtjs/mdc": "^0.9.0",
     "@pinia/nuxt": "^0.5.3",
     "@turf/turf": "^7.1.0",
     "chartjs": "^0.3.24",
