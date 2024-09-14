@@ -29,7 +29,7 @@ useHead({
   ],
 });
 
-const isChatOpen = ref(true);
+const isChatOpen = ref(false);
 </script>
 
 <template>
@@ -45,7 +45,7 @@ const isChatOpen = ref(true);
       <!-- <div class="spinner"></div> -->
       <div class="loading-text">Please wait</div>
       <div class="progress-bar">
-        <div class="progress"></div>
+        <div class="progress" />
       </div>
     </div>
   </div>

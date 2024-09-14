@@ -51,7 +51,7 @@
     </div>
     <UButton
       :class="outlineButtonClass"
-      class="fixed text-white bottom-4 right-4 z-20 text-white ring-2 rounded-full shadow-md lg:hidden"
+      class="fixed text-white bottom-16 right-4 z-50 text-white ring-2 rounded-full shadow-md lg:hidden"
       variant="solid"
       size="xl"
       color="uiearth"
