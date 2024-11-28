@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useLoadingStore } from "~/stores/loading-store";
+import { useMainStore } from "#imports";
+import { AppState } from "./stores/main-store";
 
 const loadingStore = useLoadingStore();
+const mainStore = useMainStore();
 
 useSeoMeta({
   title: "RMRDC - Resource Exploration",
@@ -30,10 +33,13 @@ useHead({
 });
 
 const isChatOpen = ref(false);
+
+const isMaintenance = computed(() => mainStore.appState === AppState.maintenance);
+const isRunning = computed(() => mainStore.appState === AppState.running);
 </script>
 
 <template>
-  <div class="">
+  <div v-if="isRunning" class="">
     <NuxtLayout>
       <NuxtPage />
 
@@ -48,6 +54,9 @@ const isChatOpen = ref(false);
         <div class="progress" />
       </div>
     </div>
+  </div>
+  <div v-if="isMaintenance" class="">
+    <MaintenanceState />
   </div>
 
   <USlideovers />
