@@ -238,7 +238,6 @@ const isModal = ref(false);
 const resourceModal = ref(false);
 const isMobileSidebarOpen = ref(false);
 let svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
-// const isFilterPaneOpen = ref(false);
 
 const openMobileBar = () => {
   isMobileSidebarOpen.value = true;
@@ -263,17 +262,6 @@ const items = [
   ],
 ];
 
-// const slideOver = useSlideover();
-
-// const openMobileBar = () => {
-//   slideOver.open(MapSidePanel, {
-//     selectedFilter: selectedFilter.value,
-//     selectedResource: selectedResource.value,
-//     customOptions: customOptions,
-//     selectedResourceCategory: selectedResourceCategory.value,
-//   });
-// };
-
 const gradientClass = computed(() => {
   switch (selectedResourceCategory.value) {
     case 1: // Solid Minerals
@@ -283,7 +271,7 @@ const gradientClass = computed(() => {
     case 3: // Agricultural Produce
       return "bg-agricultural-produce";
     default:
-      return "bg-solid-minerals"; // Default gradient
+      return "bg-solid-minerals";
   }
 });
 
@@ -400,7 +388,6 @@ const onFilterUpdate = (newFilter: string) => {
 // Handle resource updates from the slideover
 const onResourceUpdate = (newResource: string | number) => {
   selectedResource.value = newResource;
-  // loadMapData(); // Optionally load map data immediately
 };
 
 const onCategoryUpdate = (value: number) => {
