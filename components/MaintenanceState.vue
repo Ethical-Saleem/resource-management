@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const refresh = () => {
   window.location.reload();
-}
+};
 </script>
 
 <template>
@@ -15,7 +15,7 @@ const refresh = () => {
         </div>
       </header>
       <main>
-        <div class="mx-auto w-full max-w-7xl pt-32 sm:pt-0">
+        <div class="mx-auto w-full max-w-7xl">
           <div class="relative flex justify-center !items-end min-h-[400px]">
             <div class="mx-auto w-full text-center">
               <div class="max-w-[28rem] mx-auto">
@@ -32,8 +32,9 @@ const refresh = () => {
                   Maintenance !!!
                 </h4>
                 <p class="text-uimuted-400">
-                  The application is currently in maintenance. Kindly bear with us
-                  as we make necessary updates and fixes.
+                  Our application is currently undergoing maintenance to bring
+                  you necessary updates and improvements. Thank you for your
+                  patience and understanding!
                 </p>
                 <div class="mt-4">
                   <div
