@@ -7,7 +7,7 @@ export const useMainStore = defineStore('main-store', {
   state: () => ({
     map: null,
     mapType: 'state',
-    appState: AppState.maintenance
+    appState: AppState.running
   }),
   actions: {
     

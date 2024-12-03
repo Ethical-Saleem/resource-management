@@ -7,7 +7,7 @@ const loadingStore = useLoadingStore();
 const mainStore = useMainStore();
 
 useSeoMeta({
-  title: "RMRDC - Resource Exploration",
+  title: "RMRDC",
   ogTitle: "RMRDC - Resource Exploration",
   description:
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",

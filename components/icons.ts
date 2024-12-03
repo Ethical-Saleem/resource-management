@@ -1,0 +1,11 @@
+export const icons: Record<string, string> = {
+  energy: `
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="icon size-6 text-yellow-400" style="" width="1em" height="1em" viewBox="0 0 256 256" data-v-b4402e20=""><g fill="currentColor"><path d="m96 240l16-80l-64-24L160 16l-16 80l64 24Z" opacity=".2"></path><path d="M215.79 118.17a8 8 0 0 0-5-5.66L153.18 90.9l14.66-73.33a8 8 0 0 0-13.69-7l-112 120a8 8 0 0 0 3 13l57.63 21.61l-14.62 73.25a8 8 0 0 0 13.69 7l112-120a8 8 0 0 0 1.94-7.26M109.37 214l10.47-52.38a8 8 0 0 0-5-9.06L62 132.71l84.62-90.66l-10.46 52.38a8 8 0 0 0 5 9.06l52.8 19.8Z"></path></g></svg>
+  `,
+  agriculture: `
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="icon text-success-500 size-6" style="" width="1em" height="1em" viewBox="0 0 256 256" data-v-b4402e20=""><g fill="currentColor"><path d="M63.81 192.19c-47.89-79.81 16-159.62 151.64-151.64c7.98 135.68-71.83 199.53-151.64 151.64" opacity=".2"></path><path d="M223.45 40.07a8 8 0 0 0-7.52-7.52C139.8 28.08 78.82 51 52.82 94a87.1 87.1 0 0 0-12.76 49c.57 15.92 5.21 32 13.79 47.85l-19.51 19.5a8 8 0 0 0 11.32 11.32l19.5-19.51C81 210.73 97.09 215.37 113 215.94q1.67.06 3.33.06A86.93 86.93 0 0 0 162 203.18c43-26 65.93-86.97 61.45-163.11m-69.7 149.43c-22.75 13.78-49.68 14-76.71.77l88.63-88.62a8 8 0 0 0-11.32-11.32L65.73 179c-13.19-27-13-54 .77-76.71c22.09-36.47 74.6-56.44 141.31-54.06c2.39 66.66-17.59 119.18-54.06 141.27"></path></g></svg>
+  `,
+  minerals: `
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="icon size-6 text-lime-500" style="" width="1em" height="1em" viewBox="0 0 256 256" data-v-b4402e20=""><g fill="currentColor"><path d="M240 104L128 224L80 104l48-64h56Z" opacity=".2"></path><path d="m246 98.73l-56-64a8 8 0 0 0-6-2.73H72a8 8 0 0 0-6 2.73l-56 64a8 8 0 0 0 .17 10.73l112 120a8 8 0 0 0 11.7 0l112-120a8 8 0 0 0 .13-10.73M222.37 96H180l-36-48h36.37ZM74.58 112l30.13 75.33L34.41 112Zm89.6 0L128 202.46L91.82 112ZM96 96l32-42.67L160 96Zm85.42 16h40.17l-70.3 75.33ZM75.63 48H112L76 96H33.63Z"></path></g></svg>
+  `,
+};
