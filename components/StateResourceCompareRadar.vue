@@ -62,6 +62,36 @@ const states = ref([] as State[]);
 const resources = ref([] as Resource[]);
 const stateMetrics = ref([] as StateMetric[]);
 
+const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      labels: {
+        font: {
+          size: 16, // Increase the legend label font size
+        },
+        color: '#2fd8ae'
+      },
+    },
+  },
+  scales: {
+    r: {
+      pointLabels: {
+        font: {
+          size: 14, // Increase the radar point label font size
+        },
+        color: '#2fd8ae'
+      },
+      ticks: {
+        font: {
+          size: 12, // Increase the radar ticks font size
+        },
+        color: '#2fd8ae'
+      },
+    },
+  },
+};
+
 const chartData = computed(() => {
   const labels = [
     "Access to Market",
@@ -205,7 +235,7 @@ onMounted(async () => {
         padding: 'px-2 pt-2 pb-2 sm:px-2',
       },
     }"
-    class="bg-uigreen-50 ring-2 ring-uiearth-700"
+    class="dark:bg-uigreen-50 border border-uigreen-700 dark:border-uigreen-200 shadow-lg text-uigreen-400 dark:text-uigreen-700"
   >
     <template #header>
       <div class="flex items-center justify-between">
@@ -282,7 +312,7 @@ onMounted(async () => {
       </div>
     </div>
     <div v-if="!loading" class="">
-      <Radar v-if="stateMetrics.length > 0" :data="chartData" />
+      <Radar v-if="stateMetrics.length > 0" :data="chartData" :options="chartOptions" />
       <div v-else class="mx-auto my-8">
         <div class="mx-auto text-center">
           <p class="text-sm">

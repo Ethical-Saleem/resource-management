@@ -78,6 +78,7 @@ const chartOptions = {
           size: 16, // Increase the legend label font size
           color: "",
         },
+        color: '#2fd8ae'
       },
     },
     // title: {
@@ -94,6 +95,7 @@ const chartOptions = {
         font: {
           size: 14, // Increase the x-axis label font size
         },
+        color: '#2fd8ae'
       },
     },
     y: {
@@ -101,6 +103,7 @@ const chartOptions = {
         font: {
           size: 14, // Increase the y-axis label font size
         },
+        color: '#2fd8ae'
       },
     },
   },
@@ -178,7 +181,7 @@ onMounted(async () => {
         padding: 'px-2 pt-2 pb-2 sm:px-2',
       },
     }"
-    class="bg-uigreen-50 ring-2 ring-uiearth-700"
+    class="dark:bg-uigreen-50 border border-uigreen-700 dark:border-uigreen-200 shadow-lg text-uigreen-400 dark:text-uigreen-700"
   >
     <template #header>
       <div class="flex items-center justify-between">

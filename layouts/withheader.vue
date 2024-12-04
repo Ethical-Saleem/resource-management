@@ -70,22 +70,10 @@ const setSystemColorMode = (event: Event) => {
               type="checkbox"
               class="sr-only"
               @change="toggleColorScheme"
-            />
+            >
             <span
               class="toggle-inner block relative bg-uimuted-950 ring-1 ring-uiearth-300 rounded-full w-14 h-7 flex items-center justify-between px-2"
             >
-              <!-- <UIcon
-                name="i-heroicons-moon-solid"
-                class="text-gray-700 dark:text-gray-700"
-              />
-              <UIcon name="i-heroicons-sun-solid" class="text-uiyellow-500" /> -->
-              <!-- <span
-                :class="{
-                  'translate-x-7': colorMode.preference === 'dark',
-                  'translate-x-0': colorMode.preference !== 'dark',
-                }"
-                class="absolute left-0 top-0 h-7 w-7 bg-uigreen-300 rounded-full shadow-md transform motion-safe:transition-all motion-safe:duration-300"
-              /> -->
               <span
                 :class="{
                   'translate-x-7': colorMode.preference === 'dark',

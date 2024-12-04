@@ -101,36 +101,36 @@ onMounted(async () => {
     class="grid gap-4 ptablet:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 py-8"
   >
     <div class="relative">
-      <UCard class="bg-uimuted-300">
+      <UCard class="bg-white dark:bg-uigreen-800 border border-uiearth-200">
         <div class="flex flex-col gap-4">
           <UButton
             label="Solid Minerals"
             block
-            :class="currentCategory === 1 ? 'bg-uiearth-700' : 'bg-uimuted-700'"
-            class=""
+            :class="currentCategory === 1 ? 'bg-uigreen-700 dark:bg-uigreen-800 text-white ring-1 ring-uigreen-200' : 'bg-transparent dark:bg-transparent text-uigreen-400'"
+            class="hover:bg-uigreen-900 dark:hover:bg-uigreen-900 dark:text-white"
             @click="fetchData(1, 1)"
           />
           <UButton
             label="Energy Resource"
             block
             :class="
-              currentCategory === 2 ? 'bg-uiyellow-500' : 'bg-uimuted-700'
+              currentCategory === 2 ? 'bg-uigreen-700 dark:bg-uigreen-800 text-white ring-1 ring-uigreen-200' : 'bg-transparent dark:bg-transparent text-uigreen-400'
             "
-            class="energy_btn"
+            class="hover:bg-uigreen-900 dark:hover:bg-uigreen-900 dark:text-white"
             @click="fetchData(1, 2)"
           />
           <UButton
             label="Agricultural Produce"
             block
-            :class="currentCategory === 3 ? 'bg-uigreen-700' : 'bg-uimuted-700'"
-            class=""
+            :class="currentCategory === 3 ? 'bg-uigreen-700 dark:bg-uigreen-800 text-white ring-1 ring-uigreen-200' : 'bg-transparent dark:bg-transparent text-uigreen-400'"
+            class="hover:bg-uigreen-900 dark:hover:bg-uigreen-900 dark:text-white"
             @click="fetchData(1, 3)"
           />
         </div>
       </UCard>
     </div>
     <div class="relative sm:col-span-2 lg:col-span-3">
-      <UCard class="mb-4 bg-uimuted-300">
+      <UCard class="mb-4 bg-white dark:bg-uigreen-300 border border-uiearth-200">
         <div
           class="flex items-center justify-between flex-col sm:flex-row gap-3"
         >
@@ -169,7 +169,7 @@ onMounted(async () => {
       </UCard>
       <div class="grid sm:grid-cols-4 lg:grid-cols-6 gap-4">
         <div v-for="(r, index) in filteredData" :key="index" class="col-span-2">
-          <UCard :class="cardBgClass">
+          <UCard class="dark:bg-uigreen-600 border border-uigreen-700 dark:border-uigreen-200 shadow-lg">
             <div class="relative rounded-lg">
               <NuxtImg
                 :src="r.imageUrl"
@@ -180,12 +180,11 @@ onMounted(async () => {
             </div>
             <div class="mt-3">
               <h3
-                class="font-medium mb-1"
-                :style="{ color: r.colorCode ?? '#333333' }"
+                class="font-medium mb-1 text-uigreen-800 dark:text-white truncate"
               >
                 {{ r.name }}
               </h3>
-              <p class="text-xs font-normal">
+              <p class="text-xs font-normal text-uimuted-800">
                 <span
                   v-for="(category, catIndex) in r.categories"
                   :key="catIndex"

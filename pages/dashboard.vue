@@ -4,25 +4,13 @@ definePageMeta({
   layout: "main-layout",
 });
 
+const loading = ref(true);
 const energyCount = ref(11)
 const solidMineralCount = ref(157)
 const agricCount = ref(120)
-const strategics = ref([
-  { id: 1, name: 'Barite', colorCode: '#456781', states: [{ id: 2, name: 'Lagos' }]},
-  { id: 1, name: 'Bauxite', colorCode: '#efh908', states: [{ id: 3, name: 'Osun' }]}
-])
-const criticals = ref([
-  { id: 1, name: 'Barite', colorCode: '#ad9085', states: [{ id: 2, name: 'Lagos' }]},
-  { id: 1, name: 'Bauxite', colorCode: '#4deefa', states: [{ id: 3, name: 'Osun' }]}
-])
-const groupings = ref([
-  {id: 1, name: 'Fossil Fuels', resources: 3},
-  {id: 2, name: 'Gemstones', resources: 35},
-  {id: 3, name: 'Metals', resources: 18},
-  {id: 4, name: 'Minerals', resources: 57},
-  {id: 5, name: 'Petroleum Products', resources: 2},
-  {id: 6, name: 'Plastics & Polymers', resources: 2}
-])
+const strategics = ref([])
+const criticals = ref([])
+const groupings = ref([])
 const selectedGrouping = ref({})
 const detailModal = ref(false);
 const openDetailModal = (data) => {
@@ -34,17 +22,22 @@ const closeDetailModal = () => {
 }
 
 const dispatchFetchSummaryData = async () => {
+  loading.value = true;
   try {
     const data = await useApi.get(`/analytics/get-summary-data`);
     console.log('summary-data', data);
-    energyCount.value = data.energyCount
-    solidMineralCount.value = data.solidCount
-    agricCount.value = data.agricCount
-    strategics.value = data.strategics
-    criticals.value = data.criticals
-    groupings.value = data.groupings
+    if (data) {
+      energyCount.value = data.energyCount
+      solidMineralCount.value = data.solidCount
+      agricCount.value = data.agricCount
+      strategics.value = data.strategics
+      criticals.value = data.criticals
+      groupings.value = data.groupings
+      loading.value = false
+    }
   } catch (error) {
     console.log('summary-data-error', error);
+    loading.value = false;
     throw error;
   }
 }
@@ -56,8 +49,8 @@ onMounted(async () => {
 
 <template>
   <div class="mx-auto w-full">
-    <main class="pt-20">
-      <div class="grid grid-cols-12 gap-4">
+    <main class="pt-20 min-h-[calc(100vh_-_64px)]">
+      <div v-if="!loading" class="grid grid-cols-12 gap-4">
         <div class="ltablet:col-span-9 col-span-12 lg:col-span-9">
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-12 md:col-span-4">
@@ -219,7 +212,7 @@ onMounted(async () => {
                         <template #panel>
                           <div class="p-4">
                             <p class="text-xs mb-2">{{ item.name }} can be found in the following states:</p>
-                            <div class="w-full flex items-center gap-2">
+                            <div class="w-full flex flex-wrap items-center gap-2">
                               <span v-for="state in item.states" :key="state.id" class="text-sm text-medium">{{ state }},</span>
                             </div>
                           </div>
@@ -251,7 +244,7 @@ onMounted(async () => {
                         <template #panel>
                           <div class="p-4">
                             <p class="text-xs mb-2">{{ item.name }} can be found in the following states:</p>
-                            <div class="w-full flex items-center gap-2">
+                            <div class="w-full flex flex-wrap items-center gap-2">
                               <span v-for="state in item.states" :key="state" class="text-sm text-medium">{{ state }},</span>
                             </div>
                           </div>
@@ -284,6 +277,13 @@ onMounted(async () => {
                 </ul>
               </div>
             </div>
+        </div>
+      </div>
+      <div v-else class="flex items-center justify-center h-full w-full">
+        <div class="h-full">
+          <div
+            class="w-8 h-8 border-4 border-uigreen-500 border-t-transparent border-solid rounded-full animate-spin"
+          />
         </div>
       </div>
     </main>
