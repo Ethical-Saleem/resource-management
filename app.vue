@@ -43,7 +43,7 @@ const isRunning = computed(() => mainStore.appState === AppState.running);
     <NuxtLayout>
       <NuxtPage />
 
-      <ChatAIButton @open="isChatOpen = true" />
+      <!-- <ChatAIButton @open="isChatOpen = true" /> -->
       <ChatBar :is-open="isChatOpen" @close="isChatOpen = false" />
     </NuxtLayout>
 
