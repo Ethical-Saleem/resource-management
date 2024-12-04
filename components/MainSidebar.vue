@@ -34,6 +34,7 @@ const closeSidebar = () => {
                 <NuxtLink
                   to="/dashboard"
                   class="relative top-0.5 flex items-center hover:bg-uigreen-900 active:ring-uigreen-500 active:bg-uigreen-900 px-2 py-3"
+                  active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
                 >
                   <div class="flex items-center gap-2">
                     <UIcon name="i-heroicons-home-20-solid" size="lg" />
@@ -48,6 +49,7 @@ const closeSidebar = () => {
                 <NuxtLink
                   to="/resource-data"
                   class="relative top-0.5 flex items-center hover:bg-uigreen-900 active:ring-uigreen-500 active:bg-uigreen-900 px-2 py-3"
+                  active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
                 >
                   <div class="flex items-center gap-2">
                     <UIcon name="i-heroicons-table-cells-20-solid" />
@@ -62,6 +64,7 @@ const closeSidebar = () => {
                 <NuxtLink
                   to="/resource-statistics"
                   class="relative flex items-center hover:bg-uigreen-900 px-2 py-3"
+                  active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
                 >
                   <div class="flex items-center gap-2">
                     <UIcon name="i-heroicons-chart-bar-20-solid" />
@@ -80,22 +83,19 @@ const closeSidebar = () => {
         </div>
         <div class="mt-auto">
           <div class="flex w-full">
-            <a
-              href="#"
-              class="hover:bg-uigreen-900 cursor-pointer px-2 py-3 text-uigreen-400 flex size-12 gap-2 items-center w-full transition-colors duration-300"
+            <NuxtLink
+              to="/map-view"
+              class="relative flex items-center hover:bg-uigreen-900 px-2 py-3 w-full"
+              active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
             >
-              <UIcon name="i-heroicons-plus" />
-              <span>New</span>
-            </a>
-          </div>
-          <div class="flex w-full">
-            <a
-              href="#"
-              class="hover:bg-uigreen-900 cursor-pointer px-2 py-3 text-uigreen-400 flex size-12 gap-2 items-center w-full transition-colors duration-300"
-            >
-              <UIcon name="i-heroicons-question-mark-circle" />
-              <span>Help</span>
-            </a>
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-map-20-solid" />
+                <span
+                  class="text-uigreen-400 group-hover:text-uigreen-500 relative inline-flex items-center gap-2 text-sm transition-colors duration-300"
+                  >Map</span
+                >
+              </div>
+            </NuxtLink>
           </div>
           <div class="flex w-full">
             <a
