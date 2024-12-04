@@ -52,17 +52,7 @@ const setSystemColorMode = (event: Event) => {
         class="flex size-10 items-center justify-center ms-3"
         @click="toggleSidebar"
       >
-        <div class="relative size-5 scale-90">
-          <span
-            class="bg-uigreen-500 absolute block h-0.5 w-full transition-all duration-300 -rotate-45 rtl:rotate-45 max-w-[75%] top-1"
-          />
-          <span
-            class="bg-uigreen-500 absolute top-1/2 block h-0.5 w-full max-w-[50%] transition-all duration-300 opacity-0 translate-x-4 rtl:-translate-x-4"
-          />
-          <span
-            class="bg-uigreen-500 absolute block h-0.5 w-full transition-all duration-300 rotate-45 rtl:-rotate-45 max-w-[75%] bottom-1"
-          />
-        </div>
+        <UIcon name="i-heroicons-bars-3-center-left" class="w-6 h-6" />
       </button>
       <h2 class="font-bold">Raw Materials and Research Development Council</h2>
     </div>
