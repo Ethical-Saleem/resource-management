@@ -50,14 +50,12 @@ export default defineNuxtConfig({
     features: ['LabelLayout', 'UniversalTransition']
   },
   sitemap: {
-    sitemap: {
-      hostname: process.env.APP_BASE_URL || "http://localhost:3001",
-      gzip: true,
-      defaults: {
-        changefreq: 'monthly',
-        priority: 1,
-        lastmod: new Date()
-      }
+    hostname: process.env.APP_BASE_URL || "http://localhost:3001",
+    gzip: true,
+    defaults: {
+      changefreq: 'monthly',
+      priority: 1,
+      lastmod: new Date()
     }
   },
 
