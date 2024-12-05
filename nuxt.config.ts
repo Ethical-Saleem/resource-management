@@ -52,6 +52,13 @@ export default defineNuxtConfig({
   sitemap: {
     hostname: process.env.APP_BASE_URL || "http://localhost:3001",
     gzip: true,
+    exclude: [
+      '/create-resource',
+      '/state-level-map',
+      '/test-map',
+      '/server-error',
+      '/resource-view'
+    ],
     defaults: {
       changefreq: 'monthly',
       priority: 1,
