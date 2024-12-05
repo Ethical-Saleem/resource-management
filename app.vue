@@ -18,6 +18,15 @@ useSeoMeta({
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
   ogImage: `${appUrl}/img/rmrdc.png`,
   twitterCard: "summary_large_image",
+  ogType: "website",
+  ogLocale: "en_US",
+  ogImageWidth: "1200",
+  ogImageHeight: "630",
+  ogImageAlt: "RMRDC Resource Management Platform",
+  twitterTitle: "RMRDC - Resource Exploration",
+  twitterDescription: "Resource distribution and statistical data platform for Nigeria",
+  twitterImage: `${appUrl}/img/rmrdc.png`,
+  twitterImageAlt: "RMRDC Resource Management Platform"
 });
 
 useHead({
