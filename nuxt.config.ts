@@ -12,6 +12,8 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "nuxt-echarts",
     "@nuxtjs/mdc",
+    "@nuxtjs/sitemap",
+    "@nuxtjs/robots"
   ],
 
   runtimeConfig: {
@@ -22,6 +24,19 @@ export default defineNuxtConfig({
   },
 
   ssr: true,
+  app: {
+    head: {
+      title: "RMRDC - Resource Exploration",
+      meta: [
+        { name: "description", content: "This is a platform showing resource distribution and statistical data within Nigeria." },
+        { property: "og:title", content: "RMRDC - Resource Exploration" },
+        { property: "og:description", content: "Platform showing resource distribution and statistical data within Nigeria." },
+        { property: "og:image", content: "/img/rmrdc.png" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: "/img/rmrdc.png" },
+      ],
+    },
+  },
 
   routeRules: {
     '/': { ssr: false },
@@ -33,6 +48,22 @@ export default defineNuxtConfig({
     charts: ['BarChart', 'LineChart', 'PieChart'],
     components: ['DatasetComponent', 'GridComponent', 'TooltipComponent', "LegendComponent"],
     features: ['LabelLayout', 'UniversalTransition']
+  },
+  sitemap: {
+    hostname: process.env.APP_BASE_URL || "http://localhost:3001",
+    gzip: true,
+    defaults: {
+      changefreq: 'monthly',
+      priority: 1,
+      lastmod: new Date()
+    }
+  },
+
+  robots: {
+    UserAgent: '*',
+    Disallow: '/admin', // Block certain paths
+    Allow: '/',         // Allow the rest of the site
+    Sitemap: process.env.APP_BASE_URL + '/sitemap.xml',
   },
 
   compatibilityDate: "2024-08-11"
