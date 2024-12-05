@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "nuxt-echarts",
     "@nuxtjs/mdc",
+    "@nuxtjs/pwa",
     "@nuxtjs/sitemap",
     "@nuxtjs/robots"
   ],
@@ -49,6 +50,11 @@ export default defineNuxtConfig({
     components: ['DatasetComponent', 'GridComponent', 'TooltipComponent', "LegendComponent"],
     features: ['LabelLayout', 'UniversalTransition']
   },
+
+  plugins: [
+    '~/plugins/sw-registration.ts'
+  ],
+
   sitemap: {
     hostname: process.env.APP_BASE_URL || "http://localhost:3001",
     gzip: true,

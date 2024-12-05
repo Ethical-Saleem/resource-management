@@ -42,12 +42,13 @@ useHead({
     { rel: "icon", sizes: "32x32", type: "image/png", href: `${appUrl}/img/favicon-32x32.png` },
     { rel: "icon", sizes: "16x16", type: "image/png", href: `${appUrl}/img/favicon-16x16.png` },
     { rel: "apple-touch-icon", sizes: "152x152", type: "image/png", href: `${appUrl}/img/apple-touch-icon.png` },
-    { rel: "manifest", href: `${process.env.APP_URL}/manifest.json` },
+    { rel: "manifest", href: `${appUrl}/manifest.json` },
     { rel: "icon", sizes: "192x192", type: "image/png", href: `${appUrl}/img/android-chrome-192x192.png` },
     { rel: "icon", sizes: "512x512", type: "image/png", href: `${appUrl}/img/android-chrome-512x512.png` },
   ],
   meta: [
     { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics, RMRDC Portal, Portal' },
+    { name: "theme-color", content: "#2fd8ae" }
   ],
 });
 

@@ -16,7 +16,7 @@
   "theme_color": "#2fd8ae",
   "background_color": "#ffffff",
   "start_url": "https://www.nrmis.com/",
-  "scope": "https://www.nrmis.com/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "description": "A portal for resource exploration and information by RMRDC.",
