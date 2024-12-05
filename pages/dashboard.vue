@@ -40,7 +40,7 @@ const dispatchFetchSummaryData = async () => {
     loading.value = false;
     useToast().add({
       title: 'Error',
-      description: error,
+      description: 'Failed to Fetch Summary Data. Please try again',
       color: 'red',
     })
     throw error;
