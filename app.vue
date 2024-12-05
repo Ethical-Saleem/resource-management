@@ -6,6 +6,9 @@ import { AppState } from "./stores/main-store";
 const loadingStore = useLoadingStore();
 const mainStore = useMainStore();
 
+const config = useRuntimeConfig();
+const appUrl = config.public.baseUrl;
+
 useSeoMeta({
   title: "RMRDC",
   ogTitle: "RMRDC - Resource Exploration",
@@ -13,8 +16,17 @@ useSeoMeta({
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
   ogDescription:
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
-  ogImage: "/img/rmrdc.png",
+  ogImage: `${appUrl}/img/rmrdc.png`,
   twitterCard: "summary_large_image",
+  ogType: "website",
+  ogLocale: "en_US",
+  ogImageWidth: "1200",
+  ogImageHeight: "630",
+  ogImageAlt: "RMRDC Resource Management Platform",
+  twitterTitle: "RMRDC - Resource Exploration",
+  twitterDescription: "Resource distribution and statistical data platform for Nigeria",
+  twitterImage: `${appUrl}/img/rmrdc.png`,
+  twitterImageAlt: "RMRDC Resource Management Platform"
 });
 
 useHead({
@@ -24,8 +36,8 @@ useHead({
       : "RMRDC - Resource Exploration";
   },
   link: [
-    { rel: "icon", type: "img/png", href: "/img/favicon-32x32.png" },
-    { rel: "icon", type: "img/png", href: "/img/favicon-16x16.png" },
+    { rel: "icon", type: "img/png", href: `${appUrl}/img/favicon-32x32.png` },
+    { rel: "icon", type: "img/png", href: `${appUrl}/img/favicon-16x16.png` },
   ],
   meta: [
     { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics, RMRDC Portal, Portal' },
