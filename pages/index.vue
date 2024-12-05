@@ -48,10 +48,11 @@ onMounted(() => {
       <nav class="navbar navbar-default" data-spy="affix" data-offset-top="450">
         <div class="container">
           <div class="navbar-header">
-            <a class="navbar-brand" href="#">
-              <NuxtImg src="/img/rmrdc.png" class="logo" /><NuxtImg
+            <a class="navbar-brand ps-5" href="#">
+              <NuxtImg src="/img/rmrdc.png" class="logo" width="120" height="120" /><NuxtImg
                 src="/img/rmrdc.png"
                 class="logo-nav"
+                width="120" height="120"
             /></a>
           </div>
           <ul class="nav navbar-nav navbar-right hidden">

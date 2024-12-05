@@ -50,9 +50,9 @@ export default defineNuxtConfig({
     features: ['LabelLayout', 'UniversalTransition']
   },
 
-  plugins: [
-    '~/plugins/sw-registration.ts'
-  ],
+  // plugins: [
+  //   '~/plugins/sw-registration.ts'
+  // ],
 
   sitemap: {
     hostname: process.env.APP_BASE_URL || "http://localhost:3001",

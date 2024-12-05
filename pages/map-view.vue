@@ -66,7 +66,7 @@
       <div
         class="h-[4rem] flex-shrink-0 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 gap-x-4 min-w-0 !border-transparent py-2"
       >
-        <NuxtImg src="/img/rmrdc.png" width="100" height="100" />
+        <NuxtImg src="/img/rmrdc.png" width="70" height="70" />
         <div class="flex items-center gap-2">
           <ColorScheme
             ><USelect
