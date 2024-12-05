@@ -1,0 +1,24 @@
+{
+  "name": "RMRDC - Resource Exploration Portal",
+  "short_name": "RMRDC Portal",
+  "icons": [
+    {
+      "src": "/img/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#2fd8ae",
+  "background_color": "#ffffff",
+  "start_url": "https://www.nrmis.com/",
+  "scope": "https://www.nrmis.com/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "description": "A portal for resource exploration and information by RMRDC.",
+  "lang": "en"
+}
