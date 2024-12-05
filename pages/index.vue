@@ -140,7 +140,7 @@ onMounted(() => {
                 color="uiearth"
                 label="Explore"
                 size="lg"
-                @click="() => router.push('/map-view')"
+                @click="() => router.push('/dashboard')"
               />
             </div>
           </div>
