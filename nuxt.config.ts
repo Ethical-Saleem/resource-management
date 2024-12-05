@@ -21,6 +21,8 @@ export default defineNuxtConfig({
     },
   },
 
+  ssr: true,
+
   routeRules: {
     '/': { ssr: false },
     '/test-map': { ssr: false },
