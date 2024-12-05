@@ -18,7 +18,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: process.env.API_BASE_URL || 'http://localhost:3003',
+      apiBase: process.env.API_BASE_URL || 'http://localhost:3003/api',
       baseUrl: process.env.APP_BASE_URL || "http://localhost:3001"
     },
   },
@@ -31,9 +31,9 @@ export default defineNuxtConfig({
         { name: "description", content: "This is a platform showing resource distribution and statistical data within Nigeria." },
         { property: "og:title", content: "RMRDC - Resource Exploration" },
         { property: "og:description", content: "Platform showing resource distribution and statistical data within Nigeria." },
-        { property: "og:image", content: "/img/rmrdc.png" },
+        { property: "og:image", content: "/img/og-image.png" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:image", content: "/img/rmrdc.png" },
+        { name: "twitter:image", content: "/img/og-image.png" },
       ],
     },
   },
@@ -49,6 +49,11 @@ export default defineNuxtConfig({
     components: ['DatasetComponent', 'GridComponent', 'TooltipComponent', "LegendComponent"],
     features: ['LabelLayout', 'UniversalTransition']
   },
+
+  plugins: [
+    '~/plugins/sw-registration.ts'
+  ],
+
   sitemap: {
     hostname: process.env.APP_BASE_URL || "http://localhost:3001",
     gzip: true,

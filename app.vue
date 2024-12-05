@@ -18,7 +18,7 @@ useSeoMeta({
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
   ogDescription:
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
-  ogImage: `${appUrl}/img/rmrdc.png`,
+  ogImage: `${appUrl}/img/og-image.png`,
   twitterCard: "summary_large_image",
   ogType: "website",
   ogUrl: currentUrl,
@@ -28,7 +28,7 @@ useSeoMeta({
   ogImageAlt: "RMRDC Resource Management Platform",
   twitterTitle: "RMRDC - Resource Exploration",
   twitterDescription: "Resource distribution and statistical data platform for Nigeria",
-  twitterImage: `${appUrl}/img/rmrdc.png`,
+  twitterImage: `${appUrl}/img/og-image.png`,
   twitterImageAlt: "RMRDC Resource Management Platform"
 });
 
@@ -39,11 +39,16 @@ useHead({
       : "RMRDC - Resource Exploration";
   },
   link: [
-    { rel: "icon", type: "img/png", href: `${appUrl}/img/favicon-32x32.png` },
-    { rel: "icon", type: "img/png", href: `${appUrl}/img/favicon-16x16.png` },
+    { rel: "icon", sizes: "32x32", type: "image/png", href: `${appUrl}/img/favicon-32x32.png` },
+    { rel: "icon", sizes: "16x16", type: "image/png", href: `${appUrl}/img/favicon-16x16.png` },
+    { rel: "apple-touch-icon", sizes: "152x152", type: "image/png", href: `${appUrl}/img/apple-touch-icon.png` },
+    { rel: "manifest", href: `${appUrl}/manifest.json` },
+    { rel: "icon", sizes: "192x192", type: "image/png", href: `${appUrl}/img/android-chrome-192x192.png` },
+    { rel: "icon", sizes: "512x512", type: "image/png", href: `${appUrl}/img/android-chrome-512x512.png` },
   ],
   meta: [
     { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics, RMRDC Portal, Portal' },
+    { name: "theme-color", content: "#2fd8ae" }
   ],
 });
 
