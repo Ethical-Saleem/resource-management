@@ -8,6 +8,10 @@ self.addEventListener("install", (event) => {
           "/",
           "/img/android-chrome-192x192.png",
           "/img/android-chrome-512x512.png",
+          "/img/favicon-16x16.png",
+          "/img/favicon-32x32.png",
+          "/img/apple-touch-icon.png",
+          "/img/og-image.png",
           "/manifest.json",
         ])
       )
