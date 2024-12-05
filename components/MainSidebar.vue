@@ -22,13 +22,10 @@ const closeSidebar = () => {
           <NuxtLink class="flex items-center justify-center">
             <NuxtImg src="/img/rmrdc.png" class="App Logo" />
           </NuxtLink>
-          <UButton
-            class="text-uigreen-400 hover:bg-uigreen-100 hover:text-uigreen-600 ms-auto flex size-10 items-center justify-center rounded-full transition-colors duration-300 xl:hidden"
-            @click="closeSidebar"
-          />
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1 text-3xl text-uigreen-400 hover:bg-uigreen-100 hover:text-uigreen-600 ms-auto flex size-10 items-center justify-center rounded-full transition-colors duration-300 xl:hidden" @click="closeSidebar" />
         </div>
         <div class="relative size-full overflow-y-auto">
-          <div class="px-2 pb-8">
+          <div class="pb-8">
             <ul class="">
               <li class="group mb-1 min-h-8">
                 <NuxtLink
@@ -37,7 +34,7 @@ const closeSidebar = () => {
                   active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
                 >
                   <div class="flex items-center gap-2">
-                    <UIcon name="i-heroicons-home-20-solid" size="lg" />
+                    <UIcon name="i-heroicons-home-20-solid" class="w-6 h-6 text-uigreen-400" size="lg" />
                     <span
                       class="text-uigreen-400 group-hover:text-uigreen-500 relative inline-flex items-center gap-2 text-sm transition-colors duration-300"
                       >Resource Dashboard</span
@@ -52,7 +49,7 @@ const closeSidebar = () => {
                   active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
                 >
                   <div class="flex items-center gap-2">
-                    <UIcon name="i-heroicons-table-cells-20-solid" />
+                    <UIcon name="i-heroicons-table-cells-20-solid" class="w-6 h-6 text-uigreen-400" />
                     <span
                       class="text-uigreen-400 group-hover:text-uigreen-500 relative inline-flex items-center gap-2 text-sm transition-colors duration-300"
                       >Resource Data</span
@@ -67,7 +64,7 @@ const closeSidebar = () => {
                   active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
                 >
                   <div class="flex items-center gap-2">
-                    <UIcon name="i-heroicons-chart-bar-20-solid" />
+                    <UIcon name="i-heroicons-chart-bar-20-solid" class="w-6 h-6 text-uigreen-400" />
                     <span
                       class="text-uigreen-400 group-hover:text-uigreen-500 relative inline-flex items-center gap-2 text-sm transition-colors duration-300"
                       >Resource Analytics</span
@@ -89,7 +86,7 @@ const closeSidebar = () => {
               active-class="bg-uigreen-900 ring-1 ring-uigreen-500"
             >
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-map-20-solid" />
+                <UIcon name="i-heroicons-map-20-solid" class="w-6 h-6 text-uigreen-400" />
                 <span
                   class="text-uigreen-400 group-hover:text-uigreen-500 relative inline-flex items-center gap-2 text-sm transition-colors duration-300"
                   >Map</span

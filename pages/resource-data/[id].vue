@@ -5,6 +5,7 @@ import type { LgaResource } from "~/types";
 
 const loadingStore = useLoadingStore();
 const route = useRoute();
+const router = useRouter();
 
 definePageMeta({
   layout: "main-layout",
@@ -37,22 +38,13 @@ const columns = [
   { key: "actions" },
 ];
 
-const items = () => [
-  [
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash-20-solid",
-    },
-  ],
-];
-
 const q = ref("");
 const search = ref("");
 const fetching = ref(false);
 const rowData = ref([] as LgaResource[]);
 const page = ref(1);
 const pageCount = ref(10);
-const pageTotal = ref(rowData.value.length);
+const pageTotal = computed(() => filteredData.value.length);
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
 const pageTo = computed(() =>
   Math.min(page.value * pageCount.value, pageTotal.value)
@@ -130,9 +122,27 @@ onMounted(async () => {
         >
           <template #header>
             <div class="flex items-center justify-between">
-              <div class="">
-                <h4 class="text-xl">Resource Locations</h4>
-                <p class="text-lg">{{ route.query.resource }}</p>
+              <div class="flex items-center gap-2">
+                <button
+                  class="flex size-10 items-center justify-center"
+                  @click="router.go(-1)"
+                >
+                  <div class="relative size-5 scale-90">
+                    <span
+                      class="bg-uigreen-500 absolute block h-0.5 w-full transition-all duration-300 -rotate-45 rtl:rotate-45 max-w-[75%] top-1"
+                    />
+                    <span
+                      class="bg-uigreen-500 absolute top-1/2 block h-0.5 w-full max-w-[50%] transition-all duration-300 opacity-0 translate-x-4 rtl:-translate-x-4"
+                    />
+                    <span
+                      class="bg-uigreen-500 absolute block h-0.5 w-full transition-all duration-300 rotate-45 rtl:-rotate-45 max-w-[75%] bottom-1"
+                    />
+                  </div>
+                </button>
+                <div>
+                  <h4 class="text-xl mb-2">Resource Locations</h4>
+                  <p class="text-lg font-bold">{{ route.query.resource }}</p>
+                </div>
               </div>
               <div class="flex">
                 <UButton
@@ -218,14 +228,20 @@ onMounted(async () => {
               },
             }"
           >
-            <template #actions-data>
-              <UDropdown :items="items">
-                <UButton
-                  color="gray"
-                  variant="ghost"
-                  icon="i-heroicons-ellipsis-horizontal-20-solid"
-                />
-              </UDropdown>
+            <template #SampleId-data="{ row }">
+              <span>{{ row.SampleId ? row.SampleId : 'N/A' }}</span>
+            </template>
+            <template #locationName-data="{ row }">
+              <span>{{ row.locationName ? row.locationName : 'N/A' }}</span>
+            </template>
+            <template #townVillage-data="{ row }">
+              <span>{{ row.townVillage ? row.townVillage : 'N/A' }}</span>
+            </template>
+            <template #storageConditions-data="{ row }">
+              <span>{{ row.storageConditions ? row.storageConditions : 'N/A' }}</span>
+            </template>
+            <template #marketPrice-data="{ row }">
+              <span>{{ row.marketPrice ? row.marketPrice : 'N/A' }}</span>
             </template>
           </UTable>
 

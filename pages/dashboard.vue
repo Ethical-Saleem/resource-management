@@ -38,6 +38,11 @@ const dispatchFetchSummaryData = async () => {
   } catch (error) {
     console.log('summary-data-error', error);
     loading.value = false;
+    useToast().add({
+      title: 'Error',
+      description: 'Failed to Fetch Summary Data. Please try again',
+      color: 'red',
+    })
     throw error;
   }
 }
@@ -202,9 +207,9 @@ onMounted(async () => {
                   <div v-for="(item, i) in strategics" :key="i" class="flex items-center gap-2">
                     <div class="w-[1.5rem] h-[1.5rem] rounded-full shadow-xl border-2 border-uiearth-400" :style="`background-color: ${item.colorCode}`" />
                     <div>
-                      <h4 class="text-sm font-medium text-uimuted-800 dark:text-white">
+                      <NuxtLink :to="`/resource-data/${item.id}?resource=${item.name}`" class="text-sm font-medium text-uimuted-800 dark:text-white hover:text-uigreen-400 dark:hover:text-uigreen-400">
                         {{ item.name }}
-                      </h4>
+                      </NuxtLink>
                     </div>
                     <div class="ms-auto flex items-center gap-1">
                       <UPopover mode="hover" :ui="{base: 'w-[20rem] bg-uicream-100 dark:bg-uicream-50 text-uigreen-400 dark:text-uigreen-400'}">
@@ -234,9 +239,9 @@ onMounted(async () => {
                   <div v-for="(item, i) in criticals" :key="i" class="flex items-center gap-2">
                     <div class="w-[1.5rem] h-[1.5rem] rounded-full shadow-xl border-2 border-uiearth-400" :style="`background-color: ${item.colorCode}`" />
                     <div>
-                      <h4 class="text-sm font-medium text-uimuted-800 dark:text-white">
+                      <NuxtLink :to="`/resource-data/${item.id}?resource=${item.name}`" class="text-sm font-medium text-uimuted-800 dark:text-white hover:text-uigreen-400 dark:hover:text-uigreen-400">
                         {{ item.name }}
-                      </h4>
+                      </NuxtLink>
                     </div>
                     <div class="ms-auto flex items-center gap-1">
                       <UPopover mode="hover" :ui="{base: 'w-[20rem] bg-uicream-100 dark:bg-uicream-50 text-uigreen-400 dark:text-uigreen-400'}">
@@ -300,12 +305,12 @@ onMounted(async () => {
             <p class="text-sm font-medium">
               The following materials are classified under {{ selectedGrouping.name }}:
             </p>
-            <div class="w-full grid grid-cols-12 gap-2 mt-4">
-              <div v-for="item in selectedGrouping.resources" :key="item.id" class="col-span-12 col-span-3">
-                <div class="w-full flex items-center gap-2 border border-uigreen-800 p-2 rounded-lg">
+            <div class="w-full grid grid-cols-12 gap-2 mt-4 max-h-80 overflow-y-auto pb-4">
+              <div v-for="item in selectedGrouping.resources" :key="item.id" class="col-span-12 sm:col-span-6 lg:col-span-3">
+                <NuxtLink :to="`/resource-data/${item.id}?resource=${item.name}`" class="w-full flex items-center gap-2 border border-uigreen-800 p-2 rounded-lg">
                   <span class="w-1 h-1 bg-uigreen-800 rounded-full" />
                   <span class="text-xs truncate">{{ item.name }}</span>
-                </div>
+                </NuxtLink>
               </div>
             </div>
           </div>

@@ -23,8 +23,8 @@ const toggleSidebarClose = () => {
         :class="[
           'relative transition-all duration-300 overflow-hidden',
           sidebarOpen
-            ? 'xl:max-w-[calc(100%_-_250px)] xl:ms-[250px]'
-            : 'xl:max-w-full xl:ms-0',
+            ? 'lg:max-w-[calc(100%_-_250px)] lg:ms-[250px]'
+            : 'lg:max-w-full lg:ms-0',
         ]"
       >
         <!-- Fixed Header -->
@@ -32,8 +32,8 @@ const toggleSidebarClose = () => {
           :class="[
             'fixed top-0 z-[1] w-full border-b border-uimuted-200 dark:border-uimuted-700 bg-white dark:bg-uimuted-800 transition-all duration-300',
             sidebarOpen
-              ? 'xl:max-w-[calc(100%_-_250px)]'
-              : 'xl:max-w-full xl:ms-0',
+              ? 'lg:max-w-[calc(100%_-_250px)]'
+              : 'lg:max-w-full lg:ms-0',
           ]"
         >
           <MainHeader @toggle-sidebar="toggleSidebarClose">

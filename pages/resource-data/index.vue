@@ -58,7 +58,7 @@ const selectedResource = ref<Resource | null>(null);
 const imageModal = ref(false);
 const page = ref(1);
 const pageCount = ref(10);
-const pageTotal = ref(rowData.value.length);
+const pageTotal = computed(() => filteredData.value.length);
 const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
 const pageTo = computed(() =>
   Math.min(page.value * pageCount.value, pageTotal.value)
