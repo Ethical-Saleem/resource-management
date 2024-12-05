@@ -12,7 +12,6 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "nuxt-echarts",
     "@nuxtjs/mdc",
-    "@nuxtjs/pwa",
     "@nuxtjs/sitemap",
     "@nuxtjs/robots"
   ],
