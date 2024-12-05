@@ -22,14 +22,19 @@ interface Props {
 const items = [
   [
     {
-      label: "Resource Table",
-      icon: "i-heroicons-table-cells-20-solid",
-      to: '/resource-data',
+      label: "Resource Dashboard",
+      icon: "i-heroicons-home-20-solid",
+      to: "/dashboard",
     },
     {
-      label: "Resource Statistics",
+      label: "Resource Data",
+      icon: "i-heroicons-table-cells-20-solid",
+      to: "/resource-data",
+    },
+    {
+      label: "Resource Analytics",
       icon: "i-heroicons-chart-bar-20-solid",
-      to: '/resource-statistics'
+      to: "/resource-statistics",
     },
   ],
 ];

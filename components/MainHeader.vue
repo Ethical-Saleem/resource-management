@@ -54,7 +54,7 @@ const setSystemColorMode = (event: Event) => {
       >
         <UIcon name="i-heroicons-bars-3-center-left" class="w-6 h-6" />
       </button>
-      <h2 class="font-bold">Raw Materials and Research Development Council</h2>
+      <h2 class="font-bold">Raw Materials Research and Development Council</h2>
     </div>
     <div class="">
       <slot />
