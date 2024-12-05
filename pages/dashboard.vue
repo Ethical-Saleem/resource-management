@@ -1,10 +1,16 @@
 <script setup>
 import { useApi } from "#imports";
+import { useLoadingStore } from "~/stores/loading-store";
+
+const loadingStore = useLoadingStore();
+
 definePageMeta({
   layout: "main-layout",
 });
 
 const loading = ref(true);
+const apiError = ref(false);
+const errorData = ref(null);
 const energyCount = ref(11)
 const solidMineralCount = ref(157)
 const agricCount = ref(120)
@@ -22,7 +28,8 @@ const closeDetailModal = () => {
 }
 
 const dispatchFetchSummaryData = async () => {
-  loading.value = true;
+  // loading.value = true;
+  loadingStore.showLoading();
   try {
     const data = await useApi.get(`/analytics/get-summary-data`);
     console.log('summary-data', data);
@@ -30,19 +37,32 @@ const dispatchFetchSummaryData = async () => {
       energyCount.value = data.energyCount
       solidMineralCount.value = data.solidCount
       agricCount.value = data.agricCount
-      strategics.value = data.strategics
-      criticals.value = data.criticals
-      groupings.value = data.groupings
+      strategics.value = data.strategics.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      });
+      criticals.value = data.criticals.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      });
+      groupings.value = data.groupings.map((grouping) => {
+        return {
+          ...grouping,
+          resources: grouping.resources.sort((a, b) => a.name.localeCompare(b.name)),
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
       loading.value = false
+      loadingStore.hideLoading();
     }
   } catch (error) {
     console.log('summary-data-error', error);
     loading.value = false;
-    useToast().add({
-      title: 'Error',
-      description: 'Failed to Fetch Summary Data. Please try again',
-      color: 'red',
-    })
+    loadingStore.hideLoading();
+    apiError.value = true;
+    errorData.value = 'Failed to Fetch Summary Data. Please try again'
     throw error;
   }
 }
@@ -55,7 +75,7 @@ onMounted(async () => {
 <template>
   <div class="mx-auto w-full">
     <main class="pt-20 min-h-[calc(100vh_-_64px)]">
-      <div v-if="!loading" class="grid grid-cols-12 gap-4">
+      <div v-if="!loading && !apiError" class="grid grid-cols-12 gap-4">
         <div class="ltablet:col-span-9 col-span-12 lg:col-span-9">
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-12 md:col-span-4">
@@ -282,6 +302,22 @@ onMounted(async () => {
                 </ul>
               </div>
             </div>
+        </div>
+      </div>
+      <div v-else-if="!loading && apiError" class="w-full h-full">
+        <div class="max-w-lg mx-auto w-full">
+          <div>
+            <div class="max-w-[20rem] mx-auto w-full flex items-center justify-center">
+            <NuxtImg src="/img/error.png" alt="Error" class="mx-auto" />
+            </div>
+          </div>
+          <div class="mt-4 text-center max-w-[24rem] mx-auto w-full">
+            <h4 class="font-bold text-2xl">Error</h4>
+            <p class="text-lg font-medium">{{ errorData }}</p>
+            <div class="mt-4 max-w-[10rem] mx-auto w-full">
+              <UButton label="Refresh" class="bg-uiearth-700 dark:bg-uiearth-400 dark:text-white" @click="dispatchFetchSummaryData" />
+            </div>
+          </div>
         </div>
       </div>
       <div v-else class="flex items-center justify-center h-full w-full">
