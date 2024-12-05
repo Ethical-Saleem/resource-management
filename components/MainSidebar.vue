@@ -20,7 +20,7 @@ const closeSidebar = () => {
       <div class="flex h-screen flex-col">
         <div class="flex h-24 w-full items-center px-6">
           <NuxtLink class="flex items-center justify-center">
-            <NuxtImg src="/img/rmrdc.png" class="App Logo" />
+            <NuxtImg src="/img/rmrdc.png" class="App Logo" width="90" height="90" />
           </NuxtLink>
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1 text-3xl text-uigreen-400 hover:bg-uigreen-100 hover:text-uigreen-600 ms-auto flex size-10 items-center justify-center rounded-full transition-colors duration-300 xl:hidden" @click="closeSidebar" />
         </div>
