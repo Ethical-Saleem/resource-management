@@ -5,9 +5,11 @@ import { AppState } from "./stores/main-store";
 
 const loadingStore = useLoadingStore();
 const mainStore = useMainStore();
+const route = useRoute()
 
 const config = useRuntimeConfig();
 const appUrl = config.public.baseUrl;
+const currentUrl = `${appUrl}${route.fullPath}`;
 
 useSeoMeta({
   title: "RMRDC",
@@ -19,6 +21,7 @@ useSeoMeta({
   ogImage: `${appUrl}/img/rmrdc.png`,
   twitterCard: "summary_large_image",
   ogType: "website",
+  ogUrl: currentUrl,
   ogLocale: "en_US",
   ogImageWidth: "1200",
   ogImageHeight: "630",
