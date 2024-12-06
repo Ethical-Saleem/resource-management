@@ -250,12 +250,17 @@ const closeMobileSidebar = () => {
 const items = [
   [
     {
-      label: "Resource Table",
+      label: "Resource Dashboard",
+      icon: "i-heroicons-home-20-solid",
+      to: "/dashboard",
+    },
+    {
+      label: "Resource Data",
       icon: "i-heroicons-table-cells-20-solid",
       to: "/resource-data",
     },
     {
-      label: "Resource Statistics",
+      label: "Resource Analytics",
       icon: "i-heroicons-chart-bar-20-solid",
       to: "/resource-statistics",
     },
