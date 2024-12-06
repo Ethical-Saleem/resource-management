@@ -38,11 +38,11 @@ const items = (row: Resource) => [
       icon: "i-heroicons-eye-20-solid",
       click: () => router.push(`/resource-data/${row.id}?resource=${row.name}`),
     },
-    {
-      label: "Upload Image",
-      icon: "i-heroicons-document-duplicate-20-solid",
-      click: () => openImageModal(row),
-    },
+    // {
+    //   label: "Upload Image",
+    //   icon: "i-heroicons-document-duplicate-20-solid",
+    //   click: () => openImageModal(row),
+    // },
   ],
 ];
 
@@ -108,10 +108,10 @@ const resetFilters = () => {
   selectedStatus.value = [];
 };
 
-const openImageModal = (data: Resource) => {
-  imageModal.value = true;
-  selectedResource.value = data;
-};
+// const openImageModal = (data: Resource) => {
+//   imageModal.value = true;
+//   selectedResource.value = data;
+// };
 const closeImageModal = () => {
   imageModal.value = false;
   selectedResource.value = null;
