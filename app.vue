@@ -47,7 +47,7 @@ useHead({
     { rel: "icon", sizes: "512x512", type: "image/png", href: `${appUrl}/img/android-chrome-512x512.png` },
   ],
   meta: [
-    { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics, RMRDC Portal, Portal' },
+    { name: 'keywords', content: 'NRMIS, Nigeria Resource Information Portal, Nigeria Resource Map, Nigeria Resource Statistics, Statistics, RMRDC Portal, NRMIS Portal' },
     { name: "theme-color", content: "#2fd8ae" }
   ],
 });
