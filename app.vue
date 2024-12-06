@@ -12,7 +12,7 @@ const appUrl = config.public.baseUrl;
 const currentUrl = `${appUrl}${route.fullPath}`;
 
 useSeoMeta({
-  title: "NRMIS",
+  title: "NRMIS - Nigeria Resources Management and Information System",
   ogTitle: "NRMIS - Nigeria Resource Management and Information System",
   description:
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
