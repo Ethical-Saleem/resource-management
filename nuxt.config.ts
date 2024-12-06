@@ -26,11 +26,11 @@ export default defineNuxtConfig({
   ssr: true,
   app: {
     head: {
-      title: "RMRDC - Resource Exploration",
+      title: "NRMIS Resource Information Portal",
       meta: [
-        { name: "description", content: "This is a platform showing resource distribution and statistical data within Nigeria." },
-        { property: "og:title", content: "RMRDC - Resource Exploration" },
-        { property: "og:description", content: "Platform showing resource distribution and statistical data within Nigeria." },
+        { name: "description", content: "This is a platform showing the various resource distribution and statistical data within Nigeria." },
+        { property: "og:title", content: "NRMIS Resource Information Portal" },
+        { property: "og:description", content: "Platform showingthe various resource distribution and statistical data within Nigeria." },
         { property: "og:image", content: "/img/og-image.png" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: "/img/og-image.png" },
