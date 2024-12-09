@@ -43,7 +43,6 @@ onMounted(() => {
           opacity: index === currentSlide ? 1 : 0,
         }"
       />
-      <!--navigation-->
 
       <nav class="navbar navbar-default" data-spy="affix" data-offset-top="450">
         <div class="container">
@@ -71,10 +70,6 @@ onMounted(() => {
         </div>
       </nav>
 
-      <!--navigation end-->
-
-      <!--mobile navigation-->
-
       <div id="mobile-nav-overlay" class="mobile-nav-overlay hidden">
         <nav class="mobile-nav">
           <ul>
@@ -88,33 +83,9 @@ onMounted(() => {
         </nav>
       </div>
 
-      <!--mobile navigation end-->
-
-      <!--welcome message-->
-
       <section
         class="container welcome-message text-center mt-12 sm:mt-16 lg:mt-24 w-full"
       >
-        <!-- <div
-          class="flex flex-col lg:flex-row items-center lg:items-start justify-between mx-auto"
-        >
-          <div
-            class="md:col-span-5 col-span-12 flex flex-col items-center lg:items-start mb-8 lg:mb-0 max-w-2xl lg:max-w-md lg:pr-8 lg:flex-grow-0 lg:flex-shrink-0"
-          >
-          <h3 class="text-white text-sm text-center lg:text-start text-4xl font-bold mb-4">
-            Raw Materials Research and Development Council
-          </h3>
-            <h1
-              class="text-white text-center lg:text-start text-4xl font-bold mb-4"
-            >
-              Elevate Your Raw Materials Management with Us
-            </h1>
-          </div>
-          <div
-            class="md:col-span-7 col-span-12 flex justify-center lg:justify-start lg:flex-grow"
-          >
-          </div>
-        </div> -->
         <div
           class="flex flex-col lg:flex-row items-center justify-center mx-auto"
         >
@@ -134,21 +105,32 @@ onMounted(() => {
                 > Raw Materials Management with Us</span
               >
             </h1>
-            <div class="w-1/3 sm:w-1/4">
-              <UButton
-                class="text-white"
-                block
-                color="uiearth"
-                label="Explore"
-                size="lg"
-                @click="() => router.push('/dashboard')"
-              />
+            <div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg mx-auto">
+              <div class="w-1/2">
+                <UButton
+                  class="text-white"
+                  block
+                  color="uiearth"
+                  label="Explore"
+                  size="lg"
+                  @click="() => router.push('/dashboard')"
+                />
+              </div>
+              <div class="w-1/2">
+                <UButton
+                  class="font-bold"
+                  block
+                  color="uigreen"
+                  label="Register your contact information"
+                  size="lg"
+                  variant="outline"
+                  to="/contact"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
-
-      <!--welcome message end-->
     </header>
     <section class="py-16">
       <div class="container mx-auto px-4">
@@ -165,17 +147,30 @@ onMounted(() => {
               </div>
             </div>
             <div
-              class="md:col-span-5 col-span-12 flex justify-center lg:justify-start lg:flex-grow lg:max-w-lg"
+              class="md:col-span-5 col-span-12"
             >
-              <p class="text-sm md:text-base">
-                Welcome to the Raw Materials Research and Development Council’s
-                portal, your gateway to advanced categorization and database
-                management. Our platform is designed to support cutting-edge
-                research and development by providing comprehensive tools for
-                organizing and managing raw materials data. Join us in driving
-                innovation and efficiency in the raw materials sector. Explore
-                our resources and elevate your materials management today.
-              </p>
+              <div class="flex justify-center lg:justify-start lg:flex-grow lg:max-w-lg">
+                <p class="text-sm md:text-base">
+                  Welcome to the Raw Materials Research and Development Council’s
+                  portal, your gateway to advanced categorization and database
+                  management. Our platform is designed to support cutting-edge
+                  research and development by providing comprehensive tools for
+                  organizing and managing raw materials data. Join us in driving
+                  innovation and efficiency in the raw materials sector. Explore
+                  our resources and elevate your materials management today.
+                </p>
+              </div>
+              <div class="lg:w-2/3 mt-4">
+                <UButton
+                  class="font-bold"
+                  block
+                  color="uigreen"
+                  label="Register your contact information"
+                  size="lg"
+                  variant="outline"
+                  to="/contact"
+                />
+              </div>
             </div>
           </div>
         </div>
