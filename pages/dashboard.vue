@@ -305,7 +305,7 @@ onMounted(async () => {
         </div>
       </div>
       <div v-else-if="!loading && apiError" class="w-full h-full">
-        <div class="max-w-lg mx-auto w-full">
+        <!-- <div class="max-w-lg mx-auto w-full">
           <div>
             <div class="max-w-[20rem] mx-auto w-full flex items-center justify-center">
             <NuxtImg src="/img/error.png" alt="Error" class="mx-auto" />
@@ -318,7 +318,8 @@ onMounted(async () => {
               <UButton label="Refresh" class="bg-uiearth-700 dark:bg-uiearth-400 dark:text-white" @click="dispatchFetchSummaryData" />
             </div>
           </div>
-        </div>
+        </div> -->
+        <AlertContainer alert-type="error" :title="'Error'" :description="errorData" :action="dispatchFetchSummaryData" />
       </div>
       <div v-else class="flex items-center justify-center h-full w-full">
         <div class="h-full">
