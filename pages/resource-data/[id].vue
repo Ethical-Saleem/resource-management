@@ -33,6 +33,8 @@ const columns = [
   { key: "lga.name", label: "L.G.A", sortable: true },
   { key: "locationLgaWard", label: "LGA Ward", sortable: true },
   { key: "townVillage", label: "Town/Village", sortable: true },
+  { key: "locationLong", label: "Longitude", sortable: false },
+  { key: "locationLat", label: "Latitude", sortable: false },
   { key: "storageConditions", label: "Storage Condition", sortable: true },
   { key: "marketPrice", label: "Market Price", sortable: true },
   { key: "actions" },
@@ -242,6 +244,12 @@ onMounted(async () => {
             </template>
             <template #marketPrice-data="{ row }">
               <span>{{ row.marketPrice ? row.marketPrice : 'N/A' }}</span>
+            </template>
+            <template #locationLong-data="{ row }">
+              <span>{{ row.locationLong ? row.locationLong : 'N/A' }}</span>
+            </template>
+            <template #locationLat-data="{ row }">
+              <span>{{ row.locationLat ? row.locationLat : 'N/A' }}</span>
             </template>
           </UTable>
 

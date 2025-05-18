@@ -12,8 +12,8 @@ const appUrl = config.public.baseUrl;
 const currentUrl = `${appUrl}${route.fullPath}`;
 
 useSeoMeta({
-  title: "RMRDC",
-  ogTitle: "RMRDC - Resource Exploration",
+  title: "NRMIS - Nigeria Resources Management and Information System",
+  ogTitle: "NRMIS - Nigeria Resource Management and Information System",
   description:
     "This is a platform showing the various resource distribution and statistical data, within Nigeria. Owned by the Raw Materials Research and Development Council",
   ogDescription:
@@ -25,18 +25,18 @@ useSeoMeta({
   ogLocale: "en_US",
   ogImageWidth: "1200",
   ogImageHeight: "630",
-  ogImageAlt: "RMRDC Resource Management Platform",
-  twitterTitle: "RMRDC - Resource Exploration",
+  ogImageAlt: "NRMIS Resource Information Portal",
+  twitterTitle: "NRMIS - Nigeria Resource Management and Information System",
   twitterDescription: "Resource distribution and statistical data platform for Nigeria",
   twitterImage: `${appUrl}/img/og-image.png`,
-  twitterImageAlt: "RMRDC Resource Management Platform"
+  twitterImageAlt: "NRMIS Resource Information Portal"
 });
 
 useHead({
   titleTemplate: (titleChunk) => {
     return titleChunk
-      ? `${titleChunk} | RMRDC - Resource Exploration`
-      : "RMRDC - Resource Exploration";
+      ? `${titleChunk} | NRMIS - Resource Information Portal`
+      : "NRMIS - Resource Information Portal";
   },
   link: [
     { rel: "icon", sizes: "32x32", type: "image/png", href: `${appUrl}/img/favicon-32x32.png` },
@@ -47,7 +47,7 @@ useHead({
     { rel: "icon", sizes: "512x512", type: "image/png", href: `${appUrl}/img/android-chrome-512x512.png` },
   ],
   meta: [
-    { name: 'keywords', content: 'RMRDC, Resource Management, Resource Map, Resource Statistics, Statistics, RMRDC Portal, Portal' },
+    { name: 'keywords', content: 'NRMIS, Nigeria Resource Information Portal, Nigeria Resource Map, Nigeria Resource Statistics, Statistics, RMRDC Portal, NRMIS Portal' },
     { name: "theme-color", content: "#2fd8ae" }
   ],
 });
