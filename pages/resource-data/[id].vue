@@ -83,12 +83,12 @@ const paginatedFilteredData = computed(() => {
 const fetchData = async () => {
   loadingStore.showLoading();
   try {
-    const resources: LgaResource[] = await useApi.get(
+    const result = await useApi.get(
       `/resource/fetch-resource-locations/${route.params.id}`
     );
-    console.log("resources", resources);
+    console.log("resources", result);
 
-    rowData.value = resources;
+    rowData.value = result.data as LgaResource[];
   } catch (error) {
     console.log(error);
   } finally {

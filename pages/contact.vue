@@ -153,7 +153,8 @@ const dispatchFetchResources = async () => {
   try {
     const data = await useApi.get('/resource/fetch-all-resources');
     console.log('resources', data);
-    resources.value = data.sort((a, b) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resources.value = data.sort((a: any, b: any) => {
       if (a.name < b.name) return -1;
       if (a.name > b.name) return 1;
       return 0;
@@ -227,7 +228,7 @@ onMounted(async () => {
                 :options="states"
                 option-attribute="name"
                 value-attribute="name"
-                color="uiearth"
+                class="border border-[#242424] rounded-md"
                 searchable
                 placeholder="Select state"
                 />
@@ -253,7 +254,7 @@ onMounted(async () => {
               <USelectMenu
               v-model="contactForm.companySize"
               :options="companySize"
-              color="uiearth"
+              class="border border-[#242424] rounded-md"
               searchable
               placeholder="Select your company category"
               />
@@ -264,7 +265,7 @@ onMounted(async () => {
               <USelectMenu
               v-model="contactForm.companyGroup"
               :options="companyType"
-              color="uiearth"
+              class="border border-[#242424] rounded-md"
               searchable
               placeholder="Select your company category"
               />
@@ -278,7 +279,7 @@ onMounted(async () => {
               option-attribute="name"
               value-attribute="name"
               multiple
-              color="uiearth"
+              class="border border-[#242424] rounded-md"
               searchable
               placeholder="Select your company category"
               />
