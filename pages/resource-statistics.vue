@@ -1,104 +1,253 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: "main-layout",
-});
+import { useApiClient, unwrap } from "~/composables/useApiClient";
+import { useAnalyticsStore } from "~/stores/analytics-store";
+import { describeMetric } from "~/composables/useMetricTier";
+import type { Resource, State } from "~/types";
+
+definePageMeta({ layout: false });
 
 useHead({
-  title: "Statistical Data",
+  title: "Analytics",
   meta: [
     {
       name: "description",
-      content:
-        "Statistical data on the resource distribution in the 36 states in Nigeria",
+      content: "Statistical data on the resource distribution in the 36 states in Nigeria",
     },
   ],
 });
 
-const selectedResourceCategory = ref<number | null>(null);
+const CATEGORIES = [
+  { id: 1, name: "Solid Minerals" },
+  { id: 2, name: "Energy Resource" },
+  { id: 3, name: "Agricultural Produce" },
+];
+
+const analyticsStore = useAnalyticsStore();
+
+const selectedCategoryId = ref<number>(1);
+const resources = ref<Resource[]>([]);
+const states = ref<State[]>([]);
+const selectedResourceId = ref<number | null>(null);
+const selectedStateId = ref<number | null>(null);
+const fetchingResources = ref(false);
+const fetchingStates = ref(false);
+
+const stats = ref({
+  totalSites: null as number | null,
+  statesCovered: null as number | null,
+  avgMarketValue: null as number | null,
+  avgQuality: null as number | null,
+});
+const statsLoading = ref(false);
+
+const selectedResourceName = computed(
+  () => resources.value.find((r) => r.id === selectedResourceId.value)?.name || "",
+);
+
+const marketValueTier = computed(() => describeMetric(stats.value.avgMarketValue));
+const qualityTier = computed(() => describeMetric(stats.value.avgQuality));
+
+const fetchResourcesForCategory = async (categoryId: number) => {
+  fetchingResources.value = true;
+  try {
+    const api = useApiClient();
+    const data = unwrap<Resource[]>(
+      await api.GET("/resource/fetch-resources-data-by-category/{categoryId}", {
+        params: { path: { categoryId } },
+      }),
+    );
+    resources.value = data;
+    selectedResourceId.value = data[0]?.id ?? null;
+  } catch (error) {
+    console.error("fetch-resources-for-category-error", error);
+    resources.value = [];
+  } finally {
+    fetchingResources.value = false;
+  }
+};
+
+const fetchStatesForResource = async (resourceId: number) => {
+  fetchingStates.value = true;
+  try {
+    const data = await analyticsStore.dispatchFetchResourceStates(resourceId);
+    states.value = data || [];
+    selectedStateId.value = states.value[0]?.id ?? null;
+  } catch (error) {
+    console.error("fetch-states-for-resource-error", error);
+    states.value = [];
+    selectedStateId.value = null;
+  } finally {
+    fetchingStates.value = false;
+  }
+};
+
+const fetchStats = async (resourceId: number) => {
+  statsLoading.value = true;
+  try {
+    const [barMetrics, stateMetrics] = await Promise.all([
+      analyticsStore.dispatchFetchResourceBarMetrics(resourceId, 1),
+      analyticsStore.dispatchFetchStateLevelMetrics(resourceId),
+    ]);
+    stats.value.totalSites = barMetrics?.totalCount ?? 0;
+    stats.value.statesCovered = Array.isArray(stateMetrics) ? stateMetrics.length : 0;
+    const marketValues = (stateMetrics || []).map((s: { marketValue: number }) => s.marketValue);
+    const qualities = (stateMetrics || []).map((s: { quality: number }) => s.quality);
+    stats.value.avgMarketValue = average(marketValues);
+    stats.value.avgQuality = average(qualities);
+  } catch (error) {
+    console.error("fetch-stats-error", error);
+  } finally {
+    statsLoading.value = false;
+  }
+};
+
+function average(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return values.reduce((sum, v) => sum + (v || 0), 0) / values.length;
+}
+
+watch(selectedCategoryId, (categoryId) => {
+  fetchResourcesForCategory(categoryId);
+});
+
+watch(selectedResourceId, (resourceId) => {
+  if (resourceId) {
+    fetchStatesForResource(resourceId);
+    fetchStats(resourceId);
+  }
+});
+
+onMounted(() => {
+  fetchResourcesForCategory(selectedCategoryId.value);
+});
 </script>
 
 <template>
-  <div class="mx-auto w-full">
-    <main class="pt-20">
-      <div class="">
-        <UCard class="mb-2 bg-white dark:bg-uigreen-800 border border-uiearth-200">
-          <div class="">
-            <div class="flex items-center justify-between">
-              <h4 class="text-lg lg:text-xl">Resource Stats</h4>
-              <div class="flex items-center w-full sm:w-60">
-                <UFormGroup label="Category" class="w-full">
-                  <USelectMenu
-                    v-model="selectedResourceCategory"
-                    :options="[
-                      { id: 1, name: 'Solid Minerals' },
-                      { id: 2, name: 'Energy Resource' },
-                      { id: 3, name: 'Agricultural Produce' },
-                    ]"
-                    searchable
-                    option-attribute="name"
-                    value-attribute="id"
-                    placeholder="-- Select --"
-                  />
-                </UFormGroup>
-              </div>
+  <div class="flex min-h-screen flex-col bg-uimuted-50">
+    <AppHeader active="analytics" />
+
+    <!-- Filter bar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-uimuted-200 bg-white px-4 py-2.5 md:px-6">
+      <USelectMenu
+        v-model="selectedCategoryId"
+        :options="CATEGORIES"
+        option-attribute="name"
+        value-attribute="id"
+        class="w-40"
+      />
+      <USelectMenu
+        v-model="selectedResourceId"
+        :options="resources"
+        :loading="fetchingResources"
+        option-attribute="name"
+        value-attribute="id"
+        searchable
+        placeholder="Select resource"
+        class="w-52"
+      />
+      <USelectMenu
+        v-model="selectedStateId"
+        :options="states"
+        :loading="fetchingStates"
+        option-attribute="name"
+        value-attribute="id"
+        searchable
+        placeholder="Select state"
+        class="w-48"
+      />
+    </div>
+
+    <main class="flex-1 px-4 py-5 md:px-6">
+      <div v-if="!selectedResourceId" class="flex flex-1 items-center justify-center py-24">
+        <div class="mx-auto max-w-96 text-center">
+          <h4 class="mb-2 text-xl font-bold text-uimuted-900">Select a Resource</h4>
+          <p class="text-sm text-uimuted-500">
+            Choose a category and resource above to view statistics and analytics.
+          </p>
+        </div>
+      </div>
+
+      <div v-else class="flex flex-col gap-4">
+        <!-- Stat tiles -->
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div class="rounded-2xl border border-uimuted-200 bg-white p-4">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-uigreen-100">
+              <UIcon name="i-heroicons-map-pin" class="h-4 w-4 text-uigreen-800" />
+            </div>
+            <div class="mt-2.5 text-[10.5px] font-bold uppercase tracking-wide text-uimuted-400">
+              Total Sites
+            </div>
+            <div class="mt-0.5 text-2xl font-extrabold text-uimuted-950">
+              {{ statsLoading ? "…" : (stats.totalSites ?? "—") }}
+            </div>
+            <div class="mt-1 text-[11.5px] font-semibold text-uimuted-500">
+              For {{ selectedResourceName || "selected resource" }}
             </div>
           </div>
-        </UCard>
-        <div v-if="selectedResourceCategory" class="grid grid-cols-12 gap-3">
-          <div class="col-span-12 md:col-span-6">
-            <StateMetricsRadar :category-id="selectedResourceCategory" />
+
+          <div class="rounded-2xl border border-uimuted-200 bg-white p-4">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-uimuted-200">
+              <UIcon name="i-heroicons-globe-alt" class="h-4 w-4 text-uimuted-700" />
+            </div>
+            <div class="mt-2.5 text-[10.5px] font-bold uppercase tracking-wide text-uimuted-400">
+              States Covered
+            </div>
+            <div class="mt-0.5 text-2xl font-extrabold text-uimuted-950">
+              {{ statsLoading ? "…" : (stats.statesCovered ?? "—") }} / 37
+            </div>
+            <div class="mt-1 text-[11.5px] font-semibold text-uimuted-500">National coverage</div>
           </div>
-          <div class="col-span-12 md:col-span-6">
-            <ResourceLgaMetricsEChart :category-id="selectedResourceCategory" />
+
+          <div class="rounded-2xl border border-uimuted-200 bg-white p-4">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-uiearth-100">
+              <UIcon name="i-heroicons-currency-dollar" class="h-4 w-4 text-uiearth-800" />
+            </div>
+            <div class="mt-2.5 text-[10.5px] font-bold uppercase tracking-wide text-uimuted-400">
+              Avg. Market Value
+            </div>
+            <div class="mt-0.5 text-2xl font-extrabold text-uimuted-950">
+              {{ statsLoading ? "…" : marketValueTier.value }}
+            </div>
+            <div v-if="!statsLoading && marketValueTier.tier" class="mt-1 text-[11.5px] font-semibold" :style="{ color: marketValueTier.color }">
+              {{ marketValueTier.tier }} <span class="text-uimuted-400">&middot; scale 0&ndash;10</span>
+            </div>
           </div>
-          <div class="col-span-12 md:col-span-6">
-            <ResourceMetricsChart :category-id="selectedResourceCategory" />
-          </div>
-          <div class="col-span-12 md:col-span-6">
-            <StateResourceCompareRadar :category-id="selectedResourceCategory" />
-          </div>
-          <div class="col-span-12 md:col-span-6">
-            <ResourceCompareState :category-id="selectedResourceCategory" />
-          </div>
-          <div class="col-span-12 md:col-span-6">
-            <ResourceValueChainBar :category-id="selectedResourceCategory" />
-          </div>
-        </div>
-        <div v-else class="mt-8">
-          <div class="flex items-center justify-center">
-            <div class="content mx-auto max-w-96 text-center">
-              <h4 class="font-medium text-xl mb-4">Select Resource Category</h4>
-              <p class="">
-                Select a resource category to view statistics on the group
-                metrics.
-              </p>
+
+          <div class="rounded-2xl border border-uimuted-200 bg-white p-4">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg" style="background: #EDE9FE">
+              <UIcon name="i-heroicons-sparkles" class="h-4 w-4" style="color: #6D28D9" />
+            </div>
+            <div class="mt-2.5 text-[10.5px] font-bold uppercase tracking-wide text-uimuted-400">
+              Avg. Quality Index
+            </div>
+            <div class="mt-0.5 text-2xl font-extrabold text-uimuted-950">
+              {{ statsLoading ? "…" : qualityTier.value }}
+            </div>
+            <div v-if="!statsLoading && qualityTier.tier" class="mt-1 text-[11.5px] font-semibold" :style="{ color: qualityTier.color }">
+              {{ qualityTier.tier }} <span class="text-uimuted-400">&middot; scale 0&ndash;10</span>
             </div>
           </div>
         </div>
+
+        <!-- Distribution & comparisons -->
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <StateMetricsRadar :resource-id="selectedResourceId" />
+          <ResourceLgaMetricsEChart :resource-id="selectedResourceId" :state-id="selectedStateId" />
+          <ResourceMetricsChart :resource-id="selectedResourceId" :state-id="selectedStateId" />
+          <StateResourceCompareRadar :state-id="selectedStateId" :category-id="selectedCategoryId" />
+          <ResourceCompareState :resource-id="selectedResourceId" />
+          <ResourceValueChainBar :resource-id="selectedResourceId" />
+        </div>
+
+        <!-- Outliers + scatter -->
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <ResourceOutlierBoxPlot :resource-id="selectedResourceId" />
+          <ResourceMarketScatter :resource-id="selectedResourceId" />
+        </div>
+
+        <!-- Heatmap -->
+        <ResourceMetricHeatmap :state-id="selectedStateId" :category-id="selectedCategoryId" />
       </div>
     </main>
   </div>
 </template>
-
-<style>
-.stat-bg {
-  position: relative;
-}
-.stat-bg::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: linear-gradient(
-      rgba(211, 133, 31, 0.5),
-      rgba(118, 100, 24, 0.5)
-    ),
-    url("/img/map_bg.PNG");
-  background-size: cover;
-  background-position: center;
-  opacity: 1; /* Adjust this value to control opacity */
-  z-index: -1; /* Ensures the background is behind the content */
-}
-</style>

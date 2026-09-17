@@ -1,27 +1,10 @@
 <script setup lang="ts">
-import { Radar } from "vue-chartjs";
 import { useAnalyticsStore } from "~/stores/analytics-store";
-// import { useLoadingStore } from "~/stores/loading-store";
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
+import { COMPARISON_PAIR } from "~/composables/useChartPalette";
+import { tierFor } from "~/composables/useMetricTier";
 
-import type { Resource, State } from "~/types";
-
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-);
+import type { Resource } from "~/types";
 
 interface StateMetric {
   stateName: string;
@@ -31,7 +14,6 @@ interface StateMetric {
     quality: number;
     environmentalImpact: number;
     investmentOpportunities: number;
-    color: string;
   };
   resource2: {
     accessToMarket: number;
@@ -39,290 +21,153 @@ interface StateMetric {
     quality: number;
     environmentalImpact: number;
     investmentOpportunities: number;
-    color: string;
   };
 }
 
-const analyticsStore = useAnalyticsStore();
-// const loadingStore = useLoadingStore();
+const METRICS = [
+  { key: "accessToMarket", label: "Access to Market" },
+  { key: "marketValue", label: "Market Value" },
+  { key: "quality", label: "Quality" },
+  { key: "environmentalImpact", label: "Env. Impact" },
+  { key: "investmentOpportunities", label: "Investment" },
+] as const;
 
-const props = defineProps({
-  categoryId: {
-    type: Number,
-    default: () => 2,
-  },
-});
+const props = defineProps<{
+  stateId: number | null;
+  categoryId: number;
+}>();
+
+const analyticsStore = useAnalyticsStore();
 
 const resourceId1 = ref<number | null>(null);
 const resourceId2 = ref<number | null>(null);
 const loading = ref(false);
 const fetching = ref(false);
-const selectedStateId = ref<number | null>(null);
-const states = ref([] as State[]);
-const resources = ref([] as Resource[]);
-const stateMetrics = ref([] as StateMetric[]);
+const resources = ref<Resource[]>([]);
+const stateMetrics = ref<StateMetric[]>([]);
 
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      labels: {
-        font: {
-          size: 16, // Increase the legend label font size
-        },
-        color: '#2fd8ae'
-      },
-    },
-  },
-  scales: {
-    r: {
-      pointLabels: {
-        font: {
-          size: 14, // Increase the radar point label font size
-        },
-        color: '#2fd8ae'
-      },
-      ticks: {
-        font: {
-          size: 12, // Increase the radar ticks font size
-        },
-        color: '#2fd8ae'
-      },
-    },
-  },
-};
+const resource1Name = computed(
+  () => resources.value.find((r) => r.id === resourceId1.value)?.name || "Resource 1",
+);
+const resource2Name = computed(
+  () => resources.value.find((r) => r.id === resourceId2.value)?.name || "Resource 2",
+);
 
-const chartData = computed(() => {
-  const labels = [
-    "Access to Market",
-    "Market Value",
-    "Quality",
-    "Environmental Impact",
-    "Investment Opportunities",
-  ];
-  const datasets = stateMetrics.value.flatMap((metric) => [
-    {
-      label: `${metric.stateName} - Resource 1`,
-      data: [
-        metric.resource1.accessToMarket,
-        metric.resource1.marketValue,
-        metric.resource1.quality,
-        metric.resource1.environmentalImpact,
-        metric.resource1.investmentOpportunities,
-      ],
-      backgroundColor: hexToRgba(metric.resource1.color, 0.4),
-      borderColor: metric.resource1.color,
-      pointBackgroundColor: metric.resource1.color,
-      pointBorderColor: "#fff",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: metric.resource1.color,
-    },
-    {
-      label: `${metric.stateName} - Resource 2`,
-      data: [
-        metric.resource2.accessToMarket,
-        metric.resource2.marketValue,
-        metric.resource2.quality,
-        metric.resource2.environmentalImpact,
-        metric.resource2.investmentOpportunities,
-      ],
-      backgroundColor: hexToRgba(metric.resource2.color, 0.4),
-      borderColor: metric.resource2.color,
-      pointBackgroundColor: metric.resource2.color,
-      pointBorderColor: "#fff",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: metric.resource2.color,
-    },
-  ]);
-
+const chartOption = computed(() => {
+  const metric = stateMetrics.value[0];
   return {
-    labels,
-    datasets,
+    tooltip: {
+      trigger: "axis",
+      axisPointer: { type: "shadow" },
+      formatter: (params: any[]) => {
+        const lines = params.map(
+          (p) => `${p.marker} ${p.seriesName}: ${p.value} (${tierFor(p.value)})`,
+        );
+        return [`<strong>${params[0]?.axisValue ?? ""}</strong>`, ...lines].join("<br/>");
+      },
+    },
+    legend: { bottom: 0, textStyle: { color: "#64748B" } },
+    grid: { left: 40, right: 24, top: 24, bottom: 48 },
+    xAxis: {
+      type: "category",
+      data: METRICS.map((m) => m.label),
+      axisLabel: { color: "#64748B", fontSize: 11, interval: 0, rotate: 20 },
+    },
+    yAxis: { type: "value", max: 10, axisLabel: { color: "#64748B" } },
+    series: [
+      {
+        name: resource1Name.value,
+        type: "bar",
+        data: metric ? METRICS.map((m) => metric.resource1[m.key]) : [],
+        itemStyle: { color: COMPARISON_PAIR[0], borderRadius: [4, 4, 0, 0] },
+      },
+      {
+        name: resource2Name.value,
+        type: "bar",
+        data: metric ? METRICS.map((m) => metric.resource2[m.key]) : [],
+        itemStyle: { color: COMPARISON_PAIR[1], borderRadius: [4, 4, 0, 0] },
+      },
+    ],
   };
 });
 
 const fetchData = async () => {
+  if (!props.stateId || !resourceId1.value || !resourceId2.value) return;
   loading.value = true;
   try {
-    if (selectedStateId.value && resourceId1.value && resourceId2.value) {
-      const data = await analyticsStore.dispatchFetchStateResourceCompareMetrics(
-        resourceId1.value,
-        resourceId2.value,
-        selectedStateId.value
-      );
-      stateMetrics.value = data;
-    }
+    const data = await analyticsStore.dispatchFetchStateResourceCompareMetrics(
+      resourceId1.value,
+      resourceId2.value,
+      props.stateId,
+    );
+    stateMetrics.value = data || [];
   } catch (error) {
-    console.log(error);
+    console.error("state-resource-compare-error", error);
+    stateMetrics.value = [];
   } finally {
     loading.value = false;
   }
 };
 
-const hexToRgba = (hex: string, alpha: number): string => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
-
-// const fetchResources = async (categoryId: number) => {
-//   // loadingStore.showLoading();
-//   try {
-//     const data = await useApi.get(
-//       `/resource/fetch-resources-data-by-category/${categoryId}`
-//     );
-//     resources.value = data;
-//     resourceId1.value = resources.value[0].id;
-//     resourceId2.value = resources.value[1].id;
-//   } catch (error) {
-//     console.log(error);
-//   } finally {
-//     // loadingStore.hideLoading();
-//   }
-// };
-
-const fetchStateResources = async () => {
+const fetchResources = async () => {
   fetching.value = true;
   try {
-    if (selectedStateId.value) {
-      const data = await analyticsStore.dispatchFetchStateResources(selectedStateId.value, props.categoryId);
-      console.log(data);
-      resources.value = data;
-    }
+    const api = useApiClient();
+    const data = unwrap<Resource[]>(
+      await api.GET("/resource/fetch-resources-data-by-category/{categoryId}", {
+        params: { path: { categoryId: props.categoryId } },
+      }),
+    );
+    resources.value = data;
+    resourceId1.value = data[0]?.id ?? null;
+    resourceId2.value = data[1]?.id ?? null;
   } catch (error) {
-    console.log(error)
+    console.error("fetch-resources-error", error);
+    resources.value = [];
   } finally {
     fetching.value = false;
   }
-}
+};
 
-// watch(
-//   () => props.categoryId,
-//   async (newCategoryId) => {
-//     await fetchResources(newCategoryId);
-//     await fetchData();
-//   }
-// );
-
-watch(
-  () => selectedStateId.value,
-  async () => {
-    fetchStateResources();
-  }
-)
+watch(() => props.categoryId, fetchResources);
+watch([() => props.stateId, resourceId1, resourceId2], fetchData);
 
 onMounted(async () => {
-  states.value = await useApi.get("/territory/fetch-all-states");
-  // await fetchResources(props.categoryId);
-  selectedStateId.value = states.value[0].id;
+  await fetchResources();
   await fetchData();
 });
 </script>
 
 <template>
-  <UCard
-    :ui="{
-      base: 'mb-4',
-      divide: 'divide-y divide-uiearth-700 dark:divide-uiearth-800',
-      ring: 'ring-1 ring-uiearth-200 dark:ring-uiearth-800',
-      body: {
-        padding: 'p-3 sm:p-6',
-      },
-      footer: {
-        base: '',
-        background: '',
-        padding: 'px-2 pt-2 pb-2 sm:px-2',
-      },
-    }"
-    class="dark:bg-uigreen-50 border border-uigreen-700 dark:border-uigreen-200 shadow-lg text-uigreen-400 dark:text-uigreen-700"
+  <AnalyticsChartCard
+    title="Cross-Resource Comparison"
+    description="Compare two resources within the selected state"
+    :loading="loading"
+    :empty="stateMetrics.length === 0"
   >
-    <template #header>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <h6 class="text-sm pr-1">State Level Metrics Comparison</h6>
-          <UPopover mode="hover">
-            <UButton label="?" variant="ghost" class="text-lg" />
-            <template #panel>
-              <div
-                class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
-              >
-                This chart compares two resources across various states,
-                evaluating key metrics like market value, quality, access to
-                market, environmental impact, and investment opportunities. The
-                chart helps you visually understand how these resources perform
-                in different regions, highlighting areas of strength or concern
-                for each resource. Hover over a state to see the specific metric
-                values for both resources side by side, enabling a detailed
-                comparison. <br ><br >
-                0 - 3 : Low <br >
-                4 - 6 : Average <br >
-                7 - 10 : High
-              </div>
-            </template>
-          </UPopover>
-        </div>
-      </div>
+    <template #filters>
+      <USelectMenu
+        v-model="resourceId1"
+        :options="resources"
+        :loading="fetching"
+        option-attribute="name"
+        value-attribute="id"
+        searchable
+        placeholder="Resource one"
+        class="w-40"
+      />
+      <span class="text-xs font-semibold text-uimuted-400">vs</span>
+      <USelectMenu
+        v-model="resourceId2"
+        :options="resources"
+        :loading="fetching"
+        option-attribute="name"
+        value-attribute="id"
+        searchable
+        placeholder="Resource two"
+        class="w-40"
+      />
     </template>
-    <div class="grid grid-cols-12 gap-3 mb-3">
-      <div class="col-span-12 lg:col-span-11 grid grid-cols-3 gap-2">
-        <UFormGroup v-if="selectedStateId" label="Resource One">
-          <USelectMenu
-            v-model="resourceId1"
-            :options="resources"
-            :loading="fetching"
-            :disabled="fetching"
-            option-attribute="name"
-            value-attribute="id"
-            searchable
-            placeholder="-- Select --"
-          />
-        </UFormGroup>
-        <UFormGroup label="State">
-          <USelectMenu
-            v-model="selectedStateId"
-            :options="states"
-            option-attribute="name"
-            value-attribute="id"
-            searchable
-            placeholder="-- Select --"
-          />
-        </UFormGroup>
-        <UFormGroup v-if="selectedStateId" label="Resource Two">
-          <USelectMenu
-            v-model="resourceId2"
-            :options="resources"
-            :loading="fetching"
-            :disabled="fetching"
-            option-attribute="name"
-            value-attribute="id"
-            searchable
-            placeholder="-- Select --"
-          />
-        </UFormGroup>
-      </div>
-      <div class="col-span-12 lg:col-span-1 text-end">
-        <UButton
-          v-if="resourceId1 && resourceId2"
-          icon="i-heroicons-magnifying-glass"
-          class="text-white rounded-full"
-          :disabled="loading || fetching"
-          @click="fetchData"
-        />
-      </div>
-    </div>
-    <div v-if="!loading" class="">
-      <Radar v-if="stateMetrics.length > 0" :data="chartData" :options="chartOptions" />
-      <div v-else class="mx-auto my-8">
-        <div class="mx-auto text-center">
-          <p class="text-sm">
-            No data available to compare the selected resources
-          </p>
-        </div>
-      </div>
-    </div>
-    <div v-if="loading" class="flex items-center justify-center my-4">
-      <div class="spinner" />
-    </div>
-  </UCard>
+    <VChart :option="chartOption" style="height: 320px" autoresize />
+  </AnalyticsChartCard>
 </template>

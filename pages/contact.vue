@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { useApi, useLoadingStore } from '#imports';
+import { useLoadingStore } from '#imports';
+import { useApiClient, unwrap } from '~/composables/useApiClient';
+import type { components } from '~/types/api';
+
+type CreateContactDtoBody = components['schemas']['CreateContactDto'];
 import { object, string, array, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
@@ -117,7 +121,20 @@ const dispatchSubmitContactForm = async (event: FormSubmitEvent<Schema>) => {
     apiRes.value = null;
   }
   try {
-    const res = await useApi.post('/territory/create-contact-info', event.data);
+    const api = useApiClient();
+    // The form's yup schema names this field `description`, but the backend
+    // DTO expects `companyDescription` — this mismatch meant the field was
+    // silently dropped on every submission until the typed client caught it.
+    const { description, ...rest } = event.data;
+    // Separately: the yup schema marks `companyName` optional, but the
+    // backend DTO requires it — another pre-existing mismatch the typed
+    // client surfaced. Left as a cast rather than silently changing either
+    // side's validation rule; flagged for a product decision.
+    const res = unwrap(
+      await api.POST('/territory/create-contact-info', {
+        body: { ...rest, companyDescription: description } as CreateContactDtoBody,
+      }),
+    );
     console.log('res', res);
     if (res) {
       apiRes.value = 2
@@ -138,7 +155,8 @@ const dispatchSubmitContactForm = async (event: FormSubmitEvent<Schema>) => {
 const dispatchFetchStates = async () => {
   fetching.value = true
   try {
-    const data = await useApi.get('/territory/fetch-all-states');
+    const api = useApiClient();
+    const data = unwrap(await api.GET('/territory/fetch-all-states', {}));
     console.log('states', data);
     states.value = data;
     fetching.value = false
@@ -151,7 +169,8 @@ const dispatchFetchStates = async () => {
 const dispatchFetchResources = async () => {
   fetching.value = true
   try {
-    const data = await useApi.get('/resource/fetch-all-resources');
+    const api = useApiClient();
+    const data = unwrap(await api.GET('/resource/fetch-all-resources', {}));
     console.log('resources', data);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resources.value = data.sort((a: any, b: any) => {

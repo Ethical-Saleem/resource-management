@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useApi } from "~/composables/useApi";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 
 interface NewResource {
   name: string;
@@ -32,8 +32,8 @@ const resource = ref<NewResource>({
 });
 
 const loading = ref(false);
-const { data: categories, status } = useAsyncData("categories", () =>
-  useApi.get("/resource/fetch-all-categories")
+const { data: categories, status } = useAsyncData("categories", async () =>
+  unwrap(await useApiClient().GET("/resource/fetch-all-categories", {}))
 );
 
 const selectedStates = ref<
@@ -145,7 +145,15 @@ const submitData = async () => {
   loading.value = true;
 
   try {
-    const res = await useApi.post("/resource/create-resource", createData);
+    // NOTE: /resource/create-resource is not implemented on the backend yet
+    // (deferred alongside the rest of the resource-creation flow). This call
+    // will 404 until that work is picked back up — kept as a plain $fetch
+    // rather than the typed client since there is no such path to type.
+    const config = useRuntimeConfig();
+    const res = await $fetch(
+      `${config.public.apiBase}/resource/create-resource`,
+      { method: "POST", body: createData },
+    );
     if (res) {
       alert("New Resource added successfully");
       resetForm()

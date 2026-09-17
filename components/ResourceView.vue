@@ -1,6 +1,7 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import { useLoadingStore } from "~/stores/loading-store";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 
 import type { Resource } from "~/types";
 
@@ -68,8 +69,11 @@ const fetchData = async (page = 1, categoryId: number) => {
   loadingStore.showLoading();
   currentCategory.value = categoryId;
   try {
-    const res = await useApi.get(
-      `/resource/fetch-resources-data-by-filter?page=${page}&pageSize=${12}&categoryId=${categoryId}`
+    const api = useApiClient();
+    const res = unwrap(
+      await api.GET("/resource/fetch-resources-data-by-filter", {
+        params: { query: { page, pageSize: 12, categoryId } },
+      }),
     );
     console.log("resources", res);
 

@@ -1,238 +1,83 @@
 <script setup lang="ts">
-import { Bar } from "vue-chartjs";
 import { useAnalyticsStore } from "~/stores/analytics-store";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { CATEGORICAL_PALETTE } from "~/composables/useChartPalette";
+import { tierFor } from "~/composables/useMetricTier";
 
-import type { Resource } from "~/types";
+const MAX_STATES_SHOWN = 15;
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+const props = defineProps<{
+  resourceId: number | null;
+}>();
 
 const analyticsStore = useAnalyticsStore();
-
-const props = defineProps({
-  categoryId: {
-    type: Number,
-    required: true,
-  },
-});
-
-const barChartData = ref(
-  [] as { stateName: string; averageValueChainAnalysis: number }[]
-);
 const loading = ref(false);
-const resourceId = ref<number | null>(null);
-const resources = ref([] as Resource[]);
+const allBarChartData = ref<{ stateName: string; averageValueChainAnalysis: number }[]>([]);
 
-const chartData = computed(() => {
-  const labels = barChartData.value.map((item) => item.stateName);
-  const data = barChartData.value.map((item) => item.averageValueChainAnalysis);
+// A single series (one bar per state) needs one consistent color, not a
+// color per bar — the y-axis labels already carry state identity, so a
+// rainbow-per-bar would just be redundant, noisy encoding.
+const SERIES_COLOR = CATEGORICAL_PALETTE[0];
 
-  //   const backgroundColor = data.map(() => {
-  //     // const randomColor = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-  //     //   Math.random() * 256
-  //     // )}, ${Math.floor(Math.random() * 256)}, 0.9)`;
-  //     // return randomColor;
-  //     const randomColor = `rgba(${150 + Math.floor(Math.random() * 106)}, ${150 + Math.floor(
-  //       Math.random() * 106
-  //     )}, ${150 + Math.floor(Math.random() * 106)}, 0.5)`;
-  //     return randomColor;
-  //   });
+const barChartData = computed(() =>
+  [...allBarChartData.value]
+    .sort((a, b) => b.averageValueChainAnalysis - a.averageValueChainAnalysis)
+    .slice(0, MAX_STATES_SHOWN),
+);
+const truncated = computed(() => allBarChartData.value.length > MAX_STATES_SHOWN);
 
-  const backgroundColor = generateRandomColors(data.length);
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: "Value Chain Analysis",
-        data,
-        backgroundColor: backgroundColor,
-        borderColor: backgroundColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-});
-
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      labels: {
-        font: {
-          size: 16, // Increase the legend label font size
-          color: "",
-        },
-        color: '#2fd8ae'
-      },
-    },
-    // title: {
-    //   display: true,
-    //   text: "Value Chain Analysis by State",
-    //   font: {
-    //     size: 24, // Increase the title font size
-    //   },
-    // },
-  },
-  scales: {
-    x: {
-      ticks: {
-        font: {
-          size: 14, // Increase the x-axis label font size
-        },
-        color: '#2fd8ae'
-      },
-    },
-    y: {
-      ticks: {
-        font: {
-          size: 14, // Increase the y-axis label font size
-        },
-        color: '#2fd8ae'
-      },
+const chartOption = computed(() => ({
+  tooltip: {
+    trigger: "axis",
+    axisPointer: { type: "shadow" },
+    formatter: (params: any[]) => {
+      const p = params[0];
+      if (!p) return "";
+      return `<strong>${p.axisValue}</strong><br/>${p.marker} ${p.value} (${tierFor(p.value)})`;
     },
   },
-};
-
-function generateRandomColors(length: number) {
-  const colors = [];
-  for (let i = 0; i < length; i++) {
-    const color = `hsl(${Math.floor(Math.random() * 360)}, 80%, 50%)`;
-    colors.push(color);
-  }
-  return colors;
-}
+  grid: { left: 90, right: 24, top: 16, bottom: 24 },
+  xAxis: { type: "value", axisLabel: { color: "#64748B" } },
+  yAxis: {
+    type: "category",
+    data: barChartData.value.map((item) => item.stateName).reverse(),
+    axisLabel: { color: "#64748B", fontSize: 12 },
+  },
+  series: [
+    {
+      name: "Value Chain Analysis",
+      type: "bar",
+      data: barChartData.value.map((item) => item.averageValueChainAnalysis).reverse(),
+      itemStyle: { color: SERIES_COLOR, borderRadius: [0, 4, 4, 0] },
+      barMaxWidth: 22,
+    },
+  ],
+}));
 
 const fetchData = async () => {
+  if (!props.resourceId) return;
   loading.value = true;
   try {
-    if (resourceId.value) {
-      const data = await analyticsStore.dispatchFetchValueChainAnalysisByState(
-        resourceId.value
-      );
-      barChartData.value = data.stateAverages;
-    }
+    const data = await analyticsStore.dispatchFetchValueChainAnalysisByState(props.resourceId);
+    allBarChartData.value = data.stateAverages || [];
   } catch (error) {
-    console.log(error);
+    console.error("value-chain-bar-error", error);
+    allBarChartData.value = [];
   } finally {
     loading.value = false;
   }
 };
 
-const fetchResources = async (categoryId: number) => {
-  loading.value = true;
-  try {
-    const data: Resource[] = await useApi.get(
-      `/resource/fetch-resources-data-by-category/${categoryId}`
-    );
-    resources.value = data;
-    if (data.length > 0) {
-      resourceId.value = data[0].id; // Set the first resource as the default
-    }
-    console.log("data", data);
-  } catch (error) {
-    console.log(error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-watch(
-  () => props.categoryId,
-  async (newCategoryId) => {
-    await fetchResources(newCategoryId);
-    await fetchData();
-  }
-);
-
-onMounted(async () => {
-  await fetchResources(props.categoryId);
-  await fetchData();
-});
+watch(() => props.resourceId, fetchData);
+onMounted(fetchData);
 </script>
 
 <template>
-  <UCard
-    :ui="{
-      base: 'mb-4',
-      divide: 'divide-y divide-uiearth-700 dark:divide-uiearth-800',
-      ring: 'ring-1 ring-uiearth-200 dark:ring-uiearth-800',
-      body: {
-        padding: 'p-3 sm:p-6',
-      },
-      footer: {
-        base: '',
-        background: '',
-        padding: 'px-2 pt-2 pb-2 sm:px-2',
-      },
-    }"
-    class="dark:bg-uigreen-50 border border-uigreen-700 dark:border-uigreen-200 shadow-lg text-uigreen-400 dark:text-uigreen-700"
+  <AnalyticsChartCard
+    title="Value Chain Analysis by State"
+    :description="truncated ? `Top ${MAX_STATES_SHOWN} of ${allBarChartData.length} states, by rating` : 'Overall value chain rating by state'"
+    :loading="loading"
+    :empty="barChartData.length === 0"
   >
-    <template #header>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <h6 class="text-sm pr-1">Value Chain Analysis by State</h6>
-          <UPopover mode="hover">
-            <UButton label="?" variant="ghost" class="text-lg" />
-            <template #panel>
-              <div
-                class="p-4 text-xs h-30 w-60 ring-2 ring-[#d292ff] overflow-y-auto"
-              >
-                This chart compares the value chain rating of a resource across
-                all states it can be found, evaluating the overall value chain
-                rating for the resource in each state. The length of the bar
-                determine is used as the mode of comparison here. <br ><br >
-                <!-- 0 - 3 : Low <br >
-                4 - 6 : Average <br >
-                7 - 10 : High -->
-              </div>
-            </template>
-          </UPopover>
-        </div>
-      </div>
-    </template>
-    <div class="grid grid-cols-1 gap-3 mb-3">
-      <UFormGroup label="Resource">
-        <USelectMenu
-          v-model="resourceId"
-          :options="resources"
-          option-attribute="name"
-          value-attribute="id"
-          searchable
-          placeholder="-- Select --"
-          @change="fetchData"
-        />
-      </UFormGroup>
-    </div>
-    <div v-if="!loading">
-      <Bar
-        v-if="barChartData.length > 0"
-        :data="chartData"
-        :options="{ ...chartOptions, indexAxis: 'y' }"
-      />
-      <div v-else class="mx-auto my-8">
-        <div class="mx-auto text-center">
-          <p class="text-sm">No data available for the selected resource.</p>
-        </div>
-      </div>
-    </div>
-    <div v-if="loading" class="flex items-center justify-center my-4">
-      <div class="spinner" />
-    </div>
-  </UCard>
+    <VChart :option="chartOption" :style="{ height: `${Math.max(240, barChartData.length * 26)}px` }" autoresize />
+  </AnalyticsChartCard>
 </template>

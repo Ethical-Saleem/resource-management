@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useApi } from "~/composables/useApi";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 import type { State } from "~/types";
 
 const selectedState = ref<number | null>(null);
@@ -14,8 +14,8 @@ const onStateChange = () => {
   }
 };
 
-const { data: states, status } = await useAsyncData<State[]>("states", () =>
-  useApi.get("/territory/fetch-all-states")
+const { data: states, status } = await useAsyncData<State[]>("states", async () =>
+  unwrap(await useApiClient().GET("/territory/fetch-all-states", {}))
 );
 </script>
 

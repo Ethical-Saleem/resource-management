@@ -23,6 +23,12 @@ export default defineNuxtConfig({
     },
   },
 
+  css: [
+    "leaflet/dist/leaflet.css",
+    "leaflet.markercluster/dist/MarkerCluster.css",
+    "leaflet.markercluster/dist/MarkerCluster.Default.css",
+  ],
+
   ssr: true,
   app: {
     head: {
@@ -41,12 +47,14 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { ssr: false },
     '/test-map': { ssr: false },
+    // Leaflet touches window/document at import time — never SSR this page.
+    '/map-view': { ssr: false },
   },
 
   echarts: {
     renderer: ['canvas'],
-    charts: ['BarChart', 'LineChart', 'PieChart'],
-    components: ['DatasetComponent', 'GridComponent', 'TooltipComponent', "LegendComponent"],
+    charts: ['BarChart', 'LineChart', 'PieChart', 'RadarChart', 'BoxplotChart', 'ScatterChart', 'HeatmapChart'],
+    components: ['DatasetComponent', 'GridComponent', 'TooltipComponent', 'LegendComponent', 'RadarComponent', 'VisualMapComponent'],
     features: ['LabelLayout', 'UniversalTransition']
   },
 
@@ -59,7 +67,6 @@ export default defineNuxtConfig({
     gzip: true,
     exclude: [
       '/create-resource',
-      '/state-level-map',
       '/test-map',
       '/server-error',
       '/resource-view'
