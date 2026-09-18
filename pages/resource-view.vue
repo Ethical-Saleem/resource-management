@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLoadingStore } from "~/stores/loading-store";
-import { useApi } from "~/composables/useApi";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 
 import type { Resource } from "~/types";
 
@@ -24,7 +24,10 @@ const filteredData = computed(() => {
 const fetchResources = async () => {
   loadingStore.showLoading();
   try {
-    resources.value = await useApi.get("/resource/fetch-resources-data");
+    const api = useApiClient();
+    resources.value = unwrap<Resource[]>(
+      await api.GET("/resource/fetch-resources-data", {}),
+    );
   } catch (error) {
     console.log(error);
   } finally {

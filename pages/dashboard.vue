@@ -1,6 +1,6 @@
 <script setup>
-import { useApi } from "#imports";
 import { useLoadingStore } from "~/stores/loading-store";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 
 const loadingStore = useLoadingStore();
 
@@ -31,7 +31,8 @@ const dispatchFetchSummaryData = async () => {
   // loading.value = true;
   loadingStore.showLoading();
   try {
-    const data = await useApi.get(`/analytics/get-summary-data`);
+    const api = useApiClient();
+    const data = unwrap(await api.GET('/analytics/get-summary-data', {}));
     console.log('summary-data', data);
     if (data) {
       energyCount.value = data.energyCount

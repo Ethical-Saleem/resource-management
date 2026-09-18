@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useApi } from "~/composables/useApi";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 import type { Lga } from "~/types";
 
 const lgas = ref([] as Lga[]);
@@ -29,7 +29,12 @@ const fetchStateLgas = async (stateId: number) => {
   loading.value = true;
 
   try {
-    const res = await useApi.get(`/territory/fetch-state-lgas/${stateId}`);
+    const api = useApiClient();
+    const res = unwrap<Lga[]>(
+      await api.GET("/territory/fetch-state-lgas/{id}", {
+        params: { path: { id: stateId } },
+      }),
+    );
     if (res) {
       lgas.value = res;
       console.log("lgas", res);

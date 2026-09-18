@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useApi } from "#imports";
 import { useLoadingStore } from "~/stores/loading-store";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 import type { Resource } from "~/types";
 
 const loadingStore = useLoadingStore();
@@ -148,13 +148,19 @@ const setCurrentView = (value: number) => {
 const addImage = async () => {
   loading.value = true;
   try {
-    if (newImage.value) {
+    if (newImage.value && selectedResource.value) {
       const data = new FormData();
       data.append("image", newImage.value);
 
-      const res = await useApi.postForm(
-        `/resource/add-resource-image/${selectedResource?.value?.id}`,
-        data
+      const api = useApiClient();
+      const res = unwrap(
+        await api.POST("/resource/add-resource-image/{id}", {
+          params: { path: { id: selectedResource.value.id } },
+          // openapi-fetch types multipart bodies by their JSON schema shape;
+          // a real FormData instance is passed through untouched at runtime
+          // (its own default body serializer special-cases FormData).
+          body: data as unknown as { image?: string },
+        }),
       );
       if (res) {
         alert("Resource Image added successfully");
@@ -175,8 +181,9 @@ const addImage = async () => {
 const fetchData = async () => {
   loadingStore.showLoading();
   try {
-    const resources: Resource[] = await useApi.get(
-      "/resource/fetch-resources-data"
+    const api = useApiClient();
+    const resources = unwrap<Resource[]>(
+      await api.GET("/resource/fetch-resources-data", {}),
     );
     console.log("resources", resources);
 

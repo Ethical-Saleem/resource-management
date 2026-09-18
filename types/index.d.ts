@@ -63,3 +63,38 @@ export interface StateResource {
   resource: Resource;
   state: State;
 }
+
+export type GeoJsonFeature = import('geojson').Feature<
+  import('geojson').Geometry,
+  import('geojson').GeoJsonProperties
+>;
+
+export interface GeoJSONData extends import('geojson').FeatureCollection {
+  type: 'FeatureCollection';
+  features: GeoJsonFeature[];
+}
+
+/** A single point-located resource record, as returned by
+ * GET /resource/fetch-map-locations — the shape the map plots directly. */
+export interface MapLocation {
+  id: number;
+  identifier: string;
+  lat: number;
+  long: number;
+  locationName: string | null;
+  quantity: string | null;
+  quantityRating: number | null;
+  estimatedVolumeIndex: number | null;
+  value: number | null;
+  quality: number | null;
+  resourceId: number;
+  resourceName: string;
+  colorCode: string | null;
+  categoryIds: number[];
+  lgaId: number;
+  lgaName: string;
+  stateId: number;
+  stateName: string;
+}
+
+export type MapScope = 'country' | 'state';

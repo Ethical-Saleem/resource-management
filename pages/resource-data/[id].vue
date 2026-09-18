@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useApi } from "#imports";
 import { useLoadingStore } from "~/stores/loading-store";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 import type { LgaResource } from "~/types";
 
 const loadingStore = useLoadingStore();
@@ -83,8 +83,11 @@ const paginatedFilteredData = computed(() => {
 const fetchData = async () => {
   loadingStore.showLoading();
   try {
-    const result = await useApi.get(
-      `/resource/fetch-resource-locations/${route.params.id}`
+    const api = useApiClient();
+    const result = unwrap(
+      await api.GET("/resource/fetch-resource-locations/{id}", {
+        params: { path: { id: Number(route.params.id) } },
+      }),
     );
     console.log("resources", result);
 

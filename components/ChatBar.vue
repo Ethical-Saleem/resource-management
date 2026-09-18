@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useApi } from "~/composables/useApi";
+import { useApiClient, unwrap } from "~/composables/useApiClient";
 
 const props = defineProps({
   isOpen: {
@@ -81,7 +81,13 @@ const handleUserInput = async () => {
   loading.value = true;
 
   try {
-    const response = await useApi.get(`/ai?message=${userMessage}`);
+    const api = useApiClient();
+    // Note: this proxies to an external AI service that was confirmed
+    // unreachable during the backend audit — expect this to fail until B7
+    // (a Claude-based AI insights module) replaces it.
+    const response = unwrap<any>(
+      await api.GET("/ai", { params: { query: { message: userMessage } } }),
+    );
 
     // if (typeof response === "string") {
     // Attempt to parse string response as JSON
