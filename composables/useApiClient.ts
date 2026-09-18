@@ -11,8 +11,14 @@ let _client: Client<paths> | undefined;
 export const useApiClient = (): Client<paths> => {
   if (!_client) {
     const config = useRuntimeConfig();
+    // On the server, prefer the Docker-internal URL when one's configured
+    // (reaches the api container directly instead of round-tripping back
+    // out through the reverse proxy); the browser bundle never sees this
+    // branch, since process.server is baked in at build time per bundle.
+    const baseUrl =
+      (import.meta.server && config.apiBaseInternal) || config.public.apiBase;
     _client = createClient<paths>({
-      baseUrl: config.public.apiBase,
+      baseUrl,
       credentials: "include",
     });
   }
