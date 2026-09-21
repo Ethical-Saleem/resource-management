@@ -21,32 +21,6 @@ const totalPages = ref(0);
 const totalCount = ref(0);
 const resources = ref([] as Resource[]);
 
-const cardBgClass = computed(() => {
-  switch (currentCategory.value) {
-    case 1:
-      return "bg-uiearth-400";
-    case 2:
-      return "bg-uiyellow-100 ring-uigreen-800";
-    case 3:
-      return "bg-uigreen-400 ring-uiearth-800";
-    default:
-      return "bg-uimuted-400";
-  }
-});
-
-const viewButtonClass = computed(() => {
-  switch (currentCategory.value) {
-    case 1:
-      return "uiearth";
-    case 2:
-      return "uiyellow";
-    case 3:
-      return "uigreen";
-    default:
-      return "uigreen";
-  }
-});
-
 const filteredData = computed(() => {
   if (!q.value) {
     return resources.value;
@@ -101,115 +75,89 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    class="grid gap-4 ptablet:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 py-8"
-  >
-    <div class="relative">
-      <UCard class="bg-white dark:bg-uigreen-800 border border-uiearth-200">
-        <div class="flex flex-col gap-4">
-          <UButton
-            label="Solid Minerals"
-            block
-            :class="currentCategory === 1 ? 'bg-uigreen-700 dark:bg-uigreen-800 text-white ring-1 ring-uigreen-200' : 'bg-transparent dark:bg-transparent text-uigreen-400'"
-            class="hover:bg-uigreen-900 dark:hover:bg-uigreen-900 dark:text-white"
-            @click="fetchData(1, 1)"
-          />
-          <UButton
-            label="Energy Resource"
-            block
-            :class="
-              currentCategory === 2 ? 'bg-uigreen-700 dark:bg-uigreen-800 text-white ring-1 ring-uigreen-200' : 'bg-transparent dark:bg-transparent text-uigreen-400'
-            "
-            class="hover:bg-uigreen-900 dark:hover:bg-uigreen-900 dark:text-white"
-            @click="fetchData(1, 2)"
-          />
-          <UButton
-            label="Agricultural Produce"
-            block
-            :class="currentCategory === 3 ? 'bg-uigreen-700 dark:bg-uigreen-800 text-white ring-1 ring-uigreen-200' : 'bg-transparent dark:bg-transparent text-uigreen-400'"
-            class="hover:bg-uigreen-900 dark:hover:bg-uigreen-900 dark:text-white"
-            @click="fetchData(1, 3)"
-          />
-        </div>
-      </UCard>
-    </div>
-    <div class="relative sm:col-span-2 lg:col-span-3">
-      <UCard class="mb-4 bg-white dark:bg-uigreen-300 border border-uiearth-200">
-        <div
-          class="flex items-center justify-between flex-col sm:flex-row gap-3"
+  <div class="grid gap-4 lg:grid-cols-[240px_1fr]">
+    <aside class="h-fit rounded-2xl border border-uimuted-200 bg-white p-4">
+      <div class="mb-2 text-[11px] font-bold uppercase tracking-wider text-uimuted-400">Category</div>
+      <div class="flex flex-col gap-1">
+        <button
+          v-for="c in [
+            { id: 1, label: 'Solid Minerals', dot: '#64748B' },
+            { id: 2, label: 'Energy Resource', dot: '#FC8813' },
+            { id: 3, label: 'Agricultural Produce', dot: '#0ABF98' },
+          ]"
+          :key="c.id"
+          type="button"
+          class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13.5px]"
+          :class="currentCategory === c.id ? 'bg-uigreen-600 font-semibold text-white' : 'text-uimuted-700 hover:bg-uimuted-50'"
+          @click="fetchData(1, c.id)"
         >
-          <UInput
-            v-model="q"
-            color="uiearth"
-            class="bg-uimuted-300 dark:bg-uimuted-800 text-uiearth-400 rounded-md"
-            icon="i-heroicons-magnifying-glass-20-solid"
-            placeholder="Search for resource"
-          />
-          <div class="flex items-center gap-4 mt-4 sm:mt-2">
-            <UButton
-              icon="i-heroicons-chevron-left"
-              color="uiearth"
-              class="!text-white"
-              :disabled="currentPage === 1"
-              @click="fetchData(currentPage - 1, currentCategory)"
-            >
-              Previous
-            </UButton>
-            <span class="text-md px-3"
-              >Page <strong class="text-uigreen-500">{{ currentPage }}</strong> of <strong class="text-uigreen-500">{{ totalPages }}</strong></span
-            >
-            <UButton
-              icon="i-heroicons-chevron-right"
-              color="uiearth"
-              trailing
-              class="!text-white"
-              :disabled="currentPage === totalPages"
-              @click="fetchData(currentPage + 1, currentCategory)"
-            >
-              Next
-            </UButton>
-          </div>
+          <span class="h-2.5 w-2.5 rounded-full" :style="{ background: c.dot }" />
+          {{ c.label }}
+        </button>
+      </div>
+    </aside>
+
+    <div>
+      <div class="mb-4 flex flex-col items-center justify-between gap-3 rounded-2xl border border-uimuted-200 bg-white p-4 sm:flex-row">
+        <UInput
+          v-model="q"
+          icon="i-heroicons-magnifying-glass-20-solid"
+          placeholder="Search for resource"
+          class="w-full sm:w-72"
+        />
+        <div class="flex items-center gap-3">
+          <UButton
+            icon="i-heroicons-chevron-left"
+            color="gray"
+            variant="soft"
+            :disabled="currentPage === 1"
+            @click="fetchData(currentPage - 1, currentCategory)"
+          >
+            Previous
+          </UButton>
+          <span class="text-[13px] text-uimuted-500">
+            Page <strong class="text-uimuted-900">{{ currentPage }}</strong> of
+            <strong class="text-uimuted-900">{{ totalPages }}</strong>
+          </span>
+          <UButton
+            icon="i-heroicons-chevron-right"
+            color="gray"
+            variant="soft"
+            trailing
+            :disabled="currentPage === totalPages"
+            @click="fetchData(currentPage + 1, currentCategory)"
+          >
+            Next
+          </UButton>
         </div>
-      </UCard>
-      <div class="grid sm:grid-cols-4 lg:grid-cols-6 gap-4">
-        <div v-for="(r, index) in filteredData" :key="index" class="col-span-2">
-          <UCard class="dark:bg-uigreen-600 border border-uigreen-700 dark:border-uigreen-200 shadow-lg">
-            <div class="relative rounded-lg">
-              <NuxtImg
-                :src="r.imageUrl"
-                :alt="r.name"
-                referrerpolicy="no-referrer"
-                class="w-full h-[200px] object-cover rounded-lg"
-              />
-            </div>
-            <div class="mt-3">
-              <h3
-                class="font-medium mb-1 text-uigreen-800 dark:text-white truncate"
-              >
-                {{ r.name }}
-              </h3>
-              <p class="text-xs font-normal text-uimuted-800">
-                <span
-                  v-for="(category, catIndex) in r.categories"
-                  :key="catIndex"
-                >
-                  {{ category.category.name }}
-                  <span v-if="catIndex < r.categories.length - 1">, </span>
-                </span>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <NuxtLink
+          v-for="r in filteredData"
+          :key="r.id"
+          :to="`/resource-data/${r.id}/?resource=${r.name}`"
+          class="group overflow-hidden rounded-2xl border border-uimuted-200 bg-white hover:border-uigreen-500"
+        >
+          <NuxtImg
+            :src="r.imageUrl"
+            :alt="r.name"
+            referrerpolicy="no-referrer"
+            class="h-[180px] w-full bg-[#EBEFE7] object-cover"
+          />
+          <div class="flex items-center justify-between gap-2 p-4">
+            <div class="min-w-0">
+              <h3 class="truncate text-[14px] font-semibold text-uimuted-950">{{ r.name }}</h3>
+              <p class="truncate text-xs text-uimuted-500">
+                {{ r.categories.map((c) => c.category.name).join(", ") }}
               </p>
             </div>
-            <div class="mt-2">
-              <UButton
-                label="View"
-                icon="i-heroicons-chevron-right"
-                block
-                trailing
-                :to="`/resource-data/${r.id}/?resource=${r.name}`"
-                :color="viewButtonClass"
-              />
-            </div>
-          </UCard>
-        </div>
+            <UIcon
+              name="i-heroicons-chevron-right-20-solid"
+              class="h-4 w-4 flex-shrink-0 text-uimuted-400 group-hover:text-uigreen-600"
+            />
+          </div>
+        </NuxtLink>
       </div>
     </div>
   </div>

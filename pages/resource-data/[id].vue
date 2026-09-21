@@ -7,9 +7,7 @@ const loadingStore = useLoadingStore();
 const route = useRoute();
 const router = useRouter();
 
-definePageMeta({
-  layout: "main-layout",
-});
+definePageMeta({ layout: false });
 
 useHead({
   title: "Resource Data",
@@ -41,13 +39,12 @@ const columns = [
 ];
 
 const q = ref("");
-const search = ref("");
 const fetching = ref(false);
 const rowData = ref([] as LgaResource[]);
 const page = ref(1);
 const pageCount = ref(10);
 const pageTotal = computed(() => filteredData.value.length);
-const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
+const pageFrom = computed(() => (pageTotal.value ? (page.value - 1) * pageCount.value + 1 : 0));
 const pageTo = computed(() =>
   Math.min(page.value * pageCount.value, pageTotal.value)
 );
@@ -57,11 +54,14 @@ const tableColumns = computed(() =>
   columns.filter((column) => selectedColumns.value.includes(column))
 );
 
-const selectedStatus = ref([]);
 const resetFilters = () => {
-  search.value = "";
-  selectedStatus.value = [];
+  q.value = "";
 };
+
+// A new filter or page size can leave the current page past the end.
+watch([q, pageCount], () => {
+  page.value = 1;
+});
 
 const filteredData = computed(() => {
   if (!q.value) {
@@ -81,6 +81,7 @@ const paginatedFilteredData = computed(() => {
 });
 
 const fetchData = async () => {
+  fetching.value = true;
   loadingStore.showLoading();
   try {
     const api = useApiClient();
@@ -95,6 +96,7 @@ const fetchData = async () => {
   } catch (error) {
     console.log(error);
   } finally {
+    fetching.value = false;
     loadingStore.hideLoading();
   }
 };
@@ -105,131 +107,98 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mx-auto w-full">
-    <main class="pt-20">
-      <div class="">
-        <UCard
-          :ui="{
-            base: 'mb-4',
-            divide: 'divide-y divide-uiearth-700 dark:divide-uiearth-800',
-            ring: 'ring-1 ring-uiearth-200 dark:ring-uiearth-800',
-            body: {
-              base: 'text-uigreen-400 rounded-t-lg dark:bg-uicream-50',
-              padding: 'p-3 sm:p-6',
-            },
-            footer: {
-              base: 'bg-uigreen-100 dark:bg-uicream-100 rounded-b-lg',
-              background: '',
-              padding: 'px-2 pt-2 pb-2 sm:px-2',
-            },
-          }"
-          class="bg-white ring-1 ring-uigreen-700"
-        >
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <button
-                  class="flex size-10 items-center justify-center"
-                  @click="router.go(-1)"
-                >
-                  <div class="relative size-5 scale-90">
-                    <span
-                      class="bg-uigreen-500 absolute block h-0.5 w-full transition-all duration-300 -rotate-45 rtl:rotate-45 max-w-[75%] top-1"
-                    />
-                    <span
-                      class="bg-uigreen-500 absolute top-1/2 block h-0.5 w-full max-w-[50%] transition-all duration-300 opacity-0 translate-x-4 rtl:-translate-x-4"
-                    />
-                    <span
-                      class="bg-uigreen-500 absolute block h-0.5 w-full transition-all duration-300 rotate-45 rtl:-rotate-45 max-w-[75%] bottom-1"
-                    />
-                  </div>
-                </button>
-                <div>
-                  <h4 class="text-xl mb-2">Resource Locations</h4>
-                  <p class="text-lg font-bold">{{ route.query.resource }}</p>
-                </div>
-              </div>
-              <div class="flex">
-                <UButton
-                  color="uiyellow"
-                  variant="ghost"
-                  icon="i-heroicons-arrow-path-20-solid"
-                  class="mr-3"
-                  :loading="fetching"
-                  @click="fetchData()"
-                />
-                <UButton
-                  color="uiyellow"
-                  variant="outline"
-                  label="More"
-                  trailing-icon="i-heroicons-chevron-down-20-solid"
-                />
-              </div>
-            </div>
-          </template>
+  <div class="flex min-h-screen flex-col bg-uimuted-50">
+    <AppHeader active="resource-data" />
 
-          <div class="flex items-center justify-between gap-3 px-4 py-3 mb-4">
-            <UInput
-              v-model="q"
-              icon="i-heroicons-magnifying-glass-20-solid"
-              placeholder="Search..."
+    <main class="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-4 px-4 py-6 md:px-8 md:py-7">
+      <!-- Title row -->
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            class="flex h-10 w-10 items-center justify-center rounded-[10px] border border-uimuted-200 bg-white text-uimuted-600 hover:bg-uimuted-50"
+            aria-label="Back"
+            @click="router.go(-1)"
+          >
+            <UIcon name="i-heroicons-arrow-left-20-solid" class="h-4 w-4" />
+          </button>
+          <div>
+            <div class="text-[12px] font-semibold uppercase tracking-wider text-uimuted-500">
+              Resource Locations
+            </div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-uimuted-950">
+              {{ route.query.resource }}
+            </h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="rounded-full bg-uigreen-50 px-3 py-1 text-[12px] font-semibold text-uigreen-700">
+            {{ rowData.length }} locations
+          </span>
+          <UButton
+            variant="ghost"
+            color="gray"
+            icon="i-heroicons-arrow-path-20-solid"
+            :loading="fetching"
+            aria-label="Refresh"
+            @click="fetchData()"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col overflow-hidden rounded-2xl border border-uimuted-200 bg-white">
+        <div class="flex flex-wrap items-center gap-3 border-b border-uimuted-100 px-5 py-4">
+          <UInput
+            v-model="q"
+            icon="i-heroicons-magnifying-glass-20-solid"
+            placeholder="Search locations…"
+            class="w-full sm:w-72"
+          />
+          <div class="ml-auto flex items-center gap-2 text-[12.5px] text-uimuted-500">
+            Rows
+            <USelect
+              v-model="pageCount"
+              :options="[5, 10, 20, 30, 40]"
+              size="xs"
+              class="w-16"
             />
-          </div>
-
-          <div class="flex justify-between items-center w-full px-4 py-3 mb-4">
-            <div class="flex items-center gap-1.5">
-              <span class="text-sm leading-5">Rows per page:</span>
-
-              <USelect
-                v-model="pageCount"
-                :options="[3, 5, 10, 20, 30, 40]"
-                class="me-2 w-20"
-                size="xs"
-              />
-            </div>
-
-            <div class="flex gap-1.5 items-center">
-              <USelectMenu v-model="selectedColumns" :options="columns" multiple>
-                <UButton icon="i-heroicons-view-columns" color="gray" size="xs">
-                  Columns
-                </UButton>
-              </USelectMenu>
-
-              <UButton
-                icon="i-heroicons-funnel"
-                color="gray"
-                size="xs"
-                :disabled="q === '' && selectedStatus.length === 0"
-                @click="resetFilters"
-              >
-                Reset
+            <USelectMenu v-model="selectedColumns" :options="columns" multiple>
+              <UButton icon="i-heroicons-view-columns" color="gray" size="xs">
+                Columns
               </UButton>
-            </div>
+            </USelectMenu>
+            <UButton
+              icon="i-heroicons-funnel"
+              color="gray"
+              size="xs"
+              :disabled="q === ''"
+              @click="resetFilters"
+            >
+              Reset
+            </UButton>
           </div>
+        </div>
 
+        <div>
           <UTable
             :rows="paginatedFilteredData"
             :columns="tableColumns"
             class="w-full"
             :ui="{
-              table: 'table-relative',
-              tbody: 'divide-y divide-uiearth-500 dark:divide-uiearth-700',
-              tr: {
-                base: 'whitespace-nowrap',
-                padding: 'px-4 py-4',
-                color: 'text-uigreen-500 dark:text-uigreen-400',
-                font: '',
-                size: 'text-sm',
+              wrapper: 'relative overflow-x-auto',
+              divide: 'divide-y divide-uimuted-100',
+              thead: 'bg-uimuted-50',
+              tbody: 'divide-y divide-uimuted-100',
+              th: {
+                padding: 'px-5 py-3',
+                color: 'text-uimuted-500',
+                font: 'text-[11px] font-bold uppercase tracking-wider',
               },
               td: {
                 base: 'whitespace-nowrap',
-                padding: 'px-4 py-4',
-                color: 'text-uigreen-500 dark:text-uigreen-400',
-                font: '',
-                size: 'text-sm',
-              },
-              default: {
-                checkbox: { color: 'uiyellow', base: 'hidden md:block' },
+                padding: 'px-5 py-3.5',
+                color: 'text-uimuted-700',
+                size: 'text-[13.5px]',
               },
             }"
           >
@@ -254,38 +223,28 @@ onMounted(async () => {
             <template #locationLat-data="{ row }">
               <span>{{ row.locationLat ? row.locationLat : 'N/A' }}</span>
             </template>
+            <template #empty-state>
+              <div class="py-10 text-center text-sm text-uimuted-500">No locations found.</div>
+            </template>
           </UTable>
+        </div>
 
-          <template #footer>
-            <div class="flex flex-wrap items-center justify-between">
-              <div>
-                <span class="text-sm leading-5">
-                  Showing
-                  <span class="font-medium">{{ pageFrom }}</span>
-                  to
-                  <span class="font-medium">{{ pageTo }}</span>
-                  of
-                  <span class="font-medium">{{ pageTotal }}</span>
-                  results
-                </span>
-              </div>
-              <UPagination
-                v-model="page"
-                :page-count="pageCount"
-                :total="filteredData.length"
-                :ui="{
-                  wrapper: 'flex items-center gap-1',
-                  default: {
-                    activeButton: {
-                      variant: 'outline',
-                      color: 'uired',
-                    },
-                  },
-                }"
-              />
-            </div>
-          </template>
-        </UCard>
+        <div
+          class="flex flex-wrap items-center justify-between gap-2 border-t border-uimuted-100 bg-uimuted-50 px-5 py-3.5"
+        >
+          <span class="text-[12.5px] text-uimuted-500">
+            Showing <strong class="text-uimuted-800">{{ pageFrom }}</strong> to
+            <strong class="text-uimuted-800">{{ pageTo }}</strong> of
+            <strong class="text-uimuted-800">{{ pageTotal }}</strong> results
+          </span>
+          <UPagination
+            v-model="page"
+            :page-count="pageCount"
+            :total="pageTotal"
+            :ui="{ wrapper: 'flex items-center gap-1' }"
+            :active-button="{ variant: 'solid', color: 'uigreen' }"
+          />
+        </div>
       </div>
     </main>
   </div>
