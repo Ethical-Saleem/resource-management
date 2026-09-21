@@ -71,6 +71,7 @@ export default <Partial<Config>>{
             950: '#3E1B0C'
         },
         uimuted: {
+          50: "rgb(248 250 252)",
           100: "rgb(241, 245, 249)",
           200: "rgb(226 232 240)",
           300: "rgb(203 213 225)",

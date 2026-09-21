@@ -40,10 +40,18 @@ export const useApiClient = (): Client<paths> => {
 export const unwrap = <T = any>({
   data,
   error,
+  response,
 }: {
   data?: unknown;
   error?: unknown;
+  response?: { status: number };
 }): T => {
+  // 423 Locked: the licence gate suspended the API. Send the user to the
+  // key-entry page instead of surfacing a generic failure.
+  if (response?.status === 423 && import.meta.client) {
+    navigateTo("/license");
+    throw new Error("Application is locked.");
+  }
   if (error) {
     const message =
       typeof error === "object" && error && "message" in error

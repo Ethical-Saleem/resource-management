@@ -5,6 +5,7 @@ defineProps<{
 </script>
 
 <template>
+  <LicenseBanner />
   <header class="flex h-16 flex-shrink-0 items-center justify-between border-b border-uimuted-200 bg-white px-4 md:px-6">
     <div class="flex items-center gap-3">
       <div class="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-[10px] bg-uigreen-600">

@@ -2,6 +2,15 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  // The redesigned pages are light-only; without this, Nuxt UI inputs and
+  // buttons follow the OS dark preference and clash with the white cards.
+  // A new storageKey also drops any "system"/"dark" value saved earlier.
+  colorMode: {
+    preference: "light",
+    fallback: "light",
+    storageKey: "nrmis-color-mode",
+  },
+
   modules: [
     "@nuxt/ui",
     "@nuxt/fonts",
